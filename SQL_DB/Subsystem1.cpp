@@ -1,13 +1,16 @@
 #include "Subsystem1.h"
 
-Rel_Info Subsystem1_Manager::lookup_Rel(string RelName)
+Subsystem1_Manager Subsystem1_Manager::BASE;
+
+
+bool Subsystem1_Manager::lookup_Rel(string RelName, Rel_Info& rel)
 {
-	return Rel_Info();
+	return false;
 }
 
-Attr_Info Subsystem1_Manager::lookup_Attr(string RelName, string AttrName)
+bool Subsystem1_Manager::lookup_Attr(string RelName, string AttrName, Attr_Info& attr)
 {
-	return Attr_Info();
+	return false;
 }
 
 vector<Attr_Info> Subsystem1_Manager::lookup_Attrs(string RelName)
@@ -20,10 +23,11 @@ bool* Subsystem1_Manager::lookup_Authority(string RelName, string UserName)
 	return nullptr;
 }
 
-Index_Info Subsystem1_Manager::lookup_Index(string RelName, string AttrName)
+bool Subsystem1_Manager::lookup_Index(string RelName, string AttrName, Index_Info& Index)
 {
-	return Index_Info();
+	return false;
 }
+
 
 vector<Index_Info> Subsystem1_Manager::lookup_Indexes(string RelName)
 {
@@ -61,7 +65,8 @@ char* Scan_Reader::get_Next_Record_with_RID(RID& rid)
 	return nullptr;
 }
 
-Index_Reader::Index_Reader(string RelName, Index_Info Index, char* MIN, char* MAX)
+
+Index_Reader::Index_Reader(string RelName, Index_Info Index, bool MIN_E, char* MIN, bool MAX_E, char* MAX)
 {
 }
 
