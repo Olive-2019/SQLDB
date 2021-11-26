@@ -142,6 +142,10 @@
     <ClInclude Include="global.h" />
     <ClInclude Include="Subsystem1.h" />
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="global.cpp" />
+    <ClCompile Include="Subsystem1.cpp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

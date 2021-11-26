@@ -8,8 +8,18 @@ using namespace std;
 
 const int MAX_NAME_LENGTH = 20;    //各种名字如数据表名、字段名等最大长度
 
-string Current_DB;
-string Current_User;
+
+class Global_Paras {  //用于存放一些全局变量，如当前数据库、用户等，不可实例化
+private:
+	Global_Paras();
+
+public:
+	static string Current_DB;
+	static string Current_User;
+
+	static int Block_Size;	
+};
+
 
 
 struct RID {
