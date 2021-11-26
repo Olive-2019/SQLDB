@@ -14,7 +14,7 @@ void Optimizer::generate_execution_plan()
         Execution_Plan Plan;
         string RelName = Rels[i].Rel_Name;
         Plan.Rel = Rels[i];
-        /*检查在该表上的一元条件*/
+        /*检查在该表上的一元条件1*/
         for (int j = 0; j < Conds.size(); j++) {
             if (IsBinary(Conds[i])) continue;
             if (RelName != Conds[i].lhsAttr.relname) continue;
