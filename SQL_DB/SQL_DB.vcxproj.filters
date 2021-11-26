@@ -30,6 +30,30 @@
     <ClInclude Include="Subsystem1.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="parser\parser.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\parser_common.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\parser_interp.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\parser_lexer.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\parser_node.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\parser_syntaxtree.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\parser_token.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\redbase.h">
+      <Filter>parser</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Subsystem1.cpp">
@@ -37,6 +61,27 @@
     </ClCompile>
     <ClCompile Include="global.cpp">
       <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="parser\parser.cpp">
+      <Filter>parser</Filter>
+    </ClCompile>
+    <ClCompile Include="parser\parser_interp.cpp">
+      <Filter>parser</Filter>
+    </ClCompile>
+    <ClCompile Include="parser\parser_lexer.cpp">
+      <Filter>parser</Filter>
+    </ClCompile>
+    <ClCompile Include="parser\parser_node.cpp">
+      <Filter>parser</Filter>
+    </ClCompile>
+    <ClCompile Include="parser\parser_scan.cpp">
+      <Filter>parser</Filter>
+    </ClCompile>
+    <ClCompile Include="parser\parser_syntaxtree.cpp">
+      <Filter>parser</Filter>
+    </ClCompile>
+    <ClCompile Include="parser\parser_token.cpp">
+      <Filter>parser</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
