@@ -10,6 +10,8 @@ public:
 	//查找属性
 	Attr_Info lookup_Attr(string RelName, string AttrName);
 
+	string lookup_distribution(string RelName, string AttrName);
+
 	//查找所有属性
 	vector<Attr_Info> lookup_Attrs(string RelName);
 

@@ -54,6 +54,15 @@
     <ClInclude Include="parser\redbase.h">
       <Filter>parser</Filter>
     </ClInclude>
+    <ClInclude Include="optimizer\optimizer.h">
+      <Filter>optimizer</Filter>
+    </ClInclude>
+    <ClInclude Include="executor\executor.h">
+      <Filter>executor</Filter>
+    </ClInclude>
+    <ClInclude Include="RECORD.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Subsystem1.cpp">
@@ -82,6 +91,18 @@
     </ClCompile>
     <ClCompile Include="parser\parser_token.cpp">
       <Filter>parser</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="optimizer\optimizer.cpp">
+      <Filter>optimizer</Filter>
+    </ClCompile>
+    <ClCompile Include="executor\executor.cpp">
+      <Filter>executor</Filter>
+    </ClCompile>
+    <ClCompile Include="RECORD.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

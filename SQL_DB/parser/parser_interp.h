@@ -38,7 +38,6 @@ struct Condition {
 	Value    rhsValue;   //ÓÒ±ßµÄÖµ
 
 	friend std::ostream &operator<<(std::ostream &s, const Condition &c);
-
 };
 
 int interp(NODE *n);
