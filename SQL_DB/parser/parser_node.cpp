@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+
 #include "parser_node.h"
 
 #define MAXNODE 100

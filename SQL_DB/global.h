@@ -56,7 +56,7 @@ enum Authority {
 	SELECT,INSERT,DELETE,UPDATE
 };
 enum IndexType {
-	CLUSTER,NORMAL
+	CLUSTER_INDEX,NORMAL_INDEX
 };
 
 

@@ -25,9 +25,9 @@ struct AggRelAttr {
 };
 
 struct RelAttr {
-	string relname;
-	string attrname;
-	friend std::ostream &operator<<(std::ostream &s, const RelAttr &ra);
+	char* relname;
+	char* attrname;
+	friend std::ostream& operator<<(std::ostream& s, const RelAttr& ra);
 };
 
 struct Condition {

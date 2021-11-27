@@ -1,6 +1,6 @@
 #ifndef PARSER_NODE_H
 #define PARSER_NODE_H
-
+#include "../global.h"
 #include "redbase.h"
 
 enum NODEKIND {

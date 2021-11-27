@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "redbase.h"
+#include "../global.h"
 #include "parser_node.h"
 #include "parser_interp.h"
 

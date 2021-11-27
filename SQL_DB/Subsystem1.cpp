@@ -51,9 +51,10 @@ void Subsystem1_Manager::Update_Record(string RelName, RID rid, Attr_Info attr, 
 {
 }
 
-Scan_Reader::Scan_Reader(string RelName)
-{
-}
+//Scan_Reader::Scan_Reader(string RelName)
+//{
+//
+//}
 
 char* Scan_Reader::get_Next_Record()
 {
