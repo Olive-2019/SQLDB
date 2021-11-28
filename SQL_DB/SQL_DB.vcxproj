@@ -141,6 +141,7 @@
   <ItemGroup>
     <ClInclude Include="executor\executor.h" />
     <ClInclude Include="global.h" />
+    <ClInclude Include="optimizer\estimator.h" />
     <ClInclude Include="optimizer\optimizer.h" />
     <ClInclude Include="parser\parser.h" />
     <ClInclude Include="parser\parser_common.h" />
@@ -157,6 +158,7 @@
     <ClCompile Include="executor\executor.cpp" />
     <ClCompile Include="global.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="optimizer\estimator.cpp" />
     <ClCompile Include="optimizer\optimizer.cpp" />
     <ClCompile Include="parser\parser.cpp" />
     <ClCompile Include="parser\parser_interp.cpp" />

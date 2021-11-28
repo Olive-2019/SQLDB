@@ -8,6 +8,8 @@ using namespace std;
 
 const int MAX_NAME_LENGTH = 20;    //各种名字如数据表名、字段名等最大长度
 
+
+
 enum Distribution_Type {
 	//正态分布
 	NORMAL

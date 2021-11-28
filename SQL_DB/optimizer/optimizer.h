@@ -1,17 +1,8 @@
 #pragma once
 #include "../global.h"
 #include "../parser/parser_interp.h"
+#include "estimator.h"
 
-enum select_type {
-	SIMPLE, UNION, PRIMARY, SUBQUERY, DERIVED, UNION_RESULT
-};
-
-struct Execution_Plan {
-	Rel_Info Rel;
-	vector<Index_Info> Index;
-	vector<Condition> Conds;//一元条件
-	select_type type;
-};
 
 class Optimizer {
 
@@ -31,11 +22,9 @@ private:
 	bool lookup_Index(string RelName, string AttrName, Index_Info& index);
 	void generate_execution_plan();
 	void generate_link_order();
-	int estimate_order_lost(vector<int> Order);
-	int estimate_link_lost(Execution_Plan Plan1, Execution_Plan Plan2, vector<Condition> Cond);
-	int Scan_Lost(Execution_Plan Plan);
-	int estimate_scan_lost(Execution_Plan Plan);
-	int estimate_record_num(Execution_Plan Plan);
+
+
+
 	//是否二元条件
 	bool IsBinary(Condition cond); 
 

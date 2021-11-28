@@ -63,6 +63,9 @@
     <ClInclude Include="RECORD.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="optimizer\estimator.h">
+      <Filter>optimizer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Subsystem1.cpp">
@@ -103,6 +106,9 @@
     </ClCompile>
     <ClCompile Include="RECORD.cpp">
       <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="optimizer\estimator.cpp">
+      <Filter>optimizer</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
