@@ -31,7 +31,8 @@ private:
 	int estimate_order_lost(vector<int> Order);
 	int estimate_link_lost(Execution_Plan Plan1, Execution_Plan Plan2, vector<Condition> Cond);
 	int Scan_Lost(Execution_Plan Plan);
-
+	int estimate_scan_lost(Execution_Plan Plan);
+	int estimate_record_num(Execution_Plan Plan);
 	//是否二元条件
 	bool IsBinary(Condition cond); 
 
