@@ -38,7 +38,7 @@ int Optimizer::estimate_order_lost(vector<int> Order)
 
 int Optimizer::estimate_link_lost(Execution_Plan Plan1, Execution_Plan Plan2, vector<Condition> Cond)
 {
-
+    cout << "xxxx";
 
 
     return 0;
