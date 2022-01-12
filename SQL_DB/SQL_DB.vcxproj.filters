@@ -22,6 +22,9 @@
     <Filter Include="parser">
       <UniqueIdentifier>{2ca34379-fda6-4b50-ba80-dcb0731ca617}</UniqueIdentifier>
     </Filter>
+    <Filter Include="transaction">
+      <UniqueIdentifier>{c63a8f83-dc32-42cc-b7f5-8d38ab62e918}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="global.h">
@@ -64,6 +67,57 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="optimizer\estimator.h">
+      <Filter>optimizer</Filter>
+    </ClInclude>
+    <ClInclude Include="Query_Executor.h">
+      <Filter>executor</Filter>
+    </ClInclude>
+    <ClInclude Include="optimizer\DP_Link_Order_Affirmant.h">
+      <Filter>optimizer</Filter>
+    </ClInclude>
+    <ClInclude Include="optimizer\Link_Order_Affirmant.h">
+      <Filter>optimizer</Filter>
+    </ClInclude>
+    <ClInclude Include="optimizer\PSO_Link_Order_Affirmant.h">
+      <Filter>optimizer</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Exclusive_Lock.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="transaction\Exclusive_Lock.h">
+      <Filter>transaction</Filter>
+    </ClInclude>
+    <ClInclude Include="transaction\Lock.h">
+      <Filter>transaction</Filter>
+    </ClInclude>
+    <ClInclude Include="transaction\Log.h">
+      <Filter>transaction</Filter>
+    </ClInclude>
+    <ClInclude Include="transaction\Log_Manager.h">
+      <Filter>transaction</Filter>
+    </ClInclude>
+    <ClInclude Include="transaction\Redo_Log.h">
+      <Filter>transaction</Filter>
+    </ClInclude>
+    <ClInclude Include="transaction\Shared_Lock.h">
+      <Filter>transaction</Filter>
+    </ClInclude>
+    <ClInclude Include="transaction\Transaction.h">
+      <Filter>transaction</Filter>
+    </ClInclude>
+    <ClInclude Include="transaction\Transaction_Manager.h">
+      <Filter>transaction</Filter>
+    </ClInclude>
+    <ClInclude Include="transaction\Undo_Log.h">
+      <Filter>transaction</Filter>
+    </ClInclude>
+    <ClInclude Include="executor\Linker.h">
+      <Filter>executor</Filter>
+    </ClInclude>
+    <ClInclude Include="optimizer\Logical_Tree_Builder.h">
       <Filter>optimizer</Filter>
     </ClInclude>
   </ItemGroup>
@@ -110,5 +164,58 @@
     <ClCompile Include="optimizer\estimator.cpp">
       <Filter>optimizer</Filter>
     </ClCompile>
+    <ClCompile Include="Query_Executor.cpp">
+      <Filter>executor</Filter>
+    </ClCompile>
+    <ClCompile Include="optimizer\DP_Link_Order_Affirmant.cpp">
+      <Filter>optimizer</Filter>
+    </ClCompile>
+    <ClCompile Include="optimizer\Link_Order_Affirmant.cpp">
+      <Filter>optimizer</Filter>
+    </ClCompile>
+    <ClCompile Include="optimizer\PSO_Link_Order_Affirmant.cpp">
+      <Filter>optimizer</Filter>
+    </ClCompile>
+    <ClCompile Include="transaction\Exclusive_Lock.cpp">
+      <Filter>transaction</Filter>
+    </ClCompile>
+    <ClCompile Include="transaction\Lock.cpp">
+      <Filter>transaction</Filter>
+    </ClCompile>
+    <ClCompile Include="transaction\Log.cpp">
+      <Filter>transaction</Filter>
+    </ClCompile>
+    <ClCompile Include="transaction\Log_Manager.cpp">
+      <Filter>transaction</Filter>
+    </ClCompile>
+    <ClCompile Include="transaction\Redo_Log.cpp">
+      <Filter>transaction</Filter>
+    </ClCompile>
+    <ClCompile Include="transaction\Shared_Lock.cpp">
+      <Filter>transaction</Filter>
+    </ClCompile>
+    <ClCompile Include="transaction\Transaction.cpp">
+      <Filter>transaction</Filter>
+    </ClCompile>
+    <ClCompile Include="transaction\Transaction_Manager.cpp">
+      <Filter>transaction</Filter>
+    </ClCompile>
+    <ClCompile Include="transaction\Undo_Log.cpp">
+      <Filter>transaction</Filter>
+    </ClCompile>
+    <ClCompile Include="executor\Linker.cpp">
+      <Filter>executor</Filter>
+    </ClCompile>
+    <ClCompile Include="optimizer\Logical_Tree_Builder.cpp">
+      <Filter>optimizer</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="SQL_DB.rc">
+      <Filter>资源文件</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd" />
   </ItemGroup>
 </Project>

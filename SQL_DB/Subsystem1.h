@@ -9,7 +9,6 @@ private:
 public:
 	static Subsystem1_Manager BASE;
 
-
 	//查找数据表，返回值为是否成功，将结果存放之最后的参数rel中，后面的函数同理
 	bool lookup_Rel(string RelName, Rel_Info& rel);
 
@@ -42,45 +41,32 @@ public:
 };
 
 class Reader {  //一个用于遍历数据表的类
-
 public:
-
 	//获取下一条数据，返回char*为原件的复制
 	virtual char* get_Next_Record() = 0;
-
 	//获取下一条数据，返回char*为原件的复制，rid赋值为该数据的RID
 	virtual char* get_Next_Record_with_RID(RID& rid) = 0;
 };
 
 class Scan_Reader :public Reader {
-
 private:
 	vector<Condition> Conds;
 	//过滤器
 	bool filter(char* record);
-
 public:
-
 	Scan_Reader(string RelName, vector<Condition> Conds);
-
 	//获取下一条数据，返回char*为原件的复制，返回值必须满足filter
 	char* get_Next_Record();
-
 	//获取下一条数据，返回char*为原件的复制，rid赋值为该数据的RID
 	char* get_Next_Record_with_RID(RID& rid);
 };
 
 class Index_Reader :public Reader {
-
 public:
-
 	//MIN/MAX==NULL代表不受限，MIN_E与MAX_E代表能否取等
 	Index_Reader(string RelName, Index_Info Index, bool MIN_E, char* MIN, bool MAX_E, char* MAX);
-
 	//获取下一条数据，返回char*为原件的复制
 	char* get_Next_Record();
-
 	//获取下一条数据，返回char*为原件的复制，rid赋值为该数据的RID
 	char* get_Next_Record_with_RID(RID& rid);
-
 };

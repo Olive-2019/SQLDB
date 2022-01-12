@@ -5,7 +5,7 @@
 #include "../global.h"
 #include "parser_node.h"
 #include "parser_interp.h"
-
+#include "../optimizer/optimizer.h"
 extern bool stop;
 
 #define E_OK                0
@@ -316,7 +316,7 @@ static int mk_agg_rel_attrs(NODE* list, int max, AggRelAttr relAttrs[])
 //
 // mk_relations - 从list中提取出table的名称
 //
-static int mk_relations(NODE *list, int max, vector<string>& relations)
+static int mk_relations(NODE *list, int max, RelInfo* relations)
 {
 	int i;
 	NODE *current;
@@ -324,7 +324,6 @@ static int mk_relations(NODE *list, int max, vector<string>& relations)
 		cout << "无表" << endl;
 		return 0;
 	}
-	relations.clear();
 	/* for each element of the list... */
 	for (i = 0; list != NULL; ++i, list = list->u.LIST.next) {
 		/* If the list is too long then error */
@@ -332,7 +331,7 @@ static int mk_relations(NODE *list, int max, vector<string>& relations)
 			return E_TOOMANY;
 
 		current = list->u.LIST.curr;
-		relations.push_back(current->u.RELATION.relname);
+		relations[i].relname=(current->u.RELATION.relname);
 	}
 	
 	return i;
@@ -342,10 +341,9 @@ static int mk_relations(NODE *list, int max, vector<string>& relations)
 //
 // mk_conditions - 从列表中提取出conditons
 //
-static int mk_conditions(NODE *list, int max, vector<Condition>& conditions)
+static int mk_conditions(NODE *list, int max, Condition* conditions)
 {
 	int i;
-	conditions.clear();
 	NODE *current(NULL);
 	if (!list) return 0;
 	/* for each element of the list... */
@@ -356,7 +354,6 @@ static int mk_conditions(NODE *list, int max, vector<Condition>& conditions)
 
 		current = list->u.LIST.curr;
 		/* 条件构成 -> relname.attrname op relname.attrname */
-		conditions.push_back(Condition());
 		conditions[i].lhsAttr.relname =
 			current->u.CONDITION.lhsRelattr->u.RELATTR.relname;
 		conditions[i].lhsAttr.attrname =
@@ -491,40 +488,40 @@ int interp(NODE *n)
 		case N_QUERY: /* 查询语句 */
 		{
 			int nselattrs = 0;
-			//vector<Attribute> attr;
-			AggRelAttr relAttrs[MAXATTRS];
-
-			int nrelations = 0; /* 表的数目 */ 
-			vector<string> relations; /* 表的名称 */
+			AggRelAttr* relAttrs = new AggRelAttr[MAXATTRS];
+			int nrelations = 0; /* 表的数目 */
+			RelInfo* relations = new RelInfo[MAXATTRS]; /* 表的名称 */
 			int nconditions = 0; /* 条件的数目 */
-			vector<Condition> conditions;
-
+			Condition* conditions = new Condition[MAXCONDS];
 			int order = 0; /* 升序or降序 */
 			RelAttr orderAttr; /* 按照orderAttr来排序 */
-
 			bool group = false;
 			RelAttr groupAttr; /* 按照groupAttr来分组 */
 
 			/* 开始解析所选择的属性 */
-			
 			nselattrs = mk_agg_rel_attrs(n->u.QUERY.relattrlist, MAXATTRS, relAttrs);
-			if (nselattrs < 0) {
-				print_error("select", nselattrs);
-				break;
+			cout << endl << "attrs==" << endl;
+			for (int i = 0; i < nselattrs; i++) {
+				cout << relAttrs[i].relname << " " << relAttrs[i].attrname << endl;
 			}
-
 			/* 开始解析table的名称了 */
 			nrelations = mk_relations(n->u.QUERY.rellist, MAXATTRS, relations);
-			if (nrelations < 0) {
-				print_error("select", nrelations);
-				break;
+			cout << endl << "relations==" << endl;
+			for (int i = 0; i < nrelations; i++) {
+				cout << " " << relations[i].relname << " " << relations[i].nickname << endl;
 			}
-
 			/* 开始解析条件 */
 			nconditions = mk_conditions(n->u.QUERY.conditionlist, MAXCONDS, conditions);
-			if (nconditions < 0) {
-				print_error("select", nconditions);
-				break;
+			for (int i = 0; i < nconditions; i++) {
+				if (conditions[i].bRhsIsAttr) {
+					cout << conditions[i].rhsAttr.relname << "." << conditions[i].rhsAttr.attrname << endl;
+				}
+				else {
+					if (conditions[i].rhsValue.type == FLOAT) {
+						cout << *(double*)conditions[i].rhsValue.data << endl;
+					}
+					else cout << *(int*)conditions[i].rhsValue.data << endl;
+				}
 			}
 
 			/* Make the order by attr suitable for sending to Query */
@@ -532,21 +529,11 @@ int interp(NODE *n)
 			mk_order_relattr(n->u.QUERY.orderrelattr, order, orderAttr);
 
 			/* Make the group by attr suitable for sending to Query */
-			/*mk_rel_attr(n->u.QUERY.grouprelattr, groupAttr);
-			if (groupAttr.attrname.size() != 0)
-				group = true;*/
-			/*vector<Condition> value_condition;
-			vector<Condition> attribute_condition;
-			for (int i = 0; i < conditions.size(); ++i)
-				if (conditions[i].bRhsIsAttr) attribute_condition.push_back(conditions[i]);
-				else value_condition.push_back(conditions[i]);
+			mk_rel_attr(n->u.QUERY.grouprelattr, groupAttr);
+			if (groupAttr.attrname != NULL)
+				group = true;
 
-			optimizer opt(value_condition, relations);
-			opt.create_execution_plan();
-			vector<Execution_plan> eplan = opt.get_execution_plans();
-			executor exe(eplan, attribute_condition, attr);
-			exe.execute();
-			exe.print();*/
+			Optimizer* optimizer = new Optimizer(nrelations, relations, nselattrs, relAttrs, nconditions, conditions);
 
 			break;
 		}

@@ -10,7 +10,10 @@ struct AttrInfo {
 	AttrType type;
 	int len;
 };
-
+struct RelInfo {
+	char* relname;
+	char* nickname;
+};
 struct Value {
 	AttrType type;
 	void* data;

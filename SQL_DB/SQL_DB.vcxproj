@@ -139,10 +139,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Exclusive_Lock.h" />
     <ClInclude Include="executor\executor.h" />
+    <ClInclude Include="executor\Linker.h" />
     <ClInclude Include="global.h" />
+    <ClInclude Include="optimizer\DP_Link_Order_Affirmant.h" />
     <ClInclude Include="optimizer\estimator.h" />
+    <ClInclude Include="optimizer\Link_Order_Affirmant.h" />
+    <ClInclude Include="optimizer\Logical_Tree_Builder.h" />
     <ClInclude Include="optimizer\optimizer.h" />
+    <ClInclude Include="optimizer\PSO_Link_Order_Affirmant.h" />
     <ClInclude Include="parser\parser.h" />
     <ClInclude Include="parser\parser_common.h" />
     <ClInclude Include="parser\parser_interp.h" />
@@ -151,15 +157,31 @@
     <ClInclude Include="parser\parser_syntaxtree.h" />
     <ClInclude Include="parser\parser_token.h" />
     <ClInclude Include="parser\redbase.h" />
+    <ClInclude Include="Query_Executor.h" />
     <ClInclude Include="RECORD.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="Subsystem1.h" />
+    <ClInclude Include="transaction\Exclusive_Lock.h" />
+    <ClInclude Include="transaction\Lock.h" />
+    <ClInclude Include="transaction\Log.h" />
+    <ClInclude Include="transaction\Log_Manager.h" />
+    <ClInclude Include="transaction\Redo_Log.h" />
+    <ClInclude Include="transaction\Shared_Lock.h" />
+    <ClInclude Include="transaction\Transaction.h" />
+    <ClInclude Include="transaction\Transaction_Manager.h" />
+    <ClInclude Include="transaction\Undo_Log.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="executor\executor.cpp" />
+    <ClCompile Include="executor\Linker.cpp" />
     <ClCompile Include="global.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="optimizer\DP_Link_Order_Affirmant.cpp" />
     <ClCompile Include="optimizer\estimator.cpp" />
+    <ClCompile Include="optimizer\Link_Order_Affirmant.cpp" />
+    <ClCompile Include="optimizer\Logical_Tree_Builder.cpp" />
     <ClCompile Include="optimizer\optimizer.cpp" />
+    <ClCompile Include="optimizer\PSO_Link_Order_Affirmant.cpp" />
     <ClCompile Include="parser\parser.cpp" />
     <ClCompile Include="parser\parser_interp.cpp" />
     <ClCompile Include="parser\parser_lexer.cpp" />
@@ -167,8 +189,24 @@
     <ClCompile Include="parser\parser_scan.cpp" />
     <ClCompile Include="parser\parser_syntaxtree.cpp" />
     <ClCompile Include="parser\parser_token.cpp" />
+    <ClCompile Include="Query_Executor.cpp" />
     <ClCompile Include="RECORD.cpp" />
     <ClCompile Include="Subsystem1.cpp" />
+    <ClCompile Include="transaction\Exclusive_Lock.cpp" />
+    <ClCompile Include="transaction\Lock.cpp" />
+    <ClCompile Include="transaction\Log.cpp" />
+    <ClCompile Include="transaction\Log_Manager.cpp" />
+    <ClCompile Include="transaction\Redo_Log.cpp" />
+    <ClCompile Include="transaction\Shared_Lock.cpp" />
+    <ClCompile Include="transaction\Transaction.cpp" />
+    <ClCompile Include="transaction\Transaction_Manager.cpp" />
+    <ClCompile Include="transaction\Undo_Log.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="SQL_DB.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

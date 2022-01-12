@@ -1,6 +1,6 @@
 #include "optimizer.h"
 #include "../Subsystem1.h"
-
+#include "../Subsystem1.h"
 
 bool Optimizer::lookup_Index(string RelName, string AttrName, Index_Info& index)
 {
@@ -36,6 +36,64 @@ void Optimizer::generate_link_order()
 bool Optimizer::IsBinary(Condition cond)
 {
     return cond.bRhsIsAttr;
+}
+
+void Optimizer::init()
+{
+    //区分一元和二元条件
+    vector<Condition> cond_temp;
+    for (int cond_cnt = 0; cond_cnt < Conds.size(); ++cond_cnt)
+        if (Conds[cond_cnt].bRhsIsAttr) Binary_Cond.push_back(Conds[cond_cnt]);
+        else cond_temp.push_back(Conds[cond_cnt]);
+    //装填执行计划
+    for (int plan_cnt = 0; plan_cnt < Rels.size(); ++plan_cnt) {
+        Execution_Plan plan;
+        plan.Rel = Rels[plan_cnt];
+        plan.type = SIMPLE;//先不管外层内层的事
+        vector<Condition>::iterator it = cond_temp.begin();
+        while (it != cond_temp.end()) {
+            if (!strcmp(plan.Rel.Rel_Name, it->lhsAttr.relname)) {
+                plan.Conds.push_back(*it);
+                vector<Condition>::iterator it_temp = it;
+                it++;
+                cond_temp.erase(it_temp);
+                Index_Info index_info;
+                if (lookup_Index(plan.Rel.Rel_Name, it->lhsAttr.attrname, index_info))
+                    plan.Index.push_back(index_info);
+            }
+            else it++;
+        }
+
+    }
+}
+
+Optimizer::Optimizer(int Rel_num, RelInfo* rels, int Attr_num, AggRelAttr* attrs, int Cond_num, Condition* conds)
+{
+    /*
+    警告
+
+    nickname问题未处理，应该先将所有nickname换为原名
+    
+    */
+    {
+        //将语法树中的结构转换为标准结构
+        for (int i = 0; i < Rel_num; i++) {
+            Rel_Info temp;
+            Subsystem1_Manager::BASE.lookup_Rel(rels[i].relname, temp);
+            Rels.push_back(temp);
+        }
+        for (int i = 0; i < Attr_num; i++) {
+            Attr_Info temp;
+            Subsystem1_Manager::BASE.lookup_Attr(attrs[i].relname, attrs[i].attrname, temp);
+            Attrs.push_back(temp);
+        }
+        for (int i = 0; i < Cond_num; i++) {
+            this->Conds.push_back(conds[i]);
+        }
+    }
+    
+    this->Logical_Tree_Root = Logical_Tree_Builder(Rels, Attrs, Conds).get_tree_root();
+
 }
 
 vector<Execution_Plan> Optimizer::get_Link_Order()
