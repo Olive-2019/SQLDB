@@ -33,7 +33,9 @@ struct Link_Lost {
 class Estimator {
 
 private:
-	Estimator();
+	Estimator() {
+
+	}
 	Link_Lost estimate_link_lost_EQ(const Execution_Plan& Plan1, const Execution_Plan& Plan2, const vector<Condition>& Cond);
 	Link_Lost estimate_link_lost_LT(const Execution_Plan& Plan1, const Execution_Plan& Plan2, const vector<Condition>& Cond);
 	Link_Lost estimate_link_lost_GT(const Execution_Plan& Plan1, const Execution_Plan& Plan2, const vector<Condition>& Cond);

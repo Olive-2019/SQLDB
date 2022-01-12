@@ -5,11 +5,8 @@
 #include "../global.h"
 using namespace std;
 
+
 enum Logical_TreeNode_Kind {
-
-};
-
-typedef enum Logical_Tree_NODEKIND {
     /*stmt node tags*/
     PLAN_SELECT,
     PLAN_INSERT,
@@ -28,34 +25,32 @@ typedef enum Logical_Tree_NODEKIND {
     PLAN_LIMIT,
     /*support node tags*/
     PLAN_LIST
-}Logical_Tree_NODEKIND;
+};
 
-typedef struct Logical_TreeNode {
+struct Logical_TreeNode {
 
-    Logical_Tree_NODEKIND kind;
+    Logical_TreeNode_Kind kind;
+    union U{
+        U() {
 
-    union {
+        }
         struct {
             struct Logical_TreeNode* rel;  //数据表
-            Condition* expr_filter; //条件
+            Condition& expr_filter; //条件
         }FILTER;
         struct {
             struct Logical_TreeNode* rel;  //数据表
-            Attr_Info* Attr_list;  //投影字段
+            vector<Attr_Info>& Attr_list;  //投影字段
         }PROJECTION;
         struct {
             struct Logical_TreeNode* left;
             struct Logical_TreeNode* right;
         }JOIN;
-        
         struct {
-            Rel_Info* Rel;  //数据表  
+            Rel_Info& Rel;  //数据表  
         }FILESCAN;   //叶节点
     }u;
-}Logical_TreeNode;
-
-
-
+};
 
 class Logical_Tree_Builder {
 	//将语法树转变为逻辑树
