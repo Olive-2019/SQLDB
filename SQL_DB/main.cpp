@@ -1,5 +1,5 @@
 #include "global.h"
-
+#include "parser/parser.h"
 int main() {
-	cout << "here" << endl;
+	RBparse();
 }

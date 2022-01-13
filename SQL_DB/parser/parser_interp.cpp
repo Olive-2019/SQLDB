@@ -500,29 +500,10 @@ int interp(NODE *n)
 
 			/* 开始解析所选择的属性 */
 			nselattrs = mk_agg_rel_attrs(n->u.QUERY.relattrlist, MAXATTRS, relAttrs);
-			cout << endl << "attrs==" << endl;
-			for (int i = 0; i < nselattrs; i++) {
-				cout << relAttrs[i].relname << " " << relAttrs[i].attrname << endl;
-			}
 			/* 开始解析table的名称了 */
 			nrelations = mk_relations(n->u.QUERY.rellist, MAXATTRS, relations);
-			cout << endl << "relations==" << endl;
-			for (int i = 0; i < nrelations; i++) {
-				cout << " " << relations[i].relname << " " << relations[i].nickname << endl;
-			}
 			/* 开始解析条件 */
 			nconditions = mk_conditions(n->u.QUERY.conditionlist, MAXCONDS, conditions);
-			for (int i = 0; i < nconditions; i++) {
-				if (conditions[i].bRhsIsAttr) {
-					cout << conditions[i].rhsAttr.relname << "." << conditions[i].rhsAttr.attrname << endl;
-				}
-				else {
-					if (conditions[i].rhsValue.type == FLOAT) {
-						cout << *(double*)conditions[i].rhsValue.data << endl;
-					}
-					else cout << *(int*)conditions[i].rhsValue.data << endl;
-				}
-			}
 
 			/* Make the order by attr suitable for sending to Query */
 			/* 开始解析排序属性 */
@@ -532,7 +513,7 @@ int interp(NODE *n)
 			mk_rel_attr(n->u.QUERY.grouprelattr, groupAttr);
 			if (groupAttr.attrname != NULL)
 				group = true;
-
+			cout << "here" << endl;
 			Optimizer* optimizer = new Optimizer(nrelations, relations, nselattrs, relAttrs, nconditions, conditions);
 
 			break;

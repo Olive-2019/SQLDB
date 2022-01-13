@@ -1,33 +1,51 @@
 #include "estimator.h"
-
-Estimator Estimator::estimator;
-
-Link_Lost Estimator::estimate_link_lost_EQ(const Execution_Plan& Plan1, const Execution_Plan& Plan2, const vector<Condition>& Cond)
+#include "../Subsystem1.h"
+double Estimator::estimate()
 {
-    return Link_Lost();
+    Link_Lost lost = estimate_TreeNode_Lost(Root);
+
+    return lost.Disk_Scan_Lost * 0.9 + lost.Memory_Scan_Lost * 0.1;
 }
 
-Link_Lost Estimator::estimate_link_lost_LT(const Execution_Plan& Plan1, const Execution_Plan& Plan2, const vector<Condition>& Cond)
+Link_Lost Estimator::estimate_TreeNode_Lost(Logical_TreeNode* node)
 {
-    return Link_Lost();
-}
+    Link_Lost ret;
+    if (node->kind == Logical_TreeNode_Kind::PLAN_FILESCAN) {
+        Rel_Info temp;
+        Subsystem1_Manager::BASE.lookup_Rel(node->u.FILESCAN.Rel, temp);
+        ret.record_num = temp.Record_Num;
+    }
+    else if (node->kind == Logical_TreeNode_Kind::PLAN_FILTER) {
+        Link_Lost temp = estimate_TreeNode_Lost(node->u.FILTER.rel);
+        ret = temp;
+        /*
+        根据条件以及rel信息确定记录数量，但disk lost应该与表扫描一致
+        注意，filter下方的结点可以是叶节点，也可以是join结点
+        */
 
-Link_Lost Estimator::estimate_link_lost_GT(const Execution_Plan& Plan1, const Execution_Plan& Plan2, const vector<Condition>& Cond)
-{
-    return Link_Lost();
-}
+        if (node->u.FILTER.rel->kind == Logical_TreeNode_Kind::PLAN_FILESCAN) {
+            //根据条件涉及字段的分布信息以及条件信息获取损失
+        }
+        else if (node->u.FILTER.rel->kind == Logical_TreeNode_Kind::PLAN_JOIN) {
+            //根据条件涉及字段的分布信息以及条件信息获取损失
+        }
 
-Link_Lost Estimator::estimate_order_lost(const vector<Execution_Plan>& Plan_Order)
-{
-    return Link_Lost();
-}
+    }
+    else if (node->kind == Logical_TreeNode_Kind::PLAN_JOIN) {
+        Link_Lost tempL = estimate_TreeNode_Lost(node->u.JOIN.left);
+        Link_Lost tempR = estimate_TreeNode_Lost(node->u.JOIN.right);
 
-Link_Lost Estimator::estimate_link_lost(const Execution_Plan& Plan1, const Execution_Plan& Plan2, const vector<Condition>& Cond)
-{
-    
-    return Link_Lost();
-}
+        ret.Disk_Scan_Lost = tempL.Disk_Scan_Lost + tempR.Disk_Scan_Lost;
+        ret.record_num = tempL.record_num * tempR.record_num;
+    }
 
+    else if (node->kind == Logical_TreeNode_Kind::PLAN_PROJ) {
+        Link_Lost temp = estimate_TreeNode_Lost(node->u.PROJECTION.rel);
+        ret = temp;
+    }
+
+    return ret;
+}
 
 Link_Lost Estimator::estimate_scan_lost(const Execution_Plan& Plan)
 {

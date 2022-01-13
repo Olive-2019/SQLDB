@@ -83,6 +83,7 @@ Optimizer::Optimizer(int Rel_num, RelInfo* rels, int Attr_num, AggRelAttr* attrs
             Rels.push_back(temp);
         }
         for (int i = 0; i < Attr_num; i++) {
+            if (strcmp(attrs[i].attrname, "*") == 0) continue;
             Attr_Info temp;
             Subsystem1_Manager::BASE.lookup_Attr(attrs[i].relname, attrs[i].attrname, temp);
             Attrs.push_back(temp);
@@ -91,9 +92,15 @@ Optimizer::Optimizer(int Rel_num, RelInfo* rels, int Attr_num, AggRelAttr* attrs
             this->Conds.push_back(conds[i]);
         }
     }
-    
+    //获取逻辑树
     this->Logical_Tree_Root = Logical_Tree_Builder(Rels, Attrs, Conds).get_tree_root();
+    {
+        //优化逻辑树
 
+        //rewirte
+
+        //确定连接顺序
+    }
 }
 
 vector<Execution_Plan> Optimizer::get_Link_Order()

@@ -1,12 +1,13 @@
 #pragma once
 #include "../optimizer/optimizer.h"
 #include "../RECORD.h"
+#include "../optimizer/Logical_Tree_Builder.h"
 class Executor {
 public:
-	Executor(Optimizer* optimizer);
+	Executor(Logical_TreeNode* Root);
 	void execute();
 private:
-	vector<Execution_Plan> Plans;
+	Logical_TreeNode* Root;
 	void Display();
 	void Insert();
 	void Delete();

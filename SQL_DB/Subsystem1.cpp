@@ -5,11 +5,16 @@ Subsystem1_Manager Subsystem1_Manager::BASE;
 
 bool Subsystem1_Manager::lookup_Rel(string RelName, Rel_Info& rel)
 {
+	string DBName = "test";
+	memcpy(rel.DBName, DBName.c_str(),DBName.size()+1);
+	memcpy(rel.Rel_Name, RelName.c_str(), RelName.size()+1);
+
 	return false;
 }
 
 bool Subsystem1_Manager::lookup_Attr(string RelName, string AttrName, Attr_Info& attr)
 {
+
 	return false;
 }
 

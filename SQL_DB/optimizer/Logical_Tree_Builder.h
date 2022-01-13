@@ -31,34 +31,49 @@ struct Logical_TreeNode {
 
     Logical_TreeNode_Kind kind;
     union U{
-        U() {
 
-        }
-        struct {
+        struct FILTER {
             struct Logical_TreeNode* rel;  //数据表
-            Condition& expr_filter; //条件
+            void* expr_filter; //条件,强制转换为Condition后使用
         }FILTER;
-        struct {
+        struct PROJECTION {
             struct Logical_TreeNode* rel;  //数据表
-            vector<Attr_Info>& Attr_list;  //投影字段
+            int Attr_Num;
+            void* Attr_list;  //投影字段,Attr_Info*
         }PROJECTION;
-        struct {
+        struct JOIN {
             struct Logical_TreeNode* left;
             struct Logical_TreeNode* right;
         }JOIN;
-        struct {
-            Rel_Info& Rel;  //数据表  
+        struct FILESCAN {
+            char* Rel;  //数据表  
         }FILESCAN;   //叶节点
     }u;
 };
+static Logical_TreeNode All_Logical_Tree_Node[100];
+static int All_Logical_Tree_Node_Ptr = 0;
+static Logical_TreeNode* get_logical_tree_node(Logical_TreeNode_Kind kind) {
+    Logical_TreeNode* ret = All_Logical_Tree_Node + All_Logical_Tree_Node_Ptr;
+    All_Logical_Tree_Node_Ptr++;
+    ret->kind = kind;
+    return ret;
+}
+
 
 class Logical_Tree_Builder {
 	//将语法树转变为逻辑树
 private:
     Logical_TreeNode* Root;
+    vector<Rel_Info> Rels;
+    vector<Attr_Info> Attrs;
+    vector<Condition> Conds;
+
 public:
     Logical_Tree_Builder(vector<Rel_Info> Rels, vector<Attr_Info> Attrs, vector<Condition> Conds);
-    Logical_TreeNode* get_tree_root() {
-        return Root;
-    }
+    
+    
+    Logical_TreeNode* get_tree_root();
+    //根据某种连接顺序确定逻辑树，order内部为RelName
+    Logical_TreeNode* get_tree_root_order(vector<string> order);
+    void display();
 };
