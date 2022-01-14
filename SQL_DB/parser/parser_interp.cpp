@@ -513,7 +513,7 @@ int interp(NODE *n)
 			mk_rel_attr(n->u.QUERY.grouprelattr, groupAttr);
 			if (groupAttr.attrname != NULL)
 				group = true;
-			cout << "here" << endl;
+
 			Optimizer* optimizer = new Optimizer(nrelations, relations, nselattrs, relAttrs, nconditions, conditions);
 
 			break;

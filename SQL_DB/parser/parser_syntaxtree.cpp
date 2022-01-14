@@ -404,7 +404,7 @@ bool SyntaxTree::parseCreateDatabase(NODE*& node) {
 	}
 	return false;
 tg:
-	throw GeneralError("阴公，连创建数据库语句都写错！");
+	throw GeneralError("创建数据库语句错误");
 }
 bool SyntaxTree::parseCreateTable(NODE* &node)
 {

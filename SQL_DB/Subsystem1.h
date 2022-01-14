@@ -54,7 +54,7 @@ private:
 	//过滤器
 	bool filter(char* record);
 public:
-	Scan_Reader(string RelName, vector<Condition> Conds= vector<Condition>());
+	Scan_Reader(string RelName, vector<Condition> Conds= vector<Condition>()) {}
 	//获取下一条数据，返回char*为原件的复制，返回值必须满足filter
 	char* get_Next_Record();
 	//获取下一条数据，返回char*为原件的复制，rid赋值为该数据的RID
