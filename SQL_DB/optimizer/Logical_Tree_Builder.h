@@ -30,16 +30,16 @@ enum Logical_TreeNode_Kind {
 struct Logical_TreeNode {
 
     Logical_TreeNode_Kind kind;
+    string RelName;
     union U{
-
         struct FILTER {
             struct Logical_TreeNode* rel;  //数据表
-            void* expr_filter; //条件,强制转换为Condition后使用
+            Condition* expr_filter; //条件,强制转换为Condition后使用
         }FILTER;
         struct PROJECTION {
             struct Logical_TreeNode* rel;  //数据表
             int Attr_Num;
-            void* Attr_list;  //投影字段,Attr_Info*
+            Attr_Info* Attr_list;  //投影字段,Attr_Info*
         }PROJECTION;
         struct JOIN {
             struct Logical_TreeNode* left;

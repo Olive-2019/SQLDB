@@ -50,7 +50,7 @@ Logical_TreeNode* Logical_Tree_Builder::get_tree_root()
 			Logical_TreeNode* leaf = mp_Rel_to_Node[temp.Rel_Name];
 			Logical_TreeNode* node = get_logical_tree_node(Logical_TreeNode_Kind::PLAN_FILTER);
 			node->u.FILTER.rel = leaf;
-			node->u.FILTER.expr_filter = new char[10000];
+			node->u.FILTER.expr_filter = new Condition;
 			memcpy(node->u.FILTER.expr_filter, &(Conds[i]), sizeof(Condition));//利用filter结点替换原本的叶节点
 			node_to_rel_map[node] = node_to_rel_map[leaf];
 			node_to_rel_map.erase(node_to_rel_map.find(leaf));
@@ -76,7 +76,7 @@ Logical_TreeNode* Logical_Tree_Builder::get_tree_root()
 				Logical_TreeNode* Filter_Node = get_logical_tree_node(Logical_TreeNode_Kind::PLAN_FILTER); //两表连接后加一层filter条件
 				Filter_Node->u.FILTER.rel = node;
 				
-				Filter_Node->u.FILTER.expr_filter = new char[10000];
+				Filter_Node->u.FILTER.expr_filter = new Condition;
 				memcpy(Filter_Node->u.FILTER.expr_filter, &Conds[i], sizeof(Condition));
 				//两结点对应关系的合并
 				vector<string> LRel = node_to_rel_map[Lnode], RRel = node_to_rel_map[Rnode];
@@ -93,7 +93,7 @@ Logical_TreeNode* Logical_Tree_Builder::get_tree_root()
 			else {
 				Logical_TreeNode* Filter_Node = get_logical_tree_node(Logical_TreeNode_Kind::PLAN_FILTER); //两表连接后加一层filter条件
 				Filter_Node->u.FILTER.rel = Lnode;
-				Filter_Node->u.FILTER.expr_filter = new char[10000];
+				Filter_Node->u.FILTER.expr_filter = new Condition;
 				memcpy(Filter_Node->u.FILTER.expr_filter, &Conds[i], sizeof(Condition));
 				node_to_rel_map[Filter_Node] = node_to_rel_map[Lnode];
 				node_to_rel_map.erase(node_to_rel_map.find(Lnode));
@@ -131,7 +131,7 @@ Logical_TreeNode* Logical_Tree_Builder::get_tree_root()
 			attrs[i] = Attrs[i];
 		}
 		Root->u.PROJECTION.Attr_Num = Attrs.size();
-		Root->u.PROJECTION.Attr_list = (void*)attrs;
+		Root->u.PROJECTION.Attr_list = attrs;
 	}
 	display();
 	return Root;
@@ -174,7 +174,7 @@ Logical_TreeNode* Logical_Tree_Builder::get_tree_root_order(vector<string> order
 			Logical_TreeNode* leaf = mp_Rel_to_Node[temp.Rel_Name];
 			Logical_TreeNode* node = get_logical_tree_node(Logical_TreeNode_Kind::PLAN_FILTER);
 			node->u.FILTER.rel = leaf;
-			node->u.FILTER.expr_filter = new char[10000];
+			node->u.FILTER.expr_filter = new Condition;
 			memcpy(node->u.FILTER.expr_filter, &(Conds[i]), sizeof(Condition));//利用filter结点替换原本的叶节点
 			mp_Rel_to_Node[Conds[i].lhsAttr.relname] = node;
 		}
@@ -199,7 +199,7 @@ Logical_TreeNode* Logical_Tree_Builder::get_tree_root_order(vector<string> order
 			{
 				Logical_TreeNode* filter_node = get_logical_tree_node(Logical_TreeNode_Kind::PLAN_FILTER);
 				filter_node->u.FILTER.rel = Final;
-				filter_node->u.FILTER.expr_filter = new char[1000];
+				filter_node->u.FILTER.expr_filter = new Condition;
 				memcpy(filter_node->u.FILTER.expr_filter, &Conds[i], sizeof(Condition));
 
 				Final = filter_node;
@@ -214,7 +214,7 @@ Logical_TreeNode* Logical_Tree_Builder::get_tree_root_order(vector<string> order
 		attrs[i] = Attrs[i];
 	}
 	Root->u.PROJECTION.Attr_Num = Attrs.size();
-	Root->u.PROJECTION.Attr_list = (void*)attrs;
+	Root->u.PROJECTION.Attr_list = attrs;
 	display();
 	return Root;
 }

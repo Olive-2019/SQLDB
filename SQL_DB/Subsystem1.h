@@ -31,7 +31,7 @@ public:
 	char* Find_Record_by_RID(RID rid);
 
 	//插入数据
-	void Insert_Reocrd(string RelName, char* record);
+	RID Insert_Reocrd(string RelName, char* record);
 
 	//根据RID删除数据
 	void Delete_Record(string RelName, vector<RID> rids);

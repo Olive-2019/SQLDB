@@ -44,8 +44,9 @@ char* Subsystem1_Manager::Find_Record_by_RID(RID rid)
 	return nullptr;
 }
 
-void Subsystem1_Manager::Insert_Reocrd(string RelName, char* record)
+RID Subsystem1_Manager::Insert_Reocrd(string RelName, char* record)
 {
+	return RID();
 }
 
 void Subsystem1_Manager::Delete_Record(string RelName, vector<RID> rids)
@@ -60,6 +61,7 @@ void Subsystem1_Manager::Update_Record(string RelName, RID rid, Attr_Info attr, 
 //{
 //
 //}
+
 
 char* Scan_Reader::get_Next_Record()
 {
