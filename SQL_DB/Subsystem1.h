@@ -38,6 +38,11 @@ public:
 
 	//根据RID更新数据
 	void Update_Record(string RelName, RID rid, Attr_Info attr, char* new_value);
+
+	//新建数据表
+	void Create_Rel(string RelName, vector<Attr_Info> attrs);
+	//删除数据表
+	void Delete_Rel(string RelName);
 };
 
 class Reader {  //一个用于遍历数据表的类

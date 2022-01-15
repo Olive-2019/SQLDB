@@ -35,7 +35,6 @@ vector<RID> Query_Executor::execute_tree_node_scan(Logical_TreeNode* node, vecto
 {
 	node->RelName = node->u.FILESCAN.Rel;
 
-
 	vector<RID> ret;
 	vector<Attr_Info> attrs = Subsystem1_Manager::BASE.lookup_Attrs(node->u.FILESCAN.Rel);
 	string key;
@@ -57,7 +56,7 @@ vector<RID> Query_Executor::execute_tree_node_scan(Logical_TreeNode* node, vecto
 	}
 	if (hasIndex) {
 		Index_Reader* reader = NULL;
-		//针对当前索引获取
+		//针对当前索引获取reader
 		switch (key_cond->op)
 		{
 		case TOKENKIND::T_EQ:
@@ -81,10 +80,9 @@ vector<RID> Query_Executor::execute_tree_node_scan(Logical_TreeNode* node, vecto
 
 		RID temp;
 		char* record = NULL;
-		attrs = Subsystem1_Manager::BASE.lookup_Attrs(node->u.FILESCAN.Rel);
 		while ((record = reader->get_Next_Record_with_RID(temp)) != NULL) {
 			for (int i = 0; i < cond.size(); ++i)
-				if (!record_cmp((Condition*)cond[i], record, attrs)) continue;
+				if (!record_cmp(cond[i], record, attrs)) continue;
 			ret.push_back(temp);
 		}
 		return ret;
@@ -95,7 +93,7 @@ vector<RID> Query_Executor::execute_tree_node_scan(Logical_TreeNode* node, vecto
 	attrs = Subsystem1_Manager::BASE.lookup_Attrs(node->u.FILESCAN.Rel);
 	while ((record = reader->get_Next_Record_with_RID(temp)) != NULL) {
 		for (int i = 0; i < cond.size(); ++i)
-			if (!record_cmp((Condition*)cond[i], record, attrs)) continue;
+			if (!record_cmp(cond[i], record, attrs)) continue;
 		ret.push_back(temp);
 	}
 	cond.clear();
@@ -110,8 +108,9 @@ vector<RID> Query_Executor::execute_tree_node_filter(Logical_TreeNode* node)
 	node->RelName = node->u.FILTER.rel->RelName;
 	return ret;
 }
-vector<RID> Query_Executor::execute_tree_node_under_filter(Logical_TreeNode* node, vector<Condition*> cond)
+vector<RID> Query_Executor::execute_tree_node_under_filter(Logical_TreeNode* node, vector<Condition*>& cond)
 {
+	cond.push_back(node->u.FILTER.expr_filter);
 	if (node->kind == Logical_TreeNode_Kind::PLAN_FILESCAN) {
 		return execute_tree_node_scan(node->u.FILTER.rel, cond);
 	}
@@ -134,13 +133,44 @@ vector<RID> Query_Executor::execute_tree_node_join(Logical_TreeNode* node, vecto
 
 	vector<Attr_Info> Lattr = Subsystem1_Manager::BASE.lookup_Attrs(node->u.JOIN.left->RelName);
 	vector<Attr_Info> Rattr = Subsystem1_Manager::BASE.lookup_Attrs(node->u.JOIN.right->RelName);
+	int Llength = Lattr.back().Offset + Lattr.back().Length;
+	int Rlength = Rattr.back().Offset + Rattr.back().Length;
+	//新表的属性
+	vector<Attr_Info> new_attr = Lattr;
+	//对新表属性名的修正：加入表名作为前缀
+	if (node->u.JOIN.left->RelName.find('&') == string::npos) {
+		for (int i = 0; i < Lattr.size(); ++i) {
+			char buff[100] = {0};
+			strcpy(buff, node->u.JOIN.left->RelName.c_str());
+			strcat(buff, ".");
+			strcat(buff, new_attr[i].Attr_Name);
+			strcpy(new_attr[i].Attr_Name, buff);
+		}
+	}
+	new_attr.insert(new_attr.end(), Rattr.begin(), Rattr.end());
+	if (node->u.JOIN.right->RelName.find('&') == string::npos) {
+		for (int i = 0; i < Rattr.size(); ++i) {
+			char buff[100] = { 0 };
+			strcpy(buff, node->u.JOIN.right->RelName.c_str());
+			strcat(buff, ".");
+			strcat(buff, new_attr[Lattr.size()+i].Attr_Name);
+			strcpy(new_attr[Lattr.size() + i].Attr_Name, buff);
+		}
+	}
+	//对新表属性offset的修正：第二张表的offset要加上第一张表的length
+	for (int right_index = Lattr.size(); right_index < Lattr.size() + Rattr.size(); ++right_index) 
+		new_attr[right_index].Offset += Llength;
+	//对新表属性所属表名的修正
+	for (int new_attr_index = 0; new_attr_index < new_attr.size(); ++new_attr_index)
+		strcpy(new_attr[new_attr_index].Rel_Name, node->RelName.c_str());
+	//创建新表
+	Subsystem1_Manager::BASE.Create_Rel(node->RelName, new_attr);
 	Rel_Info LRel,RRel;
 	Subsystem1_Manager::BASE.lookup_Rel(node->u.JOIN.left->RelName,LRel);
 	Subsystem1_Manager::BASE.lookup_Rel(node->u.JOIN.right->RelName, RRel);
-	int Llength = Lattr.back().Offset + Lattr.back().Length;
-	int Rlength = Rattr.back().Offset + Rattr.back().Length;
+	
 	/*
-	新建记录，但不插入
+	新建记录，但不插入（注释忘改了？这里貌似是插入了的）
 	筛选 record_cmp(cond[0], record, attrs);
 	插入记录
 	*/
@@ -151,15 +181,20 @@ vector<RID> Query_Executor::execute_tree_node_join(Logical_TreeNode* node, vecto
 			char* right = Subsystem1_Manager::BASE.Find_Record_by_RID(RRID[i]);
 			memcpy(record, left, Llength);
 			memcpy(record + Llength, right, Rlength);
-
-			if (record_cmp(cond[0], record, attrs)) {
-				RID rid=Subsystem1_Manager::BASE.Insert_Reocrd(node->RelName, record);
-				ret.push_back(rid);
+			//不一定只有一个条件的，这里改动了一下
+			bool pass = true;
+			for (int cond_index = 0; cond_index < cond.size(); ++cond_index) {
+				pass = record_cmp(cond[cond_index], record, attrs);
+				if (!pass) break;
 			}
-
+			//没通过检查的话，这一条记录就不插入了。
+			if (!pass) continue;
+			RID rid=Subsystem1_Manager::BASE.Insert_Reocrd(node->RelName, record);
+			ret.push_back(rid);
 		}
 	}
-
+	if (node->u.JOIN.left->RelName.find('&') != string::npos) Subsystem1_Manager::BASE.Delete_Rel(node->u.JOIN.left->RelName);
+	if (node->u.JOIN.right->RelName.find('&') != string::npos) Subsystem1_Manager::BASE.Delete_Rel(node->u.JOIN.right->RelName);
 	return ret;
 }
 vector<RID> Query_Executor::execute_tree_node_proj(Logical_TreeNode* node)
@@ -170,17 +205,50 @@ vector<RID> Query_Executor::execute_tree_node_proj(Logical_TreeNode* node)
 	/*
 	根据投影字段信息新建数据表并进行投影，将ret设为新表的RID
 	*/
+
 	Attr_Info* Proj_Attrs = node->u.PROJECTION.Attr_list;
 	int Proj_Attrs_Num = node->u.PROJECTION.Attr_Num;
 	/*构建新数据表*/
 	vector<Attr_Info> attrs = Subsystem1_Manager::BASE.lookup_Attrs(node->RelName);
+	//对未join过的表的特殊处理
+	if (node->RelName.find('&') == string::npos) {
+		for (int i = 0; i < attrs.size(); ++i) {
+			char buff[50];
+			strcpy(buff, attrs[i].Rel_Name);
+			strcat(buff, ".");
+			strcat(buff, attrs[i].Attr_Name);
+			strcat(attrs[i].Attr_Name, buff);
+		}
+	}
+	vector<Attr_Info> new_attrs;
+	
+	int offset = 0;
+	//记录的是从投影的属性到子节点属性的对应下标
+	vector<int> proj_attr_to_attrs_index;
+	//将投影后的新属性和映射表整理出来
+	for (int proj_attr_index = 0; proj_attr_index < Proj_Attrs_Num; ++proj_attr_index) {
+		Attr_Info tmp = Proj_Attrs[proj_attr_index];
+		strcpy(tmp.Attr_Name, Proj_Attrs[proj_attr_index].Rel_Name);
+		strcat(tmp.Attr_Name, ".");
+		strcat(tmp.Attr_Name, Proj_Attrs[proj_attr_index].Attr_Name);
+		tmp.Offset = offset;
+		offset += tmp.type;
+		strcpy(tmp.Rel_Name, node->RelName.c_str());
+		bool error = true;
+		for (int attr_index = 0; attr_index < attrs.size(); ++attr_index) 
+			if (!strcmp(tmp.Attr_Name, attrs[attr_index].Attr_Name)) {
+				proj_attr_to_attrs_index.push_back(attr_index);
+				error = false;
+				break;
+			}
+		if (error) cout << "投影属性出错" << endl;
+	}
 	for (int i = 0; i < Records.size(); i++) {
 		char* record = Subsystem1_Manager::BASE.Find_Record_by_RID(Records[i]);
-		char* new_record = new char[100];
+		char* new_record = new char[500];
 		for (int j = 0; j < Proj_Attrs_Num; j++) {
-			int offset = Proj_Attrs[j].Offset;
-			int length = Proj_Attrs[j].Length;
-			memcpy(new_record + attrs[j].Offset, record + offset, length);
+			memcpy(new_record + new_attrs[j].Offset, 
+				record + attrs[proj_attr_to_attrs_index[j]].Offset, new_attrs[j].Length);
 		}
 		RID rid = Subsystem1_Manager::BASE.Insert_Reocrd(node->RelName, new_record);
 		ret.push_back(rid);

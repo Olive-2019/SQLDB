@@ -17,10 +17,12 @@ public:
 	vector<RID> execute_tree_node(Logical_TreeNode* node);
 	//对叶节点的执行，conds为一元条件
 	vector<RID> execute_tree_node_scan(Logical_TreeNode* node, vector<Condition*> cond = vector<Condition*>());
+	//对于所有的filter调用的
 	vector<RID> execute_tree_node_filter(Logical_TreeNode* node);
-	vector<RID> execute_tree_node_under_filter(Logical_TreeNode* node, vector<Condition*> cond);
+	//一元的filter，一元条件下沉
+	vector<RID> execute_tree_node_under_filter(Logical_TreeNode* node, vector<Condition*>& cond);
+	//join，对二元条件下沉
 	vector<RID> execute_tree_node_join(Logical_TreeNode* node, vector<Condition*> cond = vector<Condition*>());
+	//投影结点的处理
 	vector<RID> execute_tree_node_proj(Logical_TreeNode* node);
-
-
 };

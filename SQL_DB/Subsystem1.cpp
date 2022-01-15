@@ -12,6 +12,14 @@ bool Subsystem1_Manager::lookup_Rel(string RelName, Rel_Info& rel)
 	return false;
 }
 
+void Subsystem1_Manager::Create_Rel(string RelName, vector<Attr_Info> attrs) {
+	//创建数据表
+	return;
+}
+void Subsystem1_Manager::Delete_Rel(string RelName) {
+	//删除数据表
+	return;
+}
 bool Subsystem1_Manager::lookup_Attr(string RelName, string AttrName, Attr_Info& attr)
 {
 
