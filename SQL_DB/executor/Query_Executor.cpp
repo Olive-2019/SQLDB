@@ -1,6 +1,17 @@
 #include "Query_Executor.h"
 #include "../Subsystem1.h"
 #include "../parser/parser_token.h"
+
+/*
+警告
+由于所有的attrname与relname都指向同一处内存
+同时在进行join处理时需要修改cond中的attrname与relname
+可能导致问题
+但此处为最后处理execute，后续不会再调用该内存
+因此可能没问题
+*/
+
+
 Query_Executor::Query_Executor(Logical_TreeNode* Root)
 {
 	this->Root = Root;
@@ -13,6 +24,11 @@ vector<RID> Query_Executor::query()
 
 vector<RID> Query_Executor::execute_tree_node(Logical_TreeNode* node)
 {
+	/*
+	警告
+	在进行join后，由于新表中属性名变化导致filter节点中cond属性名需要调整
+	已修改 execute tree node join中
+	*/
 	vector<RID> ret;
 	if (node->kind == Logical_TreeNode_Kind::PLAN_FILESCAN) {  //无条件的叶节点
 		return execute_tree_node_scan(node);
@@ -34,7 +50,6 @@ vector<RID> Query_Executor::execute_tree_node(Logical_TreeNode* node)
 vector<RID> Query_Executor::execute_tree_node_scan(Logical_TreeNode* node, vector<Condition*> cond)
 {
 	node->RelName = node->u.FILESCAN.Rel;
-
 	vector<RID> ret;
 	vector<Attr_Info> attrs = Subsystem1_Manager::BASE.lookup_Attrs(node->u.FILESCAN.Rel);
 	string key;
@@ -82,7 +97,7 @@ vector<RID> Query_Executor::execute_tree_node_scan(Logical_TreeNode* node, vecto
 		char* record = NULL;
 		while ((record = reader->get_Next_Record_with_RID(temp)) != NULL) {
 			for (int i = 0; i < cond.size(); ++i)
-				if (!record_cmp(cond[i], record, attrs)) continue;
+				if (!record_cmp(cond[i], record, node->RelName)) continue;
 			ret.push_back(temp);
 		}
 		return ret;
@@ -93,7 +108,7 @@ vector<RID> Query_Executor::execute_tree_node_scan(Logical_TreeNode* node, vecto
 	attrs = Subsystem1_Manager::BASE.lookup_Attrs(node->u.FILESCAN.Rel);
 	while ((record = reader->get_Next_Record_with_RID(temp)) != NULL) {
 		for (int i = 0; i < cond.size(); ++i)
-			if (!record_cmp(cond[i], record, attrs)) continue;
+			if (!record_cmp(cond[i], record, node->RelName)) continue;
 		ret.push_back(temp);
 	}
 	cond.clear();
@@ -170,6 +185,26 @@ vector<RID> Query_Executor::execute_tree_node_join(Logical_TreeNode* node, vecto
 	Subsystem1_Manager::BASE.lookup_Rel(node->u.JOIN.right->RelName, RRel);
 	
 	/*
+	修改cond中的属性名
+	*/
+
+	{
+		for (int i = 0; i < cond.size(); i++) {
+			string attrName = string(cond[i]->lhsAttr.relname) + "." + cond[i]->lhsAttr.attrname;
+			strcpy(cond[i]->lhsAttr.relname, node->RelName.c_str());
+			strcpy(cond[i]->lhsAttr.attrname, attrName.c_str());
+			if (cond[i]->bRhsIsAttr) {
+				string attrName = string(cond[i]->rhsAttr.relname) + "." + cond[i]->rhsAttr.attrname;
+				strcpy(cond[i]->rhsAttr.relname, node->RelName.c_str());
+				strcpy(cond[i]->rhsAttr.attrname, attrName.c_str());
+			}
+		}
+	}
+
+
+
+
+	/*
 	新建记录，但不插入（注释忘改了？这里貌似是插入了的）
 	筛选 record_cmp(cond[0], record, attrs);
 	插入记录
@@ -184,7 +219,7 @@ vector<RID> Query_Executor::execute_tree_node_join(Logical_TreeNode* node, vecto
 			//不一定只有一个条件的，这里改动了一下
 			bool pass = true;
 			for (int cond_index = 0; cond_index < cond.size(); ++cond_index) {
-				pass = record_cmp(cond[cond_index], record, attrs);
+				pass = record_cmp(cond[cond_index], record, node->RelName);
 				if (!pass) break;
 			}
 			//没通过检查的话，这一条记录就不插入了。
@@ -232,7 +267,7 @@ vector<RID> Query_Executor::execute_tree_node_proj(Logical_TreeNode* node)
 		strcat(tmp.Attr_Name, ".");
 		strcat(tmp.Attr_Name, Proj_Attrs[proj_attr_index].Attr_Name);
 		tmp.Offset = offset;
-		offset += tmp.type;
+		offset += tmp.Length;
 		strcpy(tmp.Rel_Name, node->RelName.c_str());
 		bool error = true;
 		for (int attr_index = 0; attr_index < attrs.size(); ++attr_index) 
@@ -255,15 +290,159 @@ vector<RID> Query_Executor::execute_tree_node_proj(Logical_TreeNode* node)
 	}
 	return ret;
 }
-bool Query_Executor::record_cmp(Condition* cond, char* record, vector<Attr_Info> attrs) {
-	/*
-	* 待完善 
-	*/
-	return true;
+
+
+
+bool Query_Executor::record_cmp(Condition* cond, char* record, string RelName) {
+	if (cond->bRhsIsAttr) {
+		return record_cmp_2(cond, record, RelName);
+	}
+	else {
+		return record_cmp_1(cond, record, RelName);
+	}
 }
-bool Query_Executor::record_cmp(Condition* cond, RID record, vector<Attr_Info> attrs) {
+bool Query_Executor::record_cmp_1(Condition* cond, char* record, string RelName)
+{
+	Attr_Info Lattr;
+	Subsystem1_Manager::BASE.lookup_Attr(RelName, cond->lhsAttr.attrname, Lattr);
+	char* Lvalue = record + Lattr.Offset;
+	int ret = cmp(Lvalue, cond->rhsValue, Lattr);
+	switch (cond->op) {
+	case TOKENKIND::T_EQ: {
+		return ret == 0;
+		break;
+	}
+		
+	case TOKENKIND::T_GE: {
+		return ret >= 0;
+		break;
+	}
+		
+	case TOKENKIND::T_GT: {
+		return ret > 0;
+		break;
+	}
+		
+	case TOKENKIND::T_LE: {
+		return ret <= 0;
+		break;
+	}
+		
+	case TOKENKIND::T_LT: {
+		return ret < 0;
+		break;
+	}
+	}
+}
+bool Query_Executor::record_cmp_2(Condition* cond, char* record, string RelName)
+{
+	Attr_Info Lattr, Rattr;
+	Subsystem1_Manager::BASE.lookup_Attr(RelName, cond->lhsAttr.attrname, Lattr);
+	Subsystem1_Manager::BASE.lookup_Attr(RelName, cond->rhsAttr.attrname, Rattr);
+	char* Lvalue = record + Lattr.Offset;
+	char* Rvalue = record + Rattr.Offset;
+	int ret = cmp(Lvalue, Rvalue, Lattr, Rattr);
+	switch (cond->op) {
+	case TOKENKIND::T_EQ: {
+		return ret == 0;
+		break;
+	}
+
+	case TOKENKIND::T_GE: {
+		return ret >= 0;
+		break;
+	}
+
+	case TOKENKIND::T_GT: {
+		return ret > 0;
+		break;
+	}
+
+	case TOKENKIND::T_LE: {
+		return ret <= 0;
+		break;
+	}
+
+	case TOKENKIND::T_LT: {
+		return ret < 0;
+		break;
+	}
+	}
+}
+
+int Query_Executor::cmp(char* p1, Value p2, Attr_Info Lattr)
+{
+
+	if (Lattr.type == INT || Lattr.type == FLOAT) {
+		float Lvalue = get_value(p1, Lattr.type);
+		float Rvalue = get_value((char*)p2.data, p2.type);
+		if (Lvalue == Rvalue) return 0;
+		if (Lvalue < Rvalue) return -1;
+		if (Lvalue > Rvalue) return 1;
+	}
+	else {
+		int Rlength = strlen((char*)p2.data);
+		int Llength = Lattr.Length;
+		int length = min(Llength, Rlength);
+		int ret = strncmp(p1, (char*)p2.data, length);
+		if (ret == 0) {
+			if (Lattr.Length == Rlength) ret = 0;
+			if (Lattr.Length > Rlength) ret = 1;
+			if (Lattr.Length < Rlength) ret = -1;
+		}
+		return ret;
+	}
+	return 0;
+}
+
+int Query_Executor::cmp(char* p1, char* p2, Attr_Info Lattr, Attr_Info Rattr)
+{
 	/*
-	* 待完善
+	警告
+	是否允许不同类型之间的比较 如int float之间以及string10 string20之间
+	当前代码允许
 	*/
-	return true;
+
+
+	//INT与FLOAT INT与INT FLOAT与FLOAT FLOAT与INT之间比较
+	if ((Lattr.type == INT|| Lattr.type == FLOAT) && Rattr.type != STRING) {
+		float Lvalue = get_value(p1, Lattr.type);
+		float Rvalue = get_value(p2, Rattr.type);
+		if (Lvalue == Rvalue) return 0;
+		if (Lvalue < Rvalue) return -1;
+		if (Lvalue > Rvalue) return 1;
+	}
+	//STRING之间比较
+	else {
+		int length = min(Lattr.Length, Rattr.Length);
+		int ret = strncmp(p1, p2, length);
+		if (ret == 0) {
+			if (Lattr.Length == Rattr.Length) ret = 0;
+			if (Lattr.Length > Rattr.Length) ret = 1;
+			if (Lattr.Length < Rattr.Length) ret = -1;
+		}
+		return ret;
+	}
+}
+
+float Query_Executor::get_value(char* value, AttrType type)
+{
+	float ret = 0;
+	if (type == AttrType::INT) {
+		int t = *(int*)value;
+		ret = t;
+	}
+	else if (type == AttrType::FLOAT) {
+		ret = *(float*)value;
+	}
+	else {
+		cout << "非int、float进行值获取操作" << endl;
+		exit(0);
+	}
+	return ret;
+}
+
+bool Query_Executor::record_cmp(Condition* cond, RID rid, string RelName) {
+	char* record = Subsystem1_Manager::BASE.Find_Record_by_RID(rid);
+	return record_cmp(cond, record, RelName);
 }
