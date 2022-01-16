@@ -1,6 +1,8 @@
 #include "executor.h"
 #include "Query_Executor.h"
-
+#include "../Subsystem1.h"
+#include <iostream>
+#include <iomanip>
 Executor::Executor(Logical_TreeNode* Root)
 {
 	this->Root = Root;
@@ -42,16 +44,50 @@ void Executor::execute()
 
 void Executor::Display(string RelName, vector<RID> records)
 {
+	cout << "查询结果为：" << endl;
+	vector<Attr_Info> attrs = Subsystem1_Manager::BASE.lookup_Attrs(RelName);
+	int length = 15;
+	for (int i = 0; i < attrs.size(); ++i) 
+		cout << setw(length) << attrs[i].Attr_Name << endl;
+	for (int i = 0; i < records.size(); ++i) {
+		char* buff = Subsystem1_Manager::BASE.Find_Record_by_RID(records[i]);
+		for (int j = 0; j < attrs.size(); ++j) {
+			switch (attrs[j].type)
+			{
+			case AttrType::INT: {
+				int data = *(int*)(buff + attrs[j].Offset);
+				cout << setw(length) << data;
+				break;
+			}
+			case AttrType::FLOAT: {
+				float data = *(float*)(buff + attrs[j].Offset);
+				cout << setw(length) << data;
+				break;
+			}
+			case AttrType::STRING: {
+				string data = buff + attrs[j].Offset;
+				cout << setw(length) << data;
+				break;
+			}
+			}
+		}
+		cout << endl;
+	}
 }
 
 void Executor::Insert(string RelName, char* record)
 {
+	Subsystem1_Manager::BASE.Insert_Reocrd(RelName, record);
 }
 
 void Executor::Delete(string RelName, vector<RID> records)
 {
+	Subsystem1_Manager::BASE.Delete_Record(RelName, records);
 }
 
 void Executor::Update(string RelName, vector<RID> records, vector<Attr_Info> attrs, char** new_values)
 {
+	for (int i = 0; i < records.size(); ++i) 
+		for (int j = 0; j < attrs.size(); ++j) 
+			Subsystem1_Manager::BASE.Update_Record(RelName, records[i], attrs[j], new_values[j]);
 }
