@@ -67,7 +67,8 @@ void Optimizer::init()
     }
 }
 
-Optimizer::Optimizer(int Rel_num, RelInfo* rels, int Attr_num, AggRelAttr* attrs, int Cond_num, Condition* conds)
+Optimizer::Optimizer(int Rel_num, RelInfo* rels, int Attr_num, AggRelAttr* attrs,
+    int Cond_num, Condition* conds, SQL_type sql_type)
 {
     /*
     警告
@@ -75,7 +76,7 @@ Optimizer::Optimizer(int Rel_num, RelInfo* rels, int Attr_num, AggRelAttr* attrs
     nickname问题未处理，应该先将所有nickname换为原名
     
     */
-    {
+    if(sql_type==SELECT){
         //将语法树中的结构转换为标准结构
         for (int i = 0; i < Rel_num; i++) {
             Rel_Info temp;
@@ -92,6 +93,7 @@ Optimizer::Optimizer(int Rel_num, RelInfo* rels, int Attr_num, AggRelAttr* attrs
             this->Conds.push_back(conds[i]);
         }
     }
+
     //获取逻辑树
     this->Logical_Tree_Root = Logical_Tree_Builder(Rels, Attrs, Conds).get_tree_root();
     {
