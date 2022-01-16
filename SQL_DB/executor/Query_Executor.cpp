@@ -17,6 +17,11 @@ Query_Executor::Query_Executor(Logical_TreeNode* Root)
 	this->Root = Root;
 }
 
+string Query_Executor::get_final_RelName()
+{
+	return Root->RelName;
+}
+
 vector<RID> Query_Executor::query()
 {
 	return execute_tree_node(Root);

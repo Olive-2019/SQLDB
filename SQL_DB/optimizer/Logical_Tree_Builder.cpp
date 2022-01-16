@@ -123,7 +123,7 @@ Logical_TreeNode* Logical_Tree_Builder::get_tree_root()
 			Join_node->u.JOIN.right = node;
 			Final = Join_node;
 		}
-
+		if(Attrs.size()!=0)
 		Root->kind = Logical_TreeNode_Kind::PLAN_PROJ;  //进行最后的投影
 		Root->u.PROJECTION.rel = Final;
 		Attr_Info* attrs = new Attr_Info[Attrs.size()];

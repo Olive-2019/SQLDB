@@ -76,7 +76,7 @@ Optimizer::Optimizer(int Rel_num, RelInfo* rels, int Attr_num, AggRelAttr* attrs
     nickname问题未处理，应该先将所有nickname换为原名
     
     */
-    if(sql_type==SELECT){
+    {
         //将语法树中的结构转换为标准结构
         for (int i = 0; i < Rel_num; i++) {
             Rel_Info temp;
@@ -103,6 +103,30 @@ Optimizer::Optimizer(int Rel_num, RelInfo* rels, int Attr_num, AggRelAttr* attrs
 
         //确定连接顺序
     }
+
+
+
+}
+//update语句构造函数,char**values为新值
+Optimizer::Optimizer(RelInfo rel, int Attr_num, AggRelAttr* attrs, char** values, int Cond_num, Condition* conds, SQL_type sql_type)
+{
+    Optimizer* optimizer = new Optimizer(1, &rel, 0, nullptr, Cond_num, conds);
+    Executor* executor = new Executor(optimizer->Logical_Tree_Root);
+    vector<Attr_Info> Attrs;
+    for (int i = 0; i < Attr_num; i++) {
+        Attr_Info attr;
+        Subsystem1_Manager::BASE.lookup_Attr(attrs[i].relname, attrs[i].attrname, attr);
+        Attrs.push_back(attr);
+    }
+    executor->execute_update(Attrs, values);
+}
+//insert语句构造函数
+Optimizer::Optimizer(RelInfo rel, int Attr_num, AggRelAttr* attrs, char** values, SQL_type sql_type)
+{
+}
+//delete语句构造函数
+Optimizer::Optimizer(RelInfo rel, int Cond_num, Condition* conds, SQL_type sql_type)
+{
 }
 
 vector<Execution_Plan> Optimizer::get_Link_Order()

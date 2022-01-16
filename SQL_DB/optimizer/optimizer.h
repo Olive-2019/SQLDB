@@ -3,14 +3,14 @@
 #include "../parser/parser_interp.h"
 #include "estimator.h"
 #include "Logical_Tree_Builder.h"
-
+#include "../executor/executor.h"
 class Optimizer {
 
 private:
 
 	Logical_TreeNode* Logical_Tree_Root;  //逻辑查询树（关系代数）
 
-
+	Executor* executor;
 
 	//未用到的属性
 	vector<Rel_Info> Rels;
@@ -40,20 +40,17 @@ private:
 public:
 	//select语句的构造函数
 	Optimizer(int Rel_num, RelInfo* rels, int Attr_num, AggRelAttr* attrs,
-		int Cond_num, Condition* conds, SQL_type sql_type = SQL_type::SELECT
-	);
+		int Cond_num, Condition* conds, SQL_type sql_type = SQL_type::SELECT);
 	//update语句构造函数,char**values为新值
 	Optimizer(RelInfo rel, int Attr_num, AggRelAttr* attrs, char**values,
-		int Cond_num, Condition* conds, SQL_type sql_type = SQL_type::UPDATE
-	);
+		int Cond_num, Condition* conds, SQL_type sql_type = SQL_type::UPDATE);
 	//insert语句构造函数
 	Optimizer(RelInfo rel, int Attr_num, AggRelAttr* attrs, char** values,
-		SQL_type sql_type = SQL_type::INSERT
-	);
-	//delete
+		SQL_type sql_type = SQL_type::INSERT);
+	//delete语句构造函数
 	Optimizer(RelInfo rel, int Cond_num, Condition* conds,
-		SQL_type sql_type = SQL_type::DELETE
-	);
+		SQL_type sql_type = SQL_type::DELETE);
+
 	vector<Execution_Plan> get_Link_Order();
 
 };

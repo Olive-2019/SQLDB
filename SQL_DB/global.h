@@ -59,7 +59,7 @@ enum AttrType {
 	INT,FLOAT,STRING
 };
 enum Authority {
-	SELECT,INSERT,DELETE,UPDATE
+	Authority_SELECT, Authority_INSERT, Authority_DELETE, Authority_UPDATE
 };
 enum IndexType {
 	CLUSTER_INDEX,NORMAL_INDEX

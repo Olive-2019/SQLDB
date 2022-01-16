@@ -20,6 +20,7 @@ private:
 	float get_value(char* value, AttrType type);
 public:
 	Query_Executor(Logical_TreeNode* Root);
+	string get_final_RelName();
 	//执行查询
 	vector<RID> query();
 	//对具体结点进行的execute
