@@ -269,7 +269,7 @@ static int mk_values(NODE *list, string RelName, char* record)
 
 	return i;
 }
-static int mk_delete_cond(NODE* del, RelInfo& rel, vector<Condition> conds) {
+static int mk_delete_cond(NODE* del, RelInfo& rel, vector<Condition>& conds) {
 	rel.relname = del->u.DELETE.relname;
 	NODE* list = del->u.DELETE.conditionlist;
 	int i;
@@ -281,25 +281,26 @@ static int mk_delete_cond(NODE* del, RelInfo& rel, vector<Condition> conds) {
 		cond.op = cond_node->u.CONDITION.op;
 		if (!cond_node->u.CONDITION.rhsRelattr) {
 			cond.bRhsIsAttr = false;
+			cond.rhsValue.type = cond_node->u.CONDITION.rhsValue->u.VALUE.type;
+			switch (cond.rhsValue.type)
+			{
+			case INT:
+				cond.rhsValue.data = (void*)&cond_node->u.CONDITION.rhsValue->u.VALUE.ival;
+				break;
+			case FLOAT:
+				cond.rhsValue.data = (void*)&cond_node->u.CONDITION.rhsValue->u.VALUE.rval;
+				break;
+			case STRING:
+				cond.rhsValue.data = (void*)cond_node->u.CONDITION.rhsValue->u.VALUE.sval;
+				break;
+			}
 		}
 		else {
 			cond.bRhsIsAttr = true;
 			cond.rhsAttr.attrname = cond_node->u.CONDITION.rhsRelattr->u.RELATTR.attrname;
 			cond.rhsAttr.relname = cond_node->u.CONDITION.lhsRelattr->u.RELATTR.relname;
 		}
-		cond.rhsValue.type = cond_node->u.CONDITION.rhsValue->u.VALUE.type;
-		switch (cond.rhsValue.type)
-		{
-		case INT:
-			cond.rhsValue.data = (void*)&cond_node->u.CONDITION.rhsValue->u.VALUE.ival;
-			break;
-		case FLOAT:
-			cond.rhsValue.data = (void*)&cond_node->u.CONDITION.rhsValue->u.VALUE.rval;
-			break;
-		case STRING:
-			cond.rhsValue.data = (void*)cond_node->u.CONDITION.rhsValue->u.VALUE.sval;
-			break;
-		}
+		
 		conds.push_back(cond);
 	}
 	return i;

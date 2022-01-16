@@ -14,7 +14,7 @@ Logical_Tree_Builder::Logical_Tree_Builder(vector<Rel_Info> Rels, vector<Attr_In
 
 Logical_TreeNode* Logical_Tree_Builder::get_tree_root()
 {
-	Logical_TreeNode* Root;
+	//Logical_TreeNode* Root;
 	//警告基本解决
 	/*
 	警告
@@ -140,7 +140,7 @@ Logical_TreeNode* Logical_Tree_Builder::get_tree_root()
 Logical_TreeNode* Logical_Tree_Builder::get_tree_root_order(vector<string> order)
 {
 
-	Logical_TreeNode* Root;
+	//Logical_TreeNode* Root;
 	/*
 	警告
 
