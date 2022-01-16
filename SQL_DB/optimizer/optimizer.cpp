@@ -87,14 +87,14 @@ Optimizer::Optimizer(int Rel_num, RelInfo* rels, int Attr_num, AggRelAttr* attrs
 }
 
 //update语句构造函数,char**values为新值
-Optimizer::Optimizer(RelInfo rel, int Attr_num, AggRelAttr* attrs, char** values, int Cond_num, Condition* conds, SQL_type sql_type)
+Optimizer::Optimizer(RelInfo rel, int Attr_num, NODE* attrs, char** values, int Cond_num, Condition* conds, SQL_type sql_type)
 {
     init(1, &rel, 0, nullptr, Cond_num, conds);
     Executor* executor = new Executor(Logical_Tree_Root);
     vector<Attr_Info> Attrs;
     for (int i = 0; i < Attr_num; i++) {
         Attr_Info attr;
-        Subsystem1_Manager::BASE.lookup_Attr(attrs[i].relname, attrs[i].attrname, attr);
+        Subsystem1_Manager::BASE.lookup_Attr(attrs[i].u.RELATTR.relname, attrs[i].u.RELATTR.attrname, attr);
         Attrs.push_back(attr);
     }
     executor->execute_update(Attrs, values);

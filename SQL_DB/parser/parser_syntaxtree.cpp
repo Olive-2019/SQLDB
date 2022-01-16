@@ -491,15 +491,19 @@ bool SyntaxTree::parseUpdate(NODE*& node) {
 	NODE* condlist, *new_val;
 	if (ta && ta->type == RW_UPDATE) {
 		discard(1);
+		//ta is the name of relation 
 		ta = next();
 		if (!ta || ta->type != RW_STRING) goto tg;
 		tb = next();
 		if (!tb || tb->type != RW_SET) goto tg;
-		//parseNonmtValueList(new_val);
-		tb = next();
-		if (!tb || tb->type != RW_WHERE) goto tg;
+		parseUpdateNewValue(new_val);
+		tb = peek(1);
+		if (!tb) {
+			node = update_node(ta->content, new_val, NULL);
+			return true;
+		}
 		parseOptWhereClause(condlist);
-		//node = update_node(ta->content, , new_val, condlist);
+		node = update_node(ta->content, new_val, condlist);
 		return true;
 	}
 	node = NULL;
@@ -741,6 +745,31 @@ bool SyntaxTree::parseAttrtype(NODE* &node)
 	}
 	throw GeneralError("Attrtype is wrong. Please check the sentence!");
 }
+//解析update set后面的新指的内容
+bool SyntaxTree::parseUpdateNewValue(NODE*& node) {
+	node = newnode(NODEKIND::N_LIST);
+	NODE* list = node;
+	TokenPtr ta, tb, tc;
+	while (true) {
+		ta = next();
+		tb = next();
+		tc = next();
+		if (!ta || !tb || !tc || ta->type != RW_STRING || tb->type != RW_DOT) return false;
+		tb = next();
+		if (!tb || tb->type != T_EQ) return false;
+		tb = next();
+		list->u.LIST.curr = update_new_val_node(ta->content, tc->content, tb->content);
+		list->u.LIST.next = NULL;
+		tb = peek(1);
+		if (!tb || tb->type != RW_COMMA) return node;
+		discard(1);
+		list->u.LIST.next = newnode(NODEKIND::N_LIST);
+		list = list->u.LIST.next;
+	}
+	throw GeneralError("解析的新值出现问题");
+}
+
+
 
 //
 // next - 获取下一个token

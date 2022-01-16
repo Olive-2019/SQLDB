@@ -306,6 +306,43 @@ static int mk_delete_cond(NODE* del, RelInfo& rel, vector<Condition>& conds) {
 	return i;
 }
 
+static int mk_update_cond(NODE* update, RelInfo& rel, vector<Condition>& conds) {
+	rel.relname = update->u.UPDATE.relname;
+	NODE* list = update->u.UPDATE.conditionlist;
+	int i;
+	for (i = 0; list; list = list->u.LIST.next, ++i) {
+		Condition cond;
+		NODE* cond_node = list->u.LIST.curr;
+		cond.lhsAttr.relname = cond_node->u.CONDITION.lhsRelattr->u.RELATTR.relname;
+		cond.lhsAttr.attrname = cond_node->u.CONDITION.lhsRelattr->u.RELATTR.attrname;
+		cond.op = cond_node->u.CONDITION.op;
+		if (!cond_node->u.CONDITION.rhsRelattr) {
+			cond.bRhsIsAttr = false;
+			cond.rhsValue.type = cond_node->u.CONDITION.rhsValue->u.VALUE.type;
+			switch (cond.rhsValue.type)
+			{
+			case INT:
+				cond.rhsValue.data = (void*)&cond_node->u.CONDITION.rhsValue->u.VALUE.ival;
+				break;
+			case FLOAT:
+				cond.rhsValue.data = (void*)&cond_node->u.CONDITION.rhsValue->u.VALUE.rval;
+				break;
+			case STRING:
+				cond.rhsValue.data = (void*)cond_node->u.CONDITION.rhsValue->u.VALUE.sval;
+				break;
+			}
+		}
+		else {
+			cond.bRhsIsAttr = true;
+			cond.rhsAttr.attrname = cond_node->u.CONDITION.rhsRelattr->u.RELATTR.attrname;
+			cond.rhsAttr.relname = cond_node->u.CONDITION.lhsRelattr->u.RELATTR.relname;
+		}
+
+		conds.push_back(cond);
+	}
+	return i;
+}
+
 /*
  * mk_agg_rel_attr: converts a single relation-attribute (<relation,
  * attribute> pair) into a AggRelAttr
@@ -424,6 +461,23 @@ static void mk_order_relattr(NODE *node, int& order, RelAttr &relAttr)
 	if (order != 0)
 		mk_rel_attr(node->u.ORDERATTR.relattr, relAttr);
 }
+//解析update的新值
+static int mk_update_new_val(NODE* node, NODE*& attrs, char**& new_val) {
+	NODE* list = node;
+	vector<NODE*> attr;
+	vector<char*> value;
+	while (list) {
+		attr.push_back(list->u.LIST.curr->u.UPDATE_NEW_VAL.attr);
+		value.push_back(list->u.LIST.curr->u.UPDATE_NEW_VAL.new_val);
+		list = list->u.LIST.next;
+	}
+	attrs = new NODE[attr.size()];
+	new_val = new char*[attr.size()];
+	for (int i = 0; i < attr.size(); ++i) attrs[i] = *attr[i];
+	for (int i = 0; i < attr.size(); ++i) new_val[i] = value[i];
+	return attr.size();
+}
+
 string parser_str = "parser tree: ";
 int interp(NODE *n)
 {
@@ -506,6 +560,18 @@ int interp(NODE *n)
 			for (int i = 0; i < cond_num; ++i) conds_arr[i] = conds[i];
 			Optimizer* optimizer = new Optimizer(rel, cond_num, conds_arr);
 			break;
+		}
+		case N_UPDATE: {
+			//Optimizer(RelInfo rel, int Attr_num, AggRelAttr* attrs, char** values, 
+			//int Cond_num, Condition* conds, SQL_type sql_type)
+			RelInfo rel;
+			int Attr_num; NODE* attrs; char** values;
+			vector<Condition> conds;
+			Attr_num = mk_update_new_val(n->u.UPDATE.new_val, attrs, values);
+			int cond_num = mk_update_cond(n, rel, conds);
+			Condition* conds_arr = new Condition[cond_num];
+			for (int i = 0; i < cond_num; ++i) conds_arr[i] = conds[i];
+			Optimizer* optimizer = new  Optimizer(rel, Attr_num, attrs, values, cond_num, conds_arr);
 		}
 		case N_LOAD:
 

@@ -205,18 +205,23 @@ NODE *delete_node(char *relname, NODE *conditionlist)
 * update_node: allocates, initializes, and returns a pointer to a new
 * update node having the indicated values.
 */
-NODE *update_node(char *relname, NODE *relattr, NODE *relorvalue,
-	NODE *conditionlist)
+NODE *update_node(char* relname, NODE* new_val, NODE* conditionlist)
 {
 	NODE *n = newnode(N_UPDATE);
 
 	n->u.UPDATE.relname = relname;
-	n->u.UPDATE.relattr = relattr;
-	n->u.UPDATE.relorvalue = relorvalue;
+	n->u.UPDATE.new_val = new_val;
 	n->u.UPDATE.conditionlist = conditionlist;
 	return n;
 }
-
+NODE* update_new_val_node(char* relname, char* attr, char* new_val) {
+	NODE* n = newnode(N_UPDATE_NEW_VAL);
+	n->u.UPDATE_NEW_VAL.attr = newnode(NODEKIND::N_RELATTR);
+	n->u.UPDATE_NEW_VAL.attr->u.RELATTR.relname = relname;
+	n->u.UPDATE_NEW_VAL.attr->u.RELATTR.attrname = attr;
+	n->u.UPDATE_NEW_VAL.new_val = new_val;
+	return n;
+}
 
 /*
 * orderattr_node: allocates, initializes, and returns a pointer to a new

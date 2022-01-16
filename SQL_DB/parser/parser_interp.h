@@ -20,12 +20,7 @@ struct Value {
 	friend ostream& operator<<(ostream& os, const Value& v);
 };
 
-struct AggRelAttr {
-	AggFun func;
-	char *relname;  /* 表名 */
-	char *attrname; /* 属性名 */
-	friend std::ostream &operator<<(std::ostream &s, const AggRelAttr &ra);
-};
+
 
 struct RelAttr {
 	char* relname;
@@ -42,7 +37,12 @@ struct Condition {
 
 	friend std::ostream &operator<<(std::ostream &s, const Condition &c);
 };
-
+struct AggRelAttr {
+	AggFun func;
+	char* relname;  /* 表名 */
+	char* attrname; /* 属性名 */
+	friend std::ostream& operator<<(std::ostream& s, const AggRelAttr& ra);
+};
 int interp(NODE *n);
 #endif /* PARSER_INTERP_H */
 
