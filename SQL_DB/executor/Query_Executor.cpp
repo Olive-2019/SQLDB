@@ -312,6 +312,10 @@ bool Query_Executor::record_cmp_1(Condition* cond, char* record, string RelName)
 		return ret == 0;
 		break;
 	}
+	case TOKENKIND::T_NE: {
+		return ret != 0;
+		break;
+	}
 		
 	case TOKENKIND::T_GE: {
 		return ret >= 0;
@@ -345,6 +349,10 @@ bool Query_Executor::record_cmp_2(Condition* cond, char* record, string RelName)
 	switch (cond->op) {
 	case TOKENKIND::T_EQ: {
 		return ret == 0;
+		break;
+	}
+	case TOKENKIND::T_NE: {
+		return ret != 0;
 		break;
 	}
 
