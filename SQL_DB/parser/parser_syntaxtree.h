@@ -28,7 +28,9 @@ private:
 	bool parseCreateDatabase(NODE*&);
 	bool parseUseDatabase(NODE* &);
 	bool parseCreateIndex(NODE* &);
-	bool parseInsert(NODE* &);
+	bool parseInsert(NODE*&);
+	bool parseDelete(NODE*&);
+	bool parseUpdate(NODE* &);
 	bool parseQuery(NODE* &);
 	bool parseDropTable(NODE* &);
 	bool parseDropIndex(NODE* &);

@@ -129,6 +129,8 @@ bool SyntaxTree::parseDML(NODE* &node)
 {
 	bool succ = parseQuery(node);
 	if (!succ) succ = parseInsert(node);
+	if (!succ) succ = parseDelete(node);
+	if (!succ) succ = parseUpdate(node);
 	return succ;
 }
 
@@ -251,7 +253,7 @@ void SyntaxTree::parseNonmtCondList(NODE* &node)
 			parseNonmtCondList(condlist);
 			node = prepend(cond, condlist);
 		}
-		else  node = list_node(cond);
+		else node = list_node(cond);
 		return;
 	}
 	throw GeneralError("Something wrong with the condlist.");
@@ -465,7 +467,46 @@ bool SyntaxTree::parseCreateIndex(NODE* &node)
 tg:
 	throw GeneralError("解析create index时出错,请检查!");
 }
-
+/*对delete语句的解析*/
+bool SyntaxTree::parseDelete(NODE*& node) {
+	TokenPtr ta = peek(1);
+	TokenPtr tb = peek(2);
+	NODE* condlist = NULL;
+	if (ta && tb && ta->type == RW_DELETE && tb->type == RW_FROM) {
+		discard(2);
+		ta = next();
+		if (!ta || ta->type != RW_STRING) goto tg;
+		parseOptWhereClause(condlist);
+		node = delete_node(ta->content, condlist);
+		return true;
+	}
+	node = NULL;
+	return false;
+tg:
+	throw GeneralError("Please check the sentence. Something wrong with the \'delete from\'.");
+}
+/*对update语句的解析，未完工*/
+bool SyntaxTree::parseUpdate(NODE*& node) {
+	TokenPtr ta = peek(1), tb;
+	NODE* condlist, *new_val;
+	if (ta && ta->type == RW_UPDATE) {
+		discard(1);
+		ta = next();
+		if (!ta || ta->type != RW_STRING) goto tg;
+		tb = next();
+		if (!tb || tb->type != RW_SET) goto tg;
+		//parseNonmtValueList(new_val);
+		tb = next();
+		if (!tb || tb->type != RW_WHERE) goto tg;
+		parseOptWhereClause(condlist);
+		//node = update_node(ta->content, , new_val, condlist);
+		return true;
+	}
+	node = NULL;
+	return false;
+tg:
+	throw GeneralError("Please check the sentence. Something wrong with the \'delete from\'.");
+}
 //
 // parseInsert - 解析insert语法
 //	insert -> RW_INSERT RW_INTO RW_STRING RW_LPAREN non_mt_value_list RW_RPAREN
