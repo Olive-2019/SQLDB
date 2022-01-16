@@ -10,8 +10,6 @@ private:
 
 	Logical_TreeNode* Logical_Tree_Root;  //逻辑查询树（关系代数）
 
-	Executor* executor;
-
 	//未用到的属性
 	vector<Rel_Info> Rels;
 	vector<Attr_Info> Attrs;
@@ -35,7 +33,8 @@ private:
 	//是否二元条件
 	bool IsBinary(Condition cond); 
 
-	void init();
+	void init(int Rel_num, RelInfo* rels, int Attr_num, AggRelAttr* attrs,
+		int Cond_num, Condition* conds);
 
 public:
 	//select语句的构造函数
@@ -45,8 +44,7 @@ public:
 	Optimizer(RelInfo rel, int Attr_num, AggRelAttr* attrs, char**values,
 		int Cond_num, Condition* conds, SQL_type sql_type = SQL_type::UPDATE);
 	//insert语句构造函数
-	Optimizer(RelInfo rel, int Attr_num, AggRelAttr* attrs, char** values,
-		SQL_type sql_type = SQL_type::INSERT);
+	Optimizer(RelInfo rel, char* record, SQL_type sql_type = SQL_type::INSERT);
 	//delete语句构造函数
 	Optimizer(RelInfo rel, int Cond_num, Condition* conds,
 		SQL_type sql_type = SQL_type::DELETE);

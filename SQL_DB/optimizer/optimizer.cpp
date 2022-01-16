@@ -38,44 +38,9 @@ bool Optimizer::IsBinary(Condition cond)
     return cond.bRhsIsAttr;
 }
 
-void Optimizer::init()
+void Optimizer::init(int Rel_num, RelInfo* rels, int Attr_num, AggRelAttr* attrs,
+    int Cond_num, Condition* conds)
 {
-    //区分一元和二元条件
-    vector<Condition> cond_temp;
-    for (int cond_cnt = 0; cond_cnt < Conds.size(); ++cond_cnt)
-        if (Conds[cond_cnt].bRhsIsAttr) Binary_Cond.push_back(Conds[cond_cnt]);
-        else cond_temp.push_back(Conds[cond_cnt]);
-    //装填执行计划
-    for (int plan_cnt = 0; plan_cnt < Rels.size(); ++plan_cnt) {
-        Execution_Plan plan;
-        plan.Rel = Rels[plan_cnt];
-        plan.type = SIMPLE;//先不管外层内层的事
-        vector<Condition>::iterator it = cond_temp.begin();
-        while (it != cond_temp.end()) {
-            if (!strcmp(plan.Rel.Rel_Name, it->lhsAttr.relname)) {
-                plan.Conds.push_back(*it);
-                vector<Condition>::iterator it_temp = it;
-                it++;
-                cond_temp.erase(it_temp);
-                Index_Info index_info;
-                if (lookup_Index(plan.Rel.Rel_Name, it->lhsAttr.attrname, index_info))
-                    plan.Index.push_back(index_info);
-            }
-            else it++;
-        }
-
-    }
-}
-
-Optimizer::Optimizer(int Rel_num, RelInfo* rels, int Attr_num, AggRelAttr* attrs,
-    int Cond_num, Condition* conds, SQL_type sql_type)
-{
-    /*
-    警告
-
-    nickname问题未处理，应该先将所有nickname换为原名
-    
-    */
     {
         //将语法树中的结构转换为标准结构
         for (int i = 0; i < Rel_num; i++) {
@@ -96,6 +61,8 @@ Optimizer::Optimizer(int Rel_num, RelInfo* rels, int Attr_num, AggRelAttr* attrs
 
     //获取逻辑树
     this->Logical_Tree_Root = Logical_Tree_Builder(Rels, Attrs, Conds).get_tree_root();
+
+
     {
         //优化逻辑树
 
@@ -103,15 +70,28 @@ Optimizer::Optimizer(int Rel_num, RelInfo* rels, int Attr_num, AggRelAttr* attrs
 
         //确定连接顺序
     }
+}
 
+Optimizer::Optimizer(int Rel_num, RelInfo* rels, int Attr_num, AggRelAttr* attrs,
+    int Cond_num, Condition* conds, SQL_type sql_type)
+{
+    /*
+    警告
 
+    nickname问题未处理，应该先将所有nickname换为原名
+    
+    */
+    init(Rel_num, rels, Attr_num, attrs, Cond_num, conds);
+    Executor* executor = new Executor(Logical_Tree_Root);
+    executor->execute_select();
 
 }
+
 //update语句构造函数,char**values为新值
 Optimizer::Optimizer(RelInfo rel, int Attr_num, AggRelAttr* attrs, char** values, int Cond_num, Condition* conds, SQL_type sql_type)
 {
-    Optimizer* optimizer = new Optimizer(1, &rel, 0, nullptr, Cond_num, conds);
-    Executor* executor = new Executor(optimizer->Logical_Tree_Root);
+    init(1, &rel, 0, nullptr, Cond_num, conds);
+    Executor* executor = new Executor(Logical_Tree_Root);
     vector<Attr_Info> Attrs;
     for (int i = 0; i < Attr_num; i++) {
         Attr_Info attr;
@@ -121,12 +101,17 @@ Optimizer::Optimizer(RelInfo rel, int Attr_num, AggRelAttr* attrs, char** values
     executor->execute_update(Attrs, values);
 }
 //insert语句构造函数
-Optimizer::Optimizer(RelInfo rel, int Attr_num, AggRelAttr* attrs, char** values, SQL_type sql_type)
+Optimizer::Optimizer(RelInfo rel, char* record, SQL_type sql_type)
 {
+    Executor* executor = new Executor(nullptr);
+    executor->execute_insert(rel.relname, record);
 }
 //delete语句构造函数
 Optimizer::Optimizer(RelInfo rel, int Cond_num, Condition* conds, SQL_type sql_type)
 {
+    init(1, &rel, 0, nullptr, Cond_num, conds);
+    Executor* executor = new Executor(Logical_Tree_Root);
+    executor->execute_delete();
 }
 
 vector<Execution_Plan> Optimizer::get_Link_Order()
