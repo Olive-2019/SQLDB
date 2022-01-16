@@ -62,7 +62,6 @@ void Optimizer::init(int Rel_num, RelInfo* rels, int Attr_num, AggRelAttr* attrs
     //获取逻辑树
     this->Logical_Tree_Root = Logical_Tree_Builder(Rels, Attrs, Conds).get_tree_root();
 
-
     {
         //优化逻辑树
 

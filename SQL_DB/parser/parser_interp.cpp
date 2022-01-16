@@ -5,6 +5,7 @@
 #include "../global.h"
 #include "parser_node.h"
 #include "parser_interp.h"
+#include "../Subsystem1.h"
 #include "../optimizer/optimizer.h"
 extern bool stop;
 
@@ -243,30 +244,25 @@ static void mk_database(NODE* node, string& dbname) {
 *    the lengh of the list on success ( >= 0 )
 *    error code otherwise
 */
-static int mk_values(NODE *list, int max, vector<int>& int_v, vector<double>& double_v, vector<string>& string_v)
+static int mk_values(NODE *list, string RelName, char* record)
 {
 	int i;
-	int_v.clear();
-	double_v.clear();
-	string_v.clear();
-	
+	vector<Attr_Info> attrs = Subsystem1_Manager::BASE.lookup_Attrs(RelName);
 	/* for each element of the list... */
 	for (i = 0; list != NULL; ++i, list = list->u.LIST.next) {
-		/* If the list is too long then error */
-		if (i == max)
-			return E_TOOMANY;
 		NODE* n = list->u.LIST.curr;
 		//mk_value(list->u.LIST.curr, values[i]);
 		int type = n->u.VALUE.type;
+		
 		switch (type) {
 		case INT:
-			int_v.push_back(n->u.VALUE.ival);
+			memcpy(record + attrs[i].Offset, (char*)&n->u.VALUE.ival, sizeof(int));
 			break;
-		case FLOAT:
-			double_v.push_back(n->u.VALUE.rval);
+		case FLOAT: 
+			memcpy(record + attrs[i].Offset, (char*)&n->u.VALUE.rval, sizeof(float));
 			break;
 		case STRING:
-			string_v.push_back(string(n->u.VALUE.sval));
+			memcpy(record + attrs[i].Offset, (char*)&n->u.VALUE.sval, attrs[i].Length);
 			break;
 		}
 	}
@@ -456,19 +452,12 @@ int interp(NODE *n)
 		case N_INSERT:
 		{
 			int nvals = 0;
-			/*
-			vector<int> i_v; vector<double> d_v; vector<string> s_v;
-			nvals = mk_values(n->u.INSERT.valuelist, MAXATTRS, i_v, d_v, s_v);
-			if (nvals < 0) {
-				print_error("insert", nvals);
-				break;
-			}
-			string table_name(n->u.INSERT.relname);
-			record r(i_v, d_v, s_v);
-			if (rc = dbsystem.add_record(table_name, r))
-				cout << "插入记录失败" << endl;
-			else
-				cout << "成功插入记录" << endl;*/
+			string rel_name = n->u.INSERT.relname;
+			char record[500];
+			nvals = mk_values(n->u.INSERT.valuelist, rel_name, record);
+			Rel_Info rel_info;
+			Subsystem1_Manager::BASE.lookup_Rel(rel_name, rel_info);
+			Optimizer* optimizer = new Optimizer(rel_info, record);
 			/* Make the call to insert */
 			break;
 		}
@@ -515,7 +504,7 @@ int interp(NODE *n)
 				group = true;
 
 			Optimizer* optimizer = new Optimizer(nrelations, relations, nselattrs, relAttrs, nconditions, conditions);
-
+			
 			break;
 		}
 		default:
