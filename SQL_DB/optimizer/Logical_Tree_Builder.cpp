@@ -14,7 +14,7 @@ Logical_Tree_Builder::Logical_Tree_Builder(vector<Rel_Info> Rels, vector<Attr_In
 
 Logical_TreeNode* Logical_Tree_Builder::get_tree_root()
 {
-	Logical_TreeNode* Root;
+	//Logical_TreeNode* Root;
 	//警告基本解决
 	/*
 	警告
@@ -139,6 +139,8 @@ Logical_TreeNode* Logical_Tree_Builder::get_tree_root()
 
 Logical_TreeNode* Logical_Tree_Builder::get_tree_root_order(vector<string> order)
 {
+
+	Logical_TreeNode* Root;
 	/*
 	警告
 	该算法将各个数据表依次链接 以(1),(12)(123),(1234)的形式

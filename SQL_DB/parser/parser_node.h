@@ -2,7 +2,7 @@
 #define PARSER_NODE_H
 #include "../global.h"
 #include "redbase.h"
-
+//#include "parser_interp.h"
 enum NODEKIND {
 	N_CREATETABLE,
 	N_CREATEDATABASE,
@@ -28,7 +28,8 @@ enum NODEKIND {
 	N_RELATION,
 	N_STATISTICS,
 	N_LIST,
-	N_EXIT
+	N_EXIT,
+	N_UPDATE_NEW_VAL
 };
 
 typedef struct node {
@@ -112,8 +113,7 @@ typedef struct node {
 		/* update node */
 		struct {
 			char *relname;
-			struct node *relattr;
-			struct node *relorvalue;
+			struct node *new_val;//list里套的UPDATE_NEW_VAL
 			struct node *conditionlist;
 		} UPDATE;
 
@@ -175,6 +175,11 @@ typedef struct node {
 			struct node *curr;
 			struct node *next;
 		} LIST;
+		/*update 值的结点*/
+		struct {
+			struct node* attr;//RELATTR
+			char* new_val;
+		}UPDATE_NEW_VAL;
 	} u;
 }NODE;
 
@@ -196,8 +201,8 @@ NODE *query_node(NODE *relattrlist, NODE *rellist, NODE *conditionlist,
 	NODE *order_relattr, NODE *group_relattr);
 NODE *insert_node(char *relname, NODE *valuelist);
 NODE *delete_node(char *relname, NODE *conditionlist);
-NODE *update_node(char *relname, NODE *relattr, NODE *value,
-	NODE *conditionlist);
+NODE *update_node(char *relname, NODE *new_val, NODE *conditionlist);
+NODE* update_new_val_node(char* relname, char* attr, char* new_val);
 NODE *relattr_node(char *relname, char *attrname);
 NODE *orderattr_node(int order, NODE *relattr);
 NODE *aggrelattr_node(AggFun a, char *relname, char *attrname);

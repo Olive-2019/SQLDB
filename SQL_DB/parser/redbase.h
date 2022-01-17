@@ -1,5 +1,6 @@
 #ifndef REDBASE_H
 #define REDBASE_H
+#include "../global.h"
 
 #define _CRT_SECURE_NO_WARNINGS 1
 //
@@ -75,4 +76,7 @@ enum AggFun {
 //	char* attrname;
 //	friend std::ostream& operator<<(std::ostream& s, const RelAttr& ra);
 //};
+
+
+
 #endif /* REDBASE_H */

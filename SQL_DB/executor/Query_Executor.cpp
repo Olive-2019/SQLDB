@@ -130,12 +130,16 @@ vector<RID> Query_Executor::execute_tree_node_filter(Logical_TreeNode* node)
 }
 vector<RID> Query_Executor::execute_tree_node_under_filter(Logical_TreeNode* node, vector<Condition*>& cond)
 {
-	cond.push_back(node->u.FILTER.expr_filter);
+	
 	if (node->kind == Logical_TreeNode_Kind::PLAN_FILESCAN) {
-		return execute_tree_node_scan(node->u.FILTER.rel, cond);
+		return execute_tree_node_scan(node, cond);
 	}
 	else if (node->kind == Logical_TreeNode_Kind::PLAN_JOIN) {
-		return execute_tree_node_join(node->u.FILTER.rel, cond);
+		return execute_tree_node_join(node, cond);
+	} 
+	else if (node->kind == Logical_TreeNode_Kind::PLAN_FILTER) {
+		cond.push_back(node->u.FILTER.expr_filter);
+		return execute_tree_node_under_filter(node->u.FILTER.rel, cond);
 	}
 }
 vector<RID> Query_Executor::execute_tree_node_join(Logical_TreeNode* node, vector<Condition*> cond)

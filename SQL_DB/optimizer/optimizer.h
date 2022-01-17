@@ -41,7 +41,7 @@ public:
 	Optimizer(int Rel_num, RelInfo* rels, int Attr_num, AggRelAttr* attrs,
 		int Cond_num, Condition* conds, SQL_type sql_type = SQL_type::SELECT);
 	//update语句构造函数,char**values为新值
-	Optimizer(RelInfo rel, int Attr_num, AggRelAttr* attrs, char**values,
+	Optimizer(RelInfo rel, int Attr_num, NODE* attrs, char**values,
 		int Cond_num, Condition* conds, SQL_type sql_type = SQL_type::UPDATE);
 	//insert语句构造函数
 	Optimizer(RelInfo rel, char* record, SQL_type sql_type = SQL_type::INSERT);
