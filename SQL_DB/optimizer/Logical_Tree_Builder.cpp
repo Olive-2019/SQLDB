@@ -139,18 +139,13 @@ Logical_TreeNode* Logical_Tree_Builder::get_tree_root()
 
 Logical_TreeNode* Logical_Tree_Builder::get_tree_root_order(vector<string> order)
 {
-
-	Logical_TreeNode* Root;
 	/*
 	警告
-
-	若两个查询条件涉及到的数据表一致，该树会导致大量的空间浪费，
-	因为会将两表连接后的新表 自身与自身进行连接
-
-	尚未测试
+	该算法将各个数据表依次链接 以(1),(12)(123),(1234)的形式
+	无法以((12),(34))的形式链接
+	或许该算法有误，应当按照逻辑树的等价变化确定连接顺序
 	*/
-
-
+	Logical_TreeNode* Root;
 	Root = get_logical_tree_node(Logical_TreeNode_Kind::PLAN_PROJ);
 	/*
 	建立逻辑树

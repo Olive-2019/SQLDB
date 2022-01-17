@@ -45,6 +45,10 @@ public:
 	void Delete_Rel(string RelName);
 };
 
+
+
+
+
 class Reader {  //一个用于遍历数据表的类
 public:
 	//获取下一条数据，返回char*为原件的复制
