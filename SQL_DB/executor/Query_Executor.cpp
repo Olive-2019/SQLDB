@@ -124,6 +124,10 @@ vector<RID> Query_Executor::execute_tree_node_filter(Logical_TreeNode* node)
 	vector<RID> ret;
 	vector<Condition*> Conds;
 	Conds.push_back(node->u.FILTER.expr_filter);//一元条件落到叶结点执行，二元条件亦可
+	while (node->u.FILTER.rel->kind == Logical_TreeNode_Kind::PLAN_FILTER) {
+		node = node->u.FILTER.rel;
+		Conds.push_back(node->u.FILTER.expr_filter);
+	}
 	ret = execute_tree_node_under_filter(node->u.FILTER.rel, Conds);
 	node->RelName = node->u.FILTER.rel->RelName;
 	return ret;

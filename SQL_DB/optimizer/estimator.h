@@ -37,22 +37,15 @@ class Estimator {
 
 private:
 	Logical_TreeNode* Root;
+	Link_Lost estimate_TreeNode_Lost_Scan(Logical_TreeNode* node);
+	Link_Lost estimate_TreeNode_Lost_Filter(Logical_TreeNode* node);
+	Link_Lost estimate_TreeNode_Lost_Join(Logical_TreeNode* node);
+	Link_Lost estimate_TreeNode_Lost_Proj(Logical_TreeNode* node);
 
 	Link_Lost estimate_TreeNode_Lost(Logical_TreeNode* node);
 
-	Link_Lost estimate_link_lost_EQ(const Execution_Plan& Plan1,
-		const Execution_Plan& Plan2, const vector<Condition>& Cond);
-
-	Link_Lost estimate_link_lost_LT(const Execution_Plan& Plan1,
-		const Execution_Plan& Plan2, const vector<Condition>& Cond);
-
-	Link_Lost estimate_link_lost_GT(const Execution_Plan& Plan1,
-		const Execution_Plan& Plan2, const vector<Condition>& Cond);
-
-	Link_Lost estimate_order_lost(const vector<Execution_Plan>& Plan_Order);
 	Link_Lost estimate_scan_lost(const Execution_Plan& Plan);
 	int estimate_record_num(const Execution_Plan& Plan);
-	Link_Lost estimate_link_lost(const Execution_Plan& Plan1, const Execution_Plan& Plan2, const vector<Condition>& Cond);
 
 public:
 	Estimator(Logical_TreeNode* Root) {

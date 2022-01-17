@@ -140,79 +140,15 @@ Logical_TreeNode* Logical_Tree_Builder::get_tree_root()
 Logical_TreeNode* Logical_Tree_Builder::get_tree_root_order(vector<string> order)
 {
 
-	Logical_TreeNode* Root;
 	/*
-	警告
-	该算法将各个数据表依次链接 以(1),(12)(123),(1234)的形式
-	无法以((12),(34))的形式链接
-	或许该算法有误，应当按照逻辑树的等价变化确定连接顺序
+	此函数功能为根据特定的顺序建立一个Logical Tree
+
+	表链接的顺序可以使用二元条件的顺序来表示（详见get tree root函数二元链接部分）
+
+	不涉及二元条件的数据表链接顺序对链接损失没有影响，全部放到最后依次链接即可
+	
+	该函数的参数有待商榷
 	*/
-	Logical_TreeNode* Root;
-	Root = get_logical_tree_node(Logical_TreeNode_Kind::PLAN_PROJ);
-	/*
-	建立逻辑树
-	*/
-
-	map<string, Logical_TreeNode*> mp_Rel_to_Node;  //根据表名查找结点
-
-	for (int i = 0; i < Rels.size(); i++) {   //建立叶节点
-		cout << Rels[i].Rel_Name << endl;
-		Logical_TreeNode* node = get_logical_tree_node(Logical_TreeNode_Kind::PLAN_FILESCAN);
-		node->u.FILESCAN.Rel = Rels[i].Rel_Name;
-		mp_Rel_to_Node[Rels[i].Rel_Name] = node;
-	}
-
-
-	for (int i = 0; i < Conds.size(); i++) {  //根据所有一元条件建立初步的filter
-		if (Conds[i].bRhsIsAttr == false) {
-			Rel_Info temp;
-			Subsystem1_Manager::BASE.lookup_Rel(Conds[i].lhsAttr.relname, temp);
-			cout << "cond RelName==" << temp.Rel_Name << endl;
-			Logical_TreeNode* leaf = mp_Rel_to_Node[temp.Rel_Name];
-			Logical_TreeNode* node = get_logical_tree_node(Logical_TreeNode_Kind::PLAN_FILTER);
-			node->u.FILTER.rel = leaf;
-			node->u.FILTER.expr_filter = new Condition;
-			memcpy(node->u.FILTER.expr_filter, &(Conds[i]), sizeof(Condition));//利用filter结点替换原本的叶节点
-			mp_Rel_to_Node[Conds[i].lhsAttr.relname] = node;
-		}
-	}
-
-
-	Logical_TreeNode* Final = mp_Rel_to_Node[order[0]];
-	map<string, bool> mp_is_node_integrated_before;
-	mp_is_node_integrated_before[order[0]] = true;
-	for (int orderi = 1; orderi < order.size(); orderi++) {
-		Logical_TreeNode* node= mp_Rel_to_Node[order[orderi]];
-		Logical_TreeNode* join_node = get_logical_tree_node(Logical_TreeNode_Kind::PLAN_JOIN);
-		join_node->u.JOIN.left = Final;
-		join_node->u.JOIN.right = node;
-		Final = join_node;
-		for (int i = 0; i < Conds.size(); i++) {
-			if (!Conds[i].bRhsIsAttr) continue;
-			if ((mp_is_node_integrated_before.count(Conds[i].lhsAttr.relname)
-				&& order[i] == Conds[i].rhsAttr.relname)
-				|| (mp_is_node_integrated_before.count(Conds[i].rhsAttr.relname)
-					&& order[i] == Conds[i].lhsAttr.relname))
-			{
-				Logical_TreeNode* filter_node = get_logical_tree_node(Logical_TreeNode_Kind::PLAN_FILTER);
-				filter_node->u.FILTER.rel = Final;
-				filter_node->u.FILTER.expr_filter = new Condition;
-				memcpy(filter_node->u.FILTER.expr_filter, &Conds[i], sizeof(Condition));
-
-				Final = filter_node;
-			}
-		}
-		mp_is_node_integrated_before[order[orderi]] = true;
-	}
-	Root->kind = Logical_TreeNode_Kind::PLAN_PROJ;  //进行最后的投影
-	Root->u.PROJECTION.rel = Final;
-	Attr_Info* attrs = new Attr_Info[Attrs.size()];
-	for (int i = 0; i < Attrs.size(); i++) {
-		attrs[i] = Attrs[i];
-	}
-	Root->u.PROJECTION.Attr_Num = Attrs.size();
-	Root->u.PROJECTION.Attr_list = attrs;
-	display();
 	return Root;
 }
 

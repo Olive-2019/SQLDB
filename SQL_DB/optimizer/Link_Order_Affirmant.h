@@ -1,16 +1,20 @@
 #pragma once
 #include "optimizer.h"
 #include "estimator.h"
+#include "../parser/parser_interp.h"
 class Link_Order_Affirmant {
 protected:
 
-	const vector<Execution_Plan>& Plans;
-	Estimator estimator;
+	vector<Condition> Conds_2;
 
+	vector<Condition> Conds_1;
+
+	vector<Rel_Info> Rels;
+	vector<Attr_Info> Attrs;
 public:
 
-	Link_Order_Affirmant(vector<Execution_Plan>& Plans);
+	Link_Order_Affirmant(vector<Condition>& Conds);
 
-	virtual vector<Execution_Plan> get_Link_Order();
+	virtual vector<Condition> get_Link_Order();
 
 };

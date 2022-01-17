@@ -7,41 +7,86 @@ double Estimator::estimate()
     return lost.Disk_Scan_Lost * 0.9 + lost.Memory_Scan_Lost * 0.1;
 }
 
+Link_Lost Estimator::estimate_TreeNode_Lost_Scan(Logical_TreeNode* node)
+{
+    Link_Lost ret;
+    Rel_Info temp;
+    Subsystem1_Manager::BASE.lookup_Rel(node->u.FILESCAN.Rel, temp);
+
+    vector<Attr_Info> attrs = Subsystem1_Manager::BASE.lookup_Attrs(temp.Rel_Name);
+    int record_length = attrs.back().Offset + attrs.back().Length;
+    ret.Disk_Scan_Lost = Global_Paras::Block_Size / (ret.record_num * record_length);
+    ret.Memory_Scan_Lost = 0;
+    ret.record_num = temp.Record_Num;
+    return ret;
+}
+
+Link_Lost Estimator::estimate_TreeNode_Lost_Filter(Logical_TreeNode* node)
+{
+    Link_Lost ret;
+    Link_Lost temp = estimate_TreeNode_Lost(node->u.FILTER.rel);
+    ret = temp;
+    /*
+    根据条件以及rel信息确定记录数量，但disk lost应该与表扫描一致
+    注意，filter下方的结点可以是叶节点，也可以是join结点和filter
+    */
+    if (node->u.FILTER.rel->kind == Logical_TreeNode_Kind::PLAN_FILESCAN) {
+        Link_Lost lost1 = estimate_TreeNode_Lost_Scan(node->u.FILTER.rel);
+        ret = lost1;
+        /*
+        根据条件以及分布
+        减少ret的record num
+        */
+    }
+    else if (node->u.FILTER.rel->kind == Logical_TreeNode_Kind::PLAN_JOIN) {
+        Link_Lost lost1 = estimate_TreeNode_Lost_Join(node->u.FILTER.rel);
+        ret = lost1;
+    }
+    else if (node->u.FILTER.rel->kind == Logical_TreeNode_Kind::PLAN_FILTER) {
+        ret = estimate_TreeNode_Lost_Filter(node->u.FILTER.rel);
+    }
+    return ret;
+}
+
+Link_Lost Estimator::estimate_TreeNode_Lost_Join(Logical_TreeNode* node)
+{
+    Link_Lost ret;
+    Link_Lost tempL = estimate_TreeNode_Lost(node->u.JOIN.left);
+    Link_Lost tempR = estimate_TreeNode_Lost(node->u.JOIN.right);
+
+    ret.Disk_Scan_Lost = tempL.Disk_Scan_Lost + tempR.Disk_Scan_Lost;
+    ret.Memory_Scan_Lost= tempL.record_num * tempR.record_num;
+    ret.record_num = tempL.record_num * tempR.record_num;
+    return ret;
+}
+
+Link_Lost Estimator::estimate_TreeNode_Lost_Proj(Logical_TreeNode* node)
+{
+    Link_Lost ret = estimate_TreeNode_Lost(node->u.PROJECTION.rel);
+    int record_length = 0;
+    int attr_num = node->u.PROJECTION.Attr_Num;
+    Attr_Info* attrs = node->u.PROJECTION.Attr_list;
+    for (int i = 0; i < attr_num; i++) {
+        record_length += attrs[i].Length;
+    }
+    ret.Disk_Scan_Lost+= Global_Paras::Block_Size / (ret.record_num * record_length);
+    return ret;
+}
+
 Link_Lost Estimator::estimate_TreeNode_Lost(Logical_TreeNode* node)
 {
     Link_Lost ret;
     if (node->kind == Logical_TreeNode_Kind::PLAN_FILESCAN) {
-        Rel_Info temp;
-        Subsystem1_Manager::BASE.lookup_Rel(node->u.FILESCAN.Rel, temp);
-        ret.record_num = temp.Record_Num;
+        return estimate_TreeNode_Lost_Scan(node);
     }
     else if (node->kind == Logical_TreeNode_Kind::PLAN_FILTER) {
-        Link_Lost temp = estimate_TreeNode_Lost(node->u.FILTER.rel);
-        ret = temp;
-        /*
-        根据条件以及rel信息确定记录数量，但disk lost应该与表扫描一致
-        注意，filter下方的结点可以是叶节点，也可以是join结点
-        */
-
-        if (node->u.FILTER.rel->kind == Logical_TreeNode_Kind::PLAN_FILESCAN) {
-            //根据条件涉及字段的分布信息以及条件信息获取损失
-        }
-        else if (node->u.FILTER.rel->kind == Logical_TreeNode_Kind::PLAN_JOIN) {
-            //根据条件涉及字段的分布信息以及条件信息获取损失
-        }
-
+        return estimate_TreeNode_Lost_Filter(node);
     }
     else if (node->kind == Logical_TreeNode_Kind::PLAN_JOIN) {
-        Link_Lost tempL = estimate_TreeNode_Lost(node->u.JOIN.left);
-        Link_Lost tempR = estimate_TreeNode_Lost(node->u.JOIN.right);
-
-        ret.Disk_Scan_Lost = tempL.Disk_Scan_Lost + tempR.Disk_Scan_Lost;
-        ret.record_num = tempL.record_num * tempR.record_num;
+        return estimate_TreeNode_Lost_Join(node);
     }
-
     else if (node->kind == Logical_TreeNode_Kind::PLAN_PROJ) {
-        Link_Lost temp = estimate_TreeNode_Lost(node->u.PROJECTION.rel);
-        ret = temp;
+        return estimate_TreeNode_Lost_Proj(node);
     }
 
     return ret;
