@@ -16,10 +16,8 @@ Link_Lost Estimator::estimate_TreeNode_Lost_Scan(Logical_TreeNode* node)
     vector<Attr_Info> attrs = Subsystem1_Manager::BASE.lookup_Attrs(temp.Rel_Name);
     int record_length = attrs.back().Offset + attrs.back().Length;
     ret.Memory_Scan_Lost = 0;
-    //ret.record_num = temp.Record_Num;
-    table_to_record_num[temp.Rel_Name] = temp.Record_Num;
+    ret.record_num = temp.Record_Num;
     ret.Disk_Scan_Lost = Global_Paras::Block_Size / (ret.record_num * record_length);
-    
     return ret;
 }
 
@@ -33,27 +31,8 @@ Link_Lost Estimator::estimate_TreeNode_Lost_Filter(Logical_TreeNode* node)
     根据条件以及rel信息确定记录数量，但disk lost应该与表扫描一致
     注意，filter下方的结点可以是叶节点，也可以是join结点和filter
     */
-    if (node->u.FILTER.rel->kind == Logical_TreeNode_Kind::PLAN_FILESCAN) {
-        Link_Lost lost1 = estimate_TreeNode_Lost_Scan(node->u.FILTER.rel);
-        ret = lost1;
-        /*
-        根据条件以及分布
-        减少ret的record num
-        */
-        
-    }
-    else if (node->u.FILTER.rel->kind == Logical_TreeNode_Kind::PLAN_JOIN) {
-        Link_Lost lost1 = estimate_TreeNode_Lost_Join(node->u.FILTER.rel);
-        ret = lost1;
-    }
-    else if (node->u.FILTER.rel->kind == Logical_TreeNode_Kind::PLAN_FILTER) {
-        ret = estimate_TreeNode_Lost_Filter(node->u.FILTER.rel);
-    }
     
-    if (!node->u.FILTER.expr_filter->bRhsIsAttr) {
-        ret.record_num = estimate_record_num(*node->u.FILTER.expr_filter, ret.record_num);
-    }
-    
+    ret.record_num = estimate_record_num(*node->u.FILTER.expr_filter, ret.record_num);
     ret.Memory_Scan_Lost += ret.record_num;
     return ret;
 }
@@ -127,30 +106,24 @@ Link_Lost Estimator::estimate_scan_lost(const Execution_Plan& Plan)
 }
 
 
-//一元条件
+
 int Estimator::estimate_record_num(const Condition& cond, int record_num) {
-    Attr_Info attr;
-    Subsystem1_Manager::BASE.lookup_Attr(cond.lhsAttr.relname, cond.lhsAttr.attrname, attr);
-    Distribution distri = attr.distribution;
-    table_to_record_num[cond.lhsAttr.relname] = distri.dis->rate(cond.op, *(double*)cond.rhsValue.data) * record_num;
-    return table_to_record_num[cond.lhsAttr.relname];
-}
-//二元条件
-int Estimator::estimate_record_num(const Condition& cond, int left_record_num, int right_record_num) {
-    Attr_Info left_attr, right_attr;
-    Subsystem1_Manager::BASE.lookup_Attr(cond.lhsAttr.relname, cond.lhsAttr.attrname, left_attr);
-    Subsystem1_Manager::BASE.lookup_Attr(cond.rhsAttr.relname, cond.rhsAttr.attrname, right_attr);
-    Distribution left_dis = left_attr.distribution;
-    Distribution right_dis = right_attr.distribution;
-    table_to_record_num[cond.lhsAttr.relname] = table_to_record_num[cond.rhsAttr.relname] =
-        left_dis.dis->binary_rate(cond.op, right_dis) * left_record_num * right_record_num;
-    return table_to_record_num[cond.rhsAttr.relname];
+
+    if (cond.bRhsIsAttr) {
+        Attr_Info left_attr, right_attr;
+        Subsystem1_Manager::BASE.lookup_Attr(cond.lhsAttr.relname, cond.lhsAttr.attrname, left_attr);
+        Subsystem1_Manager::BASE.lookup_Attr(cond.rhsAttr.relname, cond.rhsAttr.attrname, right_attr);
+        Distribution left_dis = left_attr.distribution;
+        Distribution right_dis = right_attr.distribution;
+        return left_dis.dis->binary_rate(cond.op, right_dis) * record_num;
+    }
+    else {
+        Attr_Info attr;
+        Subsystem1_Manager::BASE.lookup_Attr(cond.lhsAttr.relname, cond.lhsAttr.attrname, attr);
+        Distribution distri = attr.distribution;
+        return distri.dis->rate(cond.op, *(double*)cond.rhsValue.data) * record_num;
+    }
+    
 }
 
-int Estimator::estimate_record_num(const Condition& cond) {
-    if (cond.bRhsIsAttr) 
-        return estimate_record_num(cond, table_to_record_num[cond.lhsAttr.relname]);
-    
-    return estimate_record_num(cond, table_to_record_num[cond.lhsAttr.relname],
-        table_to_record_num[cond.lhsAttr.relname]);
-}
+

@@ -36,13 +36,8 @@ struct Link_Lost {
 class Estimator {
 	
 private:
-	//每个表对应的记录数量
-	map<string, int> table_to_record_num;
-	int estimate_record_num(const Condition& cond);
-	//一元条件的记录数量估计
+	//记录数量估计
 	int estimate_record_num(const Condition& cond, int record_num);
-	//二元条件的记录数量估计
-	int estimate_record_num(const Condition& cond, int left_record_num, int right_record_num);
 	Logical_TreeNode* Root;
 	Link_Lost estimate_TreeNode_Lost_Scan(Logical_TreeNode* node);
 	Link_Lost estimate_TreeNode_Lost_Filter(Logical_TreeNode* node);
