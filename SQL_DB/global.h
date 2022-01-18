@@ -3,6 +3,8 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <random>
+
 using namespace std;
 
 const int MAX_NAME_LENGTH = 20;    //各种名字如数据表名、字段名等最大长度
@@ -20,19 +22,34 @@ enum Distribution_Type {
 	//均匀分布
 	,EVENLY
 };
-
+struct Distribution;
+struct DISTRIBUTION_TYPE {
+	//一元条件
+	virtual double rate(int op, double value) = 0;
+	//二元条件
+	virtual double binary_rate(int op, const Distribution& dis) = 0;
+};
+struct NORMAL : public DISTRIBUTION_TYPE {
+	double mu;
+	double sigma;
+	double rate(int op, double value) {
+		return 0.5;
+	}
+	double binary_rate(int op, const Distribution& dis) {
+		return 0.5;
+	}
+};
+struct EVENLY : public DISTRIBUTION_TYPE {
+	double MIN;
+	double MAX;
+	double rate(int op, double value);
+	double binary_rate(int op, const Distribution& dis) {
+		return 0.5;
+	}
+};
 struct Distribution {
 	Distribution_Type type;
-	union {
-		struct NORMAL {
-			int mu;
-			int sigma;
-		};
-		struct EVENLY {
-			int MIN;
-			int MAX;
-		};
-	};
+	DISTRIBUTION_TYPE* dis;
 };
 
 
