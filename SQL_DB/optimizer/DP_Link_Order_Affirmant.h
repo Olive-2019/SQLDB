@@ -45,7 +45,7 @@ private:
 public:
 	DP_Link_Order_Affirmant(vector<Rel_Info>& Rels, vector<Condition>& Conds);
 
-	
+	//获取dp算法的结果逻辑树
 	Logical_TreeNode* get_tree(){
 		init();
 		dp();
