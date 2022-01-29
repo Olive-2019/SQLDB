@@ -14,7 +14,9 @@ Link_Lost Estimator::estimate_TreeNode_Lost_Scan(Logical_TreeNode* node)
     Subsystem1_Manager::BASE.lookup_Rel(node->u.FILESCAN.Rel, temp);
 
     vector<Attr_Info> attrs = Subsystem1_Manager::BASE.lookup_Attrs(temp.Rel_Name);
-    int record_length = attrs.back().Offset + attrs.back().Length;
+
+    int record_length = 0;
+    if (attrs.size()) record_length = attrs.back().Offset + attrs.back().Length;
     ret.Memory_Scan_Lost = 0;
     ret.record_num = temp.Record_Num;
     ret.Disk_Scan_Lost = (ret.record_num * record_length) / Global_Paras::Block_Size;
@@ -24,7 +26,6 @@ Link_Lost Estimator::estimate_TreeNode_Lost_Scan(Logical_TreeNode* node)
 Link_Lost Estimator::estimate_TreeNode_Lost_Filter(Logical_TreeNode* node)
 {
     Link_Lost ret;
-    //这个地方是不是执行重复了？下面的代码就是处理下一个结点的
     Link_Lost temp = estimate_TreeNode_Lost(node->u.FILTER.rel);
     ret = temp;
     /*

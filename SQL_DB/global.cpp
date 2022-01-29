@@ -1,7 +1,7 @@
 #include "global.h"
 string Global_Paras:: Current_DB;
 string Global_Paras:: Current_User;
-int Global_Paras:: Block_Size;
+int Global_Paras:: Block_Size = 10;
 #include "parser/parser_token.h"
 
 double EVENLY::rate(int op, double value) {
@@ -17,7 +17,7 @@ double EVENLY::rate(int op, double value) {
 		if (value < MAX) return 1 / (MAX - MIN) * (MAX - max(MIN, value));
 		return 0;
 	default:
-		return 1 - rate(TOKENKIND::T_LE, value);
+		return 1 - rate(TOKENKIND::T_GE, value);
 	}
 }
 

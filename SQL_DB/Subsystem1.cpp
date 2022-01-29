@@ -1,5 +1,5 @@
 #include "Subsystem1.h"
-
+#include "global.h"
 Subsystem1_Manager Subsystem1_Manager::BASE;
 
 
@@ -22,13 +22,21 @@ void Subsystem1_Manager::Delete_Rel(string RelName) {
 }
 bool Subsystem1_Manager::lookup_Attr(string RelName, string AttrName, Attr_Info& attr)
 {
-
+	attr = *new Attr_Info;
+	attr.Length = 10;
+	attr.Offset = 10;
+	attr.distribution = Distribution();
+	attr.distribution.dis = new struct EVENLY();
 	return false;
 }
 
 vector<Attr_Info> Subsystem1_Manager::lookup_Attrs(string RelName)
 {
-	return vector<Attr_Info>();
+	Attr_Info attr;
+	attr.Length = 10;
+	attr.Offset = 10;
+	vector<Attr_Info> ret = { attr };
+	return ret;
 }
 
 bool* Subsystem1_Manager::lookup_Authority(string RelName, string UserName)

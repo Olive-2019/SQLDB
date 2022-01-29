@@ -42,12 +42,10 @@ vector<vector<string>> zFun(const std::vector<string>& a, int m)
 
 
 
-
-DP_Link_Order_Affirmant::DP_Link_Order_Affirmant(vector<Rel_Info> Rels, vector<Condition> Conds)
-	:Rels(Rels), Link_Order_Affirmant(Conds) {
-	//建立叶节点
+void DP_Link_Order_Affirmant::init() {
 	for (int i = 0; i < Rels.size(); i++) {
 		Logical_TreeNode* node = get_logical_tree_node(Logical_TreeNode_Kind::PLAN_FILESCAN);
+
 		node->u.FILESCAN.Rel = Rels[i].Rel_Name;
 		relation_to_node_map[Rels[i].Rel_Name] = node;
 	}
@@ -74,10 +72,18 @@ DP_Link_Order_Affirmant::DP_Link_Order_Affirmant(vector<Rel_Info> Rels, vector<C
 			}
 			else {
 				sort(rels.begin(), rels.end());
-				Logical_TreeNode* Filter_Node = get_logical_tree_node(Logical_TreeNode_Kind::PLAN_FILTER); 
-				if (relation_to_binary_condition_node_map.count(rels)) Filter_Node->u.FILTER.rel = NULL;
-				else Filter_Node->u.FILTER.rel = relation_to_binary_condition_node_map[rels];
-				relation_to_binary_condition_node_map[rels] = Filter_Node;
+				Logical_TreeNode* Filter_Node = get_logical_tree_node(Logical_TreeNode_Kind::PLAN_FILTER);
+				memcpy(Filter_Node->u.FILTER.expr_filter, &(Conds[cond_index]), sizeof(Condition));
+				cout << relation_to_binary_condition_node_map.size() << endl;
+				if (!relation_to_binary_condition_node_map.count(rels)) {
+					Filter_Node->u.FILTER.rel = NULL;
+					relation_to_binary_condition_node_map.insert(map<vector<string>, Logical_TreeNode*>::value_type(rels, Filter_Node));
+				}
+				else {
+					Filter_Node->u.FILTER.rel = relation_to_binary_condition_node_map[rels];
+					relation_to_binary_condition_node_map[rels] = Filter_Node;
+				}
+					
 			}
 		}
 	}
@@ -85,7 +91,7 @@ DP_Link_Order_Affirmant::DP_Link_Order_Affirmant(vector<Rel_Info> Rels, vector<C
 	for (int i = 0; i < Rels.size(); ++i) rels_name.push_back(Rels[i].Rel_Name);
 
 	//joinrels第一个占位
-	joinrels.push_back(vector< vector<string>>());
+	joinrels.push_back(vector<vector<string>>());
 	//第二个就是所有的表
 	vector < vector<string>> rels;
 	for (int i = 0; i < rels_name.size(); ++i) {
@@ -94,6 +100,12 @@ DP_Link_Order_Affirmant::DP_Link_Order_Affirmant(vector<Rel_Info> Rels, vector<C
 		rels.push_back(tmp);
 	}
 	joinrels.push_back(rels);
+	for (int i = 2; i <= rels_name.size(); ++i) joinrels.push_back(vector<vector<string>>());
+}
+DP_Link_Order_Affirmant::DP_Link_Order_Affirmant(vector<Rel_Info>& Rels, vector<Condition>& Conds)
+	:Rels(Rels), Conds(Conds), Link_Order_Affirmant(Conds) {
+	
+	
 }
 Logical_TreeNode* DP_Link_Order_Affirmant::add_node_to_binary_condition_node(Logical_TreeNode* node, string rel1, string rel2) {
 	vector<string> rels = { rel1, rel2 };
@@ -133,8 +145,13 @@ void DP_Link_Order_Affirmant::dp_one_level(int level) {
 		Logical_TreeNode* node = dp_relations_to_node_map[joinrels[level - 1][i]];
 		
 		if (level != 2 || true) {
+
 			vector<vector<string>> other_rels = get_other_rel(level, joinrels[level - 1][i]);
 			for (int other_rel_index = 0; other_rel_index < other_rels.size(); ++other_rel_index) {
+				if (i == 1 && other_rel_index == 1) {
+					cout << endl;
+				}
+				
 				vector<string> new_rel;
 				Logical_TreeNode* node = join(joinrels[level - 1][i], other_rels[other_rel_index]);
 				set_union(joinrels[level - 1][i].begin(), joinrels[level - 1][i].end(),

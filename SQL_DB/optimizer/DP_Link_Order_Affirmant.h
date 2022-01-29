@@ -40,11 +40,14 @@ private:
 			dp_one_level(level);
 	}
 
+	void init();
+
 public:
-	DP_Link_Order_Affirmant(vector<Rel_Info> Rels, vector<Condition> Conds);
+	DP_Link_Order_Affirmant(vector<Rel_Info>& Rels, vector<Condition>& Conds);
 
 	
 	Logical_TreeNode* get_tree(){
+		init();
 		dp();
 		return dp_relations_to_node_map[joinrels[joinrels.size() - 1][0]];
 	}
