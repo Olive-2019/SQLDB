@@ -615,6 +615,7 @@ int interp(NODE *n)
 			if (groupAttr.attrname != NULL)
 				group = true;
 
+			
 			Optimizer* optimizer = new Optimizer(nrelations, relations, nselattrs, relAttrs, nconditions, conditions);
 			
 			break;

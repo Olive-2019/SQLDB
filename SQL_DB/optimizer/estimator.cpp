@@ -17,7 +17,7 @@ Link_Lost Estimator::estimate_TreeNode_Lost_Scan(Logical_TreeNode* node)
     int record_length = attrs.back().Offset + attrs.back().Length;
     ret.Memory_Scan_Lost = 0;
     ret.record_num = temp.Record_Num;
-    ret.Disk_Scan_Lost = Global_Paras::Block_Size / (ret.record_num * record_length);
+    ret.Disk_Scan_Lost = (ret.record_num * record_length) / Global_Paras::Block_Size;
     return ret;
 }
 

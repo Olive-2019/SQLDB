@@ -1,5 +1,7 @@
 #include "Link_Order_Affirmant.h"
 #include "Logical_Tree_Builder.h"
+#include "optimizer.h"
+#include "estimator.h"
 Link_Order_Affirmant::Link_Order_Affirmant(vector<Condition>& Conds)
 {
 	for (int i = 0; i < Conds.size(); i++) {

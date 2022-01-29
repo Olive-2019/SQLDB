@@ -1,6 +1,7 @@
 #include "optimizer.h"
 #include "../Subsystem1.h"
 #include "../Subsystem1.h"
+#include "DP_Link_Order_Affirmant.h"
 
 bool Optimizer::lookup_Index(string RelName, string AttrName, Index_Info& index)
 {
@@ -60,6 +61,8 @@ void Optimizer::init(int Rel_num, RelInfo* rels, int Attr_num, AggRelAttr* attrs
     }
 
     //获取逻辑树
+    DP_Link_Order_Affirmant link_order_affirmant = DP_Link_Order_Affirmant(Rels, Conds);
+    link_order_affirmant.get_tree();
     this->Logical_Tree_Root = Logical_Tree_Builder(Rels, Attrs, Conds).get_tree_root();
 
     {
@@ -80,6 +83,8 @@ Optimizer::Optimizer(int Rel_num, RelInfo* rels, int Attr_num, AggRelAttr* attrs
     nickname问题未处理，应该先将所有nickname换为原名
     
     */
+
+    
     init(Rel_num, rels, Attr_num, attrs, Cond_num, conds);
     Executor* executor = new Executor(Logical_Tree_Root);
     executor->execute_select();

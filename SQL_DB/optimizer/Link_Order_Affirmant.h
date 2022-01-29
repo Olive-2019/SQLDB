@@ -1,6 +1,5 @@
 #pragma once
-#include "optimizer.h"
-#include "estimator.h"
+
 #include "../parser/parser_interp.h"
 class Link_Order_Affirmant {
 protected:
