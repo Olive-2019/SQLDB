@@ -146,6 +146,7 @@
     <ClInclude Include="global.h" />
     <ClInclude Include="optimizer\DP_Link_Order_Affirmant.h" />
     <ClInclude Include="optimizer\estimator.h" />
+    <ClInclude Include="optimizer\GA_Link_Order_Affirmant.h" />
     <ClInclude Include="optimizer\Link_Order_Affirmant.h" />
     <ClInclude Include="optimizer\Logical_Tree_Builder.h" />
     <ClInclude Include="optimizer\optimizer.h" />
@@ -179,6 +180,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="optimizer\DP_Link_Order_Affirmant.cpp" />
     <ClCompile Include="optimizer\estimator.cpp" />
+    <ClCompile Include="optimizer\GA_Link_Order_Affirmant.cpp" />
     <ClCompile Include="optimizer\Link_Order_Affirmant.cpp" />
     <ClCompile Include="optimizer\Logical_Tree_Builder.cpp" />
     <ClCompile Include="optimizer\optimizer.cpp" />

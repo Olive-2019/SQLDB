@@ -42,56 +42,9 @@ vector<vector<string>> zFun(const std::vector<string>& a, int m)
 
 
 
-void DP_Link_Order_Affirmant::init() {
-	for (int i = 0; i < Rels.size(); i++) {
-		Logical_TreeNode* node = get_logical_tree_node(Logical_TreeNode_Kind::PLAN_FILESCAN);
 
-		node->u.FILESCAN.Rel = Rels[i].Rel_Name;
-		relation_to_node_map[Rels[i].Rel_Name] = node;
-	}
-	
-	for (int cond_index = 0; cond_index < Conds.size(); ++cond_index) {
-		//cout << relation_to_binary_condition_node_map.size() << endl;
-		//根据所有一元条件建立初步的filter
-		if (Conds[cond_index].bRhsIsAttr == false) {
-			Logical_TreeNode* node = get_logical_tree_node(Logical_TreeNode_Kind::PLAN_FILTER);
-			node->u.FILTER.rel = relation_to_node_map[Conds[cond_index].lhsAttr.relname];
-			node->u.FILTER.expr_filter = new Condition;
-			memcpy(node->u.FILTER.expr_filter, &(Conds[cond_index]), sizeof(Condition));//利用filter结点替换原本的叶节点
-			relation_to_node_map[Conds[cond_index].lhsAttr.relname] = node;
-		}
-		//二元条件的整理
-		else {
-			vector<string> rels = { Conds[cond_index].lhsAttr.relname, Conds[cond_index].rhsAttr.relname };
-			//左右都是同一张表的
-			if (rels[0] == rels[1]) {
-				Logical_TreeNode* Filter_Node = get_logical_tree_node(Logical_TreeNode_Kind::PLAN_FILTER); //filter条件
-				Filter_Node->u.FILTER.rel = relation_to_node_map[rels[0]];
-				Filter_Node->u.FILTER.expr_filter = new Condition;
-				memcpy(Filter_Node->u.FILTER.expr_filter, &Conds[cond_index], sizeof(Condition));
-				relation_to_node_map[rels[0]] = Filter_Node;
-			}
-			else {
-				sort(rels.begin(), rels.end());
-				Logical_TreeNode* Filter_Node = get_logical_tree_node(Logical_TreeNode_Kind::PLAN_FILTER);
-				Filter_Node->u.FILTER.expr_filter = new Condition;
-				memcpy((char*)Filter_Node->u.FILTER.expr_filter, (char*)&(Conds[cond_index]), sizeof(Conds[cond_index]));
-				
-				if (!relation_to_binary_condition_node_map.count(rels)) {
-					Filter_Node->u.FILTER.rel = NULL;
-					relation_to_binary_condition_node_map.insert(map<vector<string>, Logical_TreeNode*>::value_type(rels, Filter_Node));
-				}
-				else {
-					Filter_Node->u.FILTER.rel = relation_to_binary_condition_node_map[rels];
-					relation_to_binary_condition_node_map[rels] = Filter_Node;
-				}
-					
-			}
-		}
-	}
-
-	for (int i = 0; i < Rels.size(); ++i) rels_name.push_back(Rels[i].Rel_Name);
-
+DP_Link_Order_Affirmant::DP_Link_Order_Affirmant(vector<Rel_Info>& Rels, vector<Condition>& Conds)
+	: Link_Order_Affirmant(Rels, Conds) {
 	//joinrels第一个占位
 	joinrels.push_back(vector<vector<string>>());
 	//第二个就是所有的表
@@ -103,9 +56,6 @@ void DP_Link_Order_Affirmant::init() {
 	}
 	joinrels.push_back(rels);
 	for (int i = 2; i <= rels_name.size(); ++i) joinrels.push_back(vector<vector<string>>());
-}
-DP_Link_Order_Affirmant::DP_Link_Order_Affirmant(vector<Rel_Info>& Rels, vector<Condition>& Conds)
-	:Rels(Rels), Conds(Conds), Link_Order_Affirmant(Conds) {
 	
 	
 }

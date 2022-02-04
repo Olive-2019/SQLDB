@@ -176,6 +176,7 @@ vector<RID> Query_Executor::execute_tree_node_join(Logical_TreeNode* node, vecto
 		}
 	}
 	new_attr.insert(new_attr.end(), Rattr.begin(), Rattr.end());
+	//for (int i = 0; i < Rattr.size(); ++i) new_attr.push_back(Rattr[i]);
 	if (node->u.JOIN.right->RelName.find('&') == string::npos) {
 		for (int i = 0; i < Rattr.size(); ++i) {
 			char buff[100] = { 0 };

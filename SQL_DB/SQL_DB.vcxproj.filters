@@ -120,6 +120,9 @@
     <ClInclude Include="executor\Query_Executor.h">
       <Filter>executor</Filter>
     </ClInclude>
+    <ClInclude Include="optimizer\GA_Link_Order_Affirmant.h">
+      <Filter>optimizer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Subsystem1.cpp">
@@ -208,6 +211,9 @@
     </ClCompile>
     <ClCompile Include="executor\Query_Executor.cpp">
       <Filter>executor</Filter>
+    </ClCompile>
+    <ClCompile Include="optimizer\GA_Link_Order_Affirmant.cpp">
+      <Filter>optimizer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

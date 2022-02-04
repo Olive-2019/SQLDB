@@ -59,7 +59,7 @@ static Logical_TreeNode* get_logical_tree_node(Logical_TreeNode_Kind kind) {
     return ret;
 }
 
-
+/*两种使用方式，第一种是构造函数传入属性、第二种是get_tree_node才传入*/
 class Logical_Tree_Builder {
 	//将语法树转变为逻辑树
 private:
@@ -68,12 +68,27 @@ private:
     vector<Attr_Info> Attrs;
     vector<Condition> Conds;
 
+    //两边不同的二元条件
+    map<vector<string>, Logical_TreeNode*> relation_to_binary_condition_node_map;
+    //叶子结点、一元条件、两边相同的二元条件
+    map<string, Logical_TreeNode*> relation_to_node_map;
+
 public:
     Logical_Tree_Builder(vector<Rel_Info> Rels, vector<Attr_Info> Attrs, vector<Condition> Conds);
+
+    //GA用
+    Logical_Tree_Builder(map<vector<string>, Logical_TreeNode*> relation_to_binary_condition_node_map,
+        map<string, Logical_TreeNode*> relation_to_node_map) : Root (NULL), relation_to_node_map(relation_to_node_map),
+        relation_to_binary_condition_node_map(relation_to_binary_condition_node_map){}
     
     
     Logical_TreeNode* get_tree_root();
+    //检查是否存在二元条件，如果存在则返回新的结点，如果不存在则返回原来的node
+    Logical_TreeNode* add_node_to_binary_condition_node(Logical_TreeNode* node, string rel1, string rel2);
     //根据某种连接顺序确定逻辑树，order内部为RelName
-    Logical_TreeNode* get_tree_root_order(vector<string> order);
+    //GA用
+    Logical_TreeNode* get_tree_root_with_order(vector<string> order);
     void display();
+
+    static void delete_node(Logical_TreeNode* root);
 };

@@ -27,6 +27,7 @@ bool Subsystem1_Manager::lookup_Attr(string RelName, string AttrName, Attr_Info&
 	attr.Offset = 10;
 	attr.distribution = Distribution();
 	attr.distribution.dis = new struct EVENLY();
+	strcpy(attr.Attr_Name,"attr");
 	return false;
 }
 

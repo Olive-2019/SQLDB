@@ -137,21 +137,44 @@ Logical_TreeNode* Logical_Tree_Builder::get_tree_root()
 	return Root;
 }
 
-Logical_TreeNode* Logical_Tree_Builder::get_tree_root_order(vector<string> order)
+Logical_TreeNode* Logical_Tree_Builder::get_tree_root_with_order(vector<string> order)
 {
-
-	/*
-	此函数功能为根据特定的顺序建立一个Logical Tree
-
-	表链接的顺序可以使用二元条件的顺序来表示（详见get tree root函数二元链接部分）
-
-	不涉及二元条件的数据表链接顺序对链接损失没有影响，全部放到最后依次链接即可
+	if (order.empty()) return NULL;
+	Logical_TreeNode* Root_in_func = relation_to_node_map[order[0]];
 	
-	该函数的参数有待商榷
-	*/
-	return Root;
-}
+	for (int i = 1; i < order.size(); ++i) {
+		Logical_TreeNode* join_node = get_logical_tree_node(PLAN_JOIN);
+		join_node->u.JOIN.left = Root_in_func;
+		join_node->u.JOIN.right = relation_to_node_map[order[i]];
+		for (int j = 0; j < i; ++j) 
+			join_node = add_node_to_binary_condition_node(join_node, order[i], order[j]);
+		Root_in_func = join_node;
+	}
 
+	return Root_in_func;
+}
+Logical_TreeNode* Logical_Tree_Builder::add_node_to_binary_condition_node(Logical_TreeNode* node, string rel1, string rel2) {
+	vector<string> rels = { rel1, rel2 };
+	sort(rels.begin(), rels.end());
+	if (!relation_to_binary_condition_node_map.count(rels)) return node;
+	Logical_TreeNode* p = relation_to_binary_condition_node_map[rels], * p0 = NULL;
+	Logical_TreeNode* new_binary_tree, * root(NULL), * rear(NULL);
+	while (p) {
+		new_binary_tree = get_logical_tree_node(Logical_TreeNode_Kind::PLAN_FILTER);
+		new_binary_tree->u.FILTER.rel = NULL;
+		memcpy(new_binary_tree, p, sizeof(*p));
+		if (p == relation_to_binary_condition_node_map[rels]) {
+			rear = root = new_binary_tree;
+		}
+		else {
+			rear->u.FILTER.rel = new_binary_tree;
+			rear = new_binary_tree;
+		}
+		p0 = p, p = p->u.FILTER.rel;
+	}
+	rear->u.FILTER.rel = node;
+	return root;
+}
 void Logical_Tree_Builder::display()
 {
 	Logical_TreeNode* node = Root;
@@ -201,3 +224,14 @@ void Logical_Tree_Builder::display()
 	}
 
 }
+void Logical_Tree_Builder::delete_node(Logical_TreeNode* root) {
+	if (root->kind == PLAN_FILTER) delete_node(root->u.FILTER.rel);
+	if (root->kind == PLAN_JOIN) {
+		delete_node(root->u.JOIN.left);
+		delete_node(root->u.JOIN.right);
+	}
+	if (root->kind == PLAN_PROJ) delete_node(root->u.PROJECTION.rel);
+	//释放该结点空间
+	//delete root;
+}
+
