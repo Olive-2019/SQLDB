@@ -148,6 +148,7 @@ public:
 		FILE* fp;
 		string filename = "sys/0";
 		if ((fp = fopen(filename.c_str(), "ab+")) == NULL) {
+			cout << "asdas" << endl;
 			printf("Fail to open file!\n");
 			exit(0);
 		}
@@ -225,7 +226,8 @@ private:
 
 public:
 	Subsystem1_Manager() {
-
+		UserName = "User1";
+		DBName = "DB1";
 	}
 	static Subsystem1_Manager mgr;
 	string UserName;
@@ -1111,7 +1113,7 @@ public:
 		int buffer_id = PF_BufferMgr::pf_buffermgr.Read_page_to_buffer("sys/Relation", operate_page);
 		int* pp = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + 4);
 		int begin = *pp;
-
+		cout << "saddas==" << operate_page << endl;
 		while (operate_page != -1) {
 			int scan_begin = 8;
 			while (scan_begin != begin) {
@@ -1253,18 +1255,24 @@ public:
 	RID Insert_Reocrd(string Rel_Name, char* record) {
 		int operate_page = Scan_rel_get_page_id(Rel_Name);
 
-		string dir = "data/" + UserName + "/" + DBName + "/" + Rel_Name;
+		string dir = "../data/" + UserName + "/" + DBName + "/" + Rel_Name;
+		FILE* file = fopen(dir.c_str(), "a");
+		if (file == NULL) {
+			cout << "NULL" << endl;
+			exit(0);
+		}
+		cout << "dir==" << dir << endl;
 		int buffer_id = PF_BufferMgr::pf_buffermgr.Read_page_to_buffer(dir, operate_page);
 		int* pp = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + 4);
 		int begin = *pp;
-
+		cout << "1" << endl;
 		while (begin >= Global_Paras::Block_Size) {
 			int* pl = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData);
 			operate_page = *pl;
-
+			cout << "operate page==" << operate_page << endl;
 			if (operate_page == -1) {
 				operate_page = Page_Mgr::page_mgr.Allocate_page_to_file(dir);
-
+				cout << "new operate page==" << operate_page << endl;
 				int* p = &operate_page;
 				char* t_ch = (char*)p;
 				for (int i = 0; i < 4; i++) {
@@ -1276,7 +1284,7 @@ public:
 			pp = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + 4);
 			int begin = *pp;
 		}
-
+		cout << "2" << endl;
 		//-------------------------------------------------------------------------------------- -
 		RID rid;
 		rid.blockID = operate_page; rid.slotID = begin;
@@ -1289,7 +1297,7 @@ public:
 		}
 
 
-
+		cout << "3" << endl;
 		vector<Attr_Info> attr_vec = lookup_Attrs(Rel_Name);
 		int len = 0;
 		for (int i = 0; i < attr_vec.size(); i++) {
