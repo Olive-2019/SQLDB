@@ -140,6 +140,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Exclusive_Lock.h" />
+    <ClInclude Include="executor\DDL_executor.h" />
     <ClInclude Include="executor\executor.h" />
     <ClInclude Include="executor\Linker.h" />
     <ClInclude Include="executor\Query_Executor.h" />
@@ -173,6 +174,7 @@
     <ClInclude Include="transaction\Undo_Log.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="executor\DDL_executor.cpp" />
     <ClCompile Include="executor\executor.cpp" />
     <ClCompile Include="executor\Linker.cpp" />
     <ClCompile Include="executor\Query_Executor.cpp" />

@@ -123,6 +123,9 @@
     <ClInclude Include="optimizer\GA_Link_Order_Affirmant.h">
       <Filter>optimizer</Filter>
     </ClInclude>
+    <ClInclude Include="executor\DDL_executor.h">
+      <Filter>executor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Subsystem1.cpp">
@@ -214,6 +217,9 @@
     </ClCompile>
     <ClCompile Include="optimizer\GA_Link_Order_Affirmant.cpp">
       <Filter>optimizer</Filter>
+    </ClCompile>
+    <ClCompile Include="executor\DDL_executor.cpp">
+      <Filter>executor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

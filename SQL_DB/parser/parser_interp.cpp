@@ -7,6 +7,7 @@
 #include "parser_interp.h"
 #include "../Subsystem1.h"
 #include "../optimizer/optimizer.h"
+#include "../executor/DDL_executor.h"
 extern bool stop;
 
 #define E_OK                0
@@ -170,7 +171,7 @@ static int parse_format_string(char *format_string, AttrType *type, int *len)
 *    length of the list on success ( >= 0 )
 *    error code otherwise
 */
-static int mk_attr_infos(NODE *list, int max, vector<string>& column_name, vector<int>&types)
+static int mk_attr_infos(NODE *list, int max, vector<string>& column_name, vector<AttrType>&types)
 {
 	int i;
 	int len;
@@ -253,10 +254,10 @@ static int mk_values(NODE *list, string RelName, char* record)
 		NODE* n = list->u.LIST.curr;
 		//mk_value(list->u.LIST.curr, values[i]);
 		int type = n->u.VALUE.type;
-		
 		switch (type) {
 		case INT:
 			memcpy(record + attrs[i].Offset, (char*)&n->u.VALUE.ival, sizeof(int));
+			
 			break;
 		case FLOAT: 
 			memcpy(record + attrs[i].Offset, (char*)&n->u.VALUE.rval, sizeof(float));
@@ -266,7 +267,6 @@ static int mk_values(NODE *list, string RelName, char* record)
 			break;
 		}
 	}
-
 	return i;
 }
 static int mk_delete_cond(NODE* del, RelInfo& rel, vector<Condition>& conds) {
@@ -496,7 +496,7 @@ int interp(NODE *n)
 				print_error("create", E_TOOLONG);
 				break;
 			}
-			vector<int> type;
+			vector<AttrType> type;
 			vector<string> column_name;
 			nattrs = mk_attr_infos(n->u.CREATETABLE.attrlist, MAXATTRS, column_name, type);
 			if (nattrs < 0) {
@@ -505,6 +505,7 @@ int interp(NODE *n)
 			}/*
 			if (rc = dbsystem.create_table(table_name, type, column_name)) cout << "创建表" + table_name + "失败" << endl;
 			else cout << "创建表" + table_name + "成功" << endl;*/
+			DDL_executor::ddl_executor.create_table(table_name, type, column_name);
 			break;
 		}
 		case N_CREATEDATABASE:
@@ -514,17 +515,24 @@ int interp(NODE *n)
 			mk_database(n, dbname);
 			/*if (rc = dbsystem.create_database(dbname)) cout << "创建数据库" + dbname + "失败" << endl;
 			else cout << "创建数据库" + dbname + "成功" << endl;*/
+			DDL_executor::ddl_executor.create_DB(dbname);
 			break;
 		}
 		case N_USEDATABASE:
 		{
-			/*string dbname(n->u.USEDATABASE.databasename);
+			string dbname(n->u.USEDATABASE.databasename);
+			/*
 			int rc = dbsystem.set_database(dbname);
 			if (rc) cout  << "设定数据库出现问题" << endl;
 			else cout  << "正确设定数据库" << dbname << endl;*/
+			DDL_executor::ddl_executor.set_DB(dbname);
 			break;
 		}
 		case N_DROPTABLE:
+			/*
+			警告
+			未实现
+			*/
 			cout << parser_str << "drop table" << endl;
 			break; 
 		case N_CREATEINDEX:
@@ -533,9 +541,14 @@ int interp(NODE *n)
 			/*if (rc = dbsystem.create_index(table, column, 0)) cout << "创建索引出现问题" << endl;
 			else cout << "成功创建索引" << endl;*/
 			//cout << n->u.CREATEINDEX.attrname << ' ' << n->u.CREATEINDEX.relname << endl;
+			DDL_executor::ddl_executor.create_index(table,column);
 			break;
 		}
 		case N_DROPINDEX:
+			/*
+			警告
+			未实现
+			*/
 			cout << parser_str << "drop index" << endl;
 			break;
 		case N_INSERT:

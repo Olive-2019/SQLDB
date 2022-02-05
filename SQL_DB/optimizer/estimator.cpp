@@ -55,6 +55,7 @@ Link_Lost Estimator::estimate_TreeNode_Lost_Proj(Logical_TreeNode* node)
     Link_Lost ret = estimate_TreeNode_Lost(node->u.PROJECTION.rel);
     int record_length = 0;
     int attr_num = node->u.PROJECTION.Attr_Num;
+    cout << "attr_num==" << attr_num << endl;
     Attr_Info* attrs = node->u.PROJECTION.Attr_list;
     for (int i = 0; i < attr_num; i++) {
         record_length += attrs[i].Length;

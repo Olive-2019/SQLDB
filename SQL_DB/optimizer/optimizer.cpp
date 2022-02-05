@@ -65,10 +65,10 @@ void Optimizer::init(int Rel_num, RelInfo* rels, int Attr_num, AggRelAttr* attrs
     //for (int i = 0; i < Rels.size(); ++i) printf("%p\n",Rels[i].Rel_Name);
     //DP_Link_Order_Affirmant link_order_affirmant = DP_Link_Order_Affirmant(Rels, Conds);
     
-    GA_Link_Order_Affirmant link_order_affirmant = GA_Link_Order_Affirmant(Rels, Conds);
-    this->Logical_Tree_Root = link_order_affirmant.get_tree();
-    //this->Logical_Tree_Root = Logical_Tree_Builder(Rels, Attrs, Conds).get_tree_root();
-
+    //DP_Link_Order_Affirmant link_order_affirmant = DP_Link_Order_Affirmant(Rels, Conds);
+    //this->Logical_Tree_Root = link_order_affirmant.get_tree();
+    
+    this->Logical_Tree_Root = Logical_Tree_Builder(Rels, Attrs, Conds).get_tree_root();
     {
         //优化逻辑树
 
@@ -111,6 +111,7 @@ Optimizer::Optimizer(RelInfo rel, int Attr_num, NODE* attrs, char** values, int 
 //insert语句构造函数
 Optimizer::Optimizer(RelInfo rel, char* record, SQL_type sql_type)
 {
+
     Executor* executor = new Executor(nullptr);
     executor->execute_insert(rel.relname, record);
 }

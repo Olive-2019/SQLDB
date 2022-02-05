@@ -646,7 +646,7 @@ bool SyntaxTree::parseValue(NODE* &node)
 		break;
 	case T_INT:
 	{
-		int v;
+		int v=0;
 		sscanf_s(val->content, "%d", &v);
 		node = value_node(INT, &v);
 		break;
