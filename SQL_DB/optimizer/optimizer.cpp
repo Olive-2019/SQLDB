@@ -6,7 +6,7 @@
 
 bool Optimizer::lookup_Index(string RelName, string AttrName, Index_Info& index)
 {
-    return Subsystem1_Manager::BASE.lookup_Index(RelName, AttrName, index);
+    return Subsystem1_Manager::mgr.lookup_Index(RelName, AttrName, index);
 }
 
 void Optimizer::generate_execution_plan()
@@ -47,13 +47,13 @@ void Optimizer::init(int Rel_num, RelInfo* rels, int Attr_num, AggRelAttr* attrs
         //将语法树中的结构转换为标准结构
         for (int i = 0; i < Rel_num; i++) {
             Rel_Info temp;
-            Subsystem1_Manager::BASE.lookup_Rel(rels[i].relname, temp);
+            Subsystem1_Manager::mgr.lookup_Rel(rels[i].relname, temp);
             Rels.push_back(temp);
         }
         for (int i = 0; i < Attr_num; i++) {
             if (strcmp(attrs[i].attrname, "*") == 0) continue;
             Attr_Info temp;
-            Subsystem1_Manager::BASE.lookup_Attr(attrs[i].relname, attrs[i].attrname, temp);
+            Subsystem1_Manager::mgr.lookup_Attr(attrs[i].relname, attrs[i].attrname, temp);
             Attrs.push_back(temp);
         }
         for (int i = 0; i < Cond_num; i++) {
@@ -103,7 +103,7 @@ Optimizer::Optimizer(RelInfo rel, int Attr_num, NODE* attrs, char** values, int 
     vector<Attr_Info> Attrs;
     for (int i = 0; i < Attr_num; i++) {
         Attr_Info attr;
-        Subsystem1_Manager::BASE.lookup_Attr(attrs[i].u.RELATTR.relname, attrs[i].u.RELATTR.attrname, attr);
+        Subsystem1_Manager::mgr.lookup_Attr(attrs[i].u.RELATTR.relname, attrs[i].u.RELATTR.attrname, attr);
         Attrs.push_back(attr);
     }
     executor->execute_update(Attrs, values);

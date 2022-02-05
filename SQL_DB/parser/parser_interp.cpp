@@ -248,7 +248,7 @@ static void mk_database(NODE* node, string& dbname) {
 static int mk_values(NODE *list, string RelName, char* record)
 {
 	int i;
-	vector<Attr_Info> attrs = Subsystem1_Manager::BASE.lookup_Attrs(RelName);
+	vector<Attr_Info> attrs = Subsystem1_Manager::mgr.lookup_Attrs(RelName);
 	/* for each element of the list... */
 	for (i = 0; list != NULL; ++i, list = list->u.LIST.next) {
 		NODE* n = list->u.LIST.curr;
@@ -559,7 +559,7 @@ int interp(NODE *n)
 			nvals = mk_values(n->u.INSERT.valuelist, rel_name, record);
 			Rel_Info rel_info;
 			RelInfo rel;
-			Subsystem1_Manager::BASE.lookup_Rel(rel_name, rel_info);
+			Subsystem1_Manager::mgr.lookup_Rel(rel_name, rel_info);
 			rel.relname = rel_info.Rel_Name;
 			Optimizer* optimizer = new Optimizer(rel, record);
 			/* Make the call to insert */

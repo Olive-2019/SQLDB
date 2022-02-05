@@ -45,12 +45,12 @@ void Executor::execute()
 void Executor::Display(string RelName, vector<RID> records)
 {
 	cout << "查询结果为：" << endl;
-	vector<Attr_Info> attrs = Subsystem1_Manager::BASE.lookup_Attrs(RelName);
+	vector<Attr_Info> attrs = Subsystem1_Manager::mgr.lookup_Attrs(RelName);
 	int length = 15;
 	for (int i = 0; i < attrs.size(); ++i) 
 		cout << setw(length) << attrs[i].Attr_Name << endl;
 	for (int i = 0; i < records.size(); ++i) {
-		char* buff = Subsystem1_Manager::BASE.Find_Record_by_RID(records[i]);
+		char* buff = Subsystem1_Manager::mgr.Find_Record_by_RID(RelName, records[i]);
 		for (int j = 0; j < attrs.size(); ++j) {
 			switch (attrs[j].type)
 			{
@@ -77,17 +77,17 @@ void Executor::Display(string RelName, vector<RID> records)
 
 void Executor::Insert(string RelName, char* record)
 {
-	Subsystem1_Manager::BASE.Insert_Reocrd(RelName, record);
+	Subsystem1_Manager::mgr.Insert_Reocrd(RelName, record);
 }
 
 void Executor::Delete(string RelName, vector<RID> records)
 {
-	Subsystem1_Manager::BASE.Delete_Record(RelName, records);
+	Subsystem1_Manager::mgr.Delete_Record(RelName, records);
 }
 
 void Executor::Update(string RelName, vector<RID> records, vector<Attr_Info> attrs, char** new_values)
 {
 	for (int i = 0; i < records.size(); ++i) 
 		for (int j = 0; j < attrs.size(); ++j) 
-			Subsystem1_Manager::BASE.Update_Record(RelName, records[i], attrs[j], new_values[j]);
+			Subsystem1_Manager::mgr.Update_Record(RelName, records[i], attrs[j], new_values[j]);
 }

@@ -45,7 +45,7 @@ Logical_TreeNode* Logical_Tree_Builder::get_tree_root()
 	for (int i = 0; i < Conds.size(); i++) {  //根据所有一元条件建立初步的filter
 		if (Conds[i].bRhsIsAttr == false) {
 			Rel_Info temp;
-			Subsystem1_Manager::BASE.lookup_Rel(Conds[i].lhsAttr.relname, temp);
+			Subsystem1_Manager::mgr.lookup_Rel(Conds[i].lhsAttr.relname, temp);
 			cout << "cond RelName==" << temp.Rel_Name << endl;
 			Logical_TreeNode* leaf = mp_Rel_to_Node[temp.Rel_Name];
 			Logical_TreeNode* node = get_logical_tree_node(Logical_TreeNode_Kind::PLAN_FILTER);
@@ -63,8 +63,8 @@ Logical_TreeNode* Logical_Tree_Builder::get_tree_root()
 	for (int i = 0; i < Conds.size(); i++) {  //根据二元条件进一步建立逻辑树
 		if (Conds[i].bRhsIsAttr == true) {
 			Rel_Info Ltemp, Rtemp;
-			Subsystem1_Manager::BASE.lookup_Rel(Conds[i].lhsAttr.relname, Ltemp);
-			Subsystem1_Manager::BASE.lookup_Rel(Conds[i].rhsAttr.relname, Rtemp);
+			Subsystem1_Manager::mgr.lookup_Rel(Conds[i].lhsAttr.relname, Ltemp);
+			Subsystem1_Manager::mgr.lookup_Rel(Conds[i].rhsAttr.relname, Rtemp);
 			Logical_TreeNode* Lnode = mp_Rel_to_Node[Ltemp.Rel_Name];
 			Logical_TreeNode* Rnode = mp_Rel_to_Node[Rtemp.Rel_Name];
 			

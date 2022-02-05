@@ -11,9 +11,9 @@ Link_Lost Estimator::estimate_TreeNode_Lost_Scan(Logical_TreeNode* node)
 {
     Link_Lost ret;
     Rel_Info temp;
-    Subsystem1_Manager::BASE.lookup_Rel(node->u.FILESCAN.Rel, temp);
+    Subsystem1_Manager::mgr.lookup_Rel(node->u.FILESCAN.Rel, temp);
 
-    vector<Attr_Info> attrs = Subsystem1_Manager::BASE.lookup_Attrs(temp.Rel_Name);
+    vector<Attr_Info> attrs = Subsystem1_Manager::mgr.lookup_Attrs(temp.Rel_Name);
 
     int record_length = 0;
     if (attrs.size()) record_length = attrs.back().Offset + attrs.back().Length;
@@ -113,15 +113,15 @@ int Estimator::estimate_record_num(const Condition& cond, int record_num) {
 
     if (cond.bRhsIsAttr) {
         Attr_Info left_attr, right_attr;
-        Subsystem1_Manager::BASE.lookup_Attr(cond.lhsAttr.relname, cond.lhsAttr.attrname, left_attr);
-        Subsystem1_Manager::BASE.lookup_Attr(cond.rhsAttr.relname, cond.rhsAttr.attrname, right_attr);
+        Subsystem1_Manager::mgr.lookup_Attr(cond.lhsAttr.relname, cond.lhsAttr.attrname, left_attr);
+        Subsystem1_Manager::mgr.lookup_Attr(cond.rhsAttr.relname, cond.rhsAttr.attrname, right_attr);
         Distribution left_dis = left_attr.distribution;
         Distribution right_dis = right_attr.distribution;
         return left_dis.dis->binary_rate(cond.op, right_dis) * record_num;
     }
     else {
         Attr_Info attr;
-        Subsystem1_Manager::BASE.lookup_Attr(cond.lhsAttr.relname, cond.lhsAttr.attrname, attr);
+        Subsystem1_Manager::mgr.lookup_Attr(cond.lhsAttr.relname, cond.lhsAttr.attrname, attr);
         Distribution distri = attr.distribution;
         return distri.dis->rate(cond.op, *(double*)cond.rhsValue.data) * record_num;
     }

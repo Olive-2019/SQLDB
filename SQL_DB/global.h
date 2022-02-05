@@ -1,4 +1,12 @@
 #pragma once
+#include<unordered_map>
+#include<cstdio>
+#include<iostream>
+#include<string>
+#include<vector>
+#include<cstdlib>
+#include<string.h>
+#include <map>
 #include <iostream>
 #include <vector>
 #include <string>
@@ -8,6 +16,7 @@
 using namespace std;
 
 const int MAX_NAME_LENGTH = 20;    //各种名字如数据表名、字段名等最大长度
+const int BUFFER_NUM = 200;
 
 enum SQL_type {
 	SELECT,

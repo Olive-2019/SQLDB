@@ -25,6 +25,9 @@
     <Filter Include="transaction">
       <UniqueIdentifier>{c63a8f83-dc32-42cc-b7f5-8d38ab62e918}</UniqueIdentifier>
     </Filter>
+    <Filter Include="storage">
+      <UniqueIdentifier>{eb4eae47-108d-43f3-a88d-e549e452f236}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="global.h">
@@ -126,11 +129,11 @@
     <ClInclude Include="executor\DDL_executor.h">
       <Filter>executor</Filter>
     </ClInclude>
+    <ClInclude Include="storage\pf.h">
+      <Filter>storage</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Subsystem1.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="global.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -220,6 +223,9 @@
     </ClCompile>
     <ClCompile Include="executor\DDL_executor.cpp">
       <Filter>executor</Filter>
+    </ClCompile>
+    <ClCompile Include="storage\pf.cpp">
+      <Filter>storage</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
