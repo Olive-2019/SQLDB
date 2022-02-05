@@ -2,27 +2,28 @@
 #include "../global.h"
 
 
-//Ã¿Ò»¸ö»º³åÇø
+//changeæµ‹è¯•
+//æ¯ä¸€ä¸ªç¼“å†²åŒº
 class PF_BufPageDesc {
 public:
 	PF_BufPageDesc() {
 		pData = new char[Global_Paras::Block_Size];
 	}
-	//»º³åÇø´æ´¢pageµÄdir
+	//ç¼“å†²åŒºå­˜å‚¨pageçš„dir
 	string dir;
 	int    pageNum;
 
 	char* pData;
-	//ÓÃÀ´LRU
+	//ç”¨æ¥LRU
 	int time;
 
 };
 
-//»º³åÇø¹ÜÀí
+//ç¼“å†²åŒºç®¡ç†
 class PF_BufferMgr {
 public:
 	static PF_BufferMgr pf_buffermgr;
-	//¶ÁÈ¡pageµ½»º³åÇø
+	//è¯»å–pageåˆ°ç¼“å†²åŒº
 	int Read_page_to_buffer(string dir, int pageNum) {
 		if (If_page_in_buffer(pageNum) != -1) {
 			return If_page_in_buffer(pageNum);
@@ -58,7 +59,7 @@ public:
 		return buffer_id;
 	}
 
-	//Ğ´»ØÍâ´æ
+	//å†™å›å¤–å­˜
 	int Write_buffer_to_page(int buffer_id) {
 
 		FILE* fp;
@@ -76,7 +77,7 @@ public:
 		return 0;
 	}
 
-	//ËùÓĞ»º³åÇøĞ´»ØÍâ´æ
+	//æ‰€æœ‰ç¼“å†²åŒºå†™å›å¤–å­˜
 	int Write_all_buffer() {
 		for (int i = 0; i < occupy_buffer_size; i++) {
 			Write_buffer_to_page(i);
@@ -85,7 +86,7 @@ public:
 	}
 
 
-	//ÅĞ¶ÏpageÊÇ·ñÔÚ»º³åÇø
+	//åˆ¤æ–­pageæ˜¯å¦åœ¨ç¼“å†²åŒº
 	int If_page_in_buffer(int pageNum) {
 		int buffer_id = -1;
 		try {
@@ -97,7 +98,7 @@ public:
 		return Page_to_buffer_mp.at(pageNum);
 	}
 
-	//LRUÌæ»»
+	//LRUæ›¿æ¢
 	int LRU_get_buffer_id(string insert_dir, int insert_pageNum) {
 		int index = 0;
 		for (int i = 0; i < BUFFER_NUM; i++) {
@@ -129,18 +130,18 @@ public:
 	}
 
 public:
-	//»º³åÇø´óĞ¡
+	//ç¼“å†²åŒºå¤§å°
 	int occupy_buffer_size;
 
-	//»º³åÇø¼¯ºÏ
+	//ç¼“å†²åŒºé›†åˆ
 	PF_BufPageDesc buffer_list[BUFFER_NUM];
 
-	//pageËùÔÚ»º³åÇø
+	//pageæ‰€åœ¨ç¼“å†²åŒº
 	unordered_map<int, int> Page_to_buffer_mp;
 };
 
 
-//¹ÜÀí¿ÕÏĞÒ³Ãæ
+//ç®¡ç†ç©ºé—²é¡µé¢
 class Page_Mgr {
 public:
 	static Page_Mgr page_mgr;
@@ -163,7 +164,7 @@ public:
 		fclose(fp);
 	}
 
-	//½«Ò³ÃæĞÅÏ¢Ğ´»ØÍâ´æ
+	//å°†é¡µé¢ä¿¡æ¯å†™å›å¤–å­˜
 	int Write_page() {
 		FILE* fp;
 		string filename = "sys/0";
@@ -182,7 +183,7 @@ public:
 		fclose(fp);
 	}
 
-	//·ÖÅäĞÂµÄÒ³Ãæ
+	//åˆ†é…æ–°çš„é¡µé¢
 	int Allocate_page_to_file(string dir) {
 		int res;
 		if (free_page_id_list.empty() == false) {
@@ -206,7 +207,7 @@ public:
 		return res;
 	}
 
-	//ÊÍ·Å¿ÕÏĞÒ³Ãæ
+	//é‡Šæ”¾ç©ºé—²é¡µé¢
 	int Recover_page(string dir, int Page_id) {
 		free_page_id_list.push_back(Page_id);
 		string filename = dir + to_string(Page_id);
@@ -214,7 +215,7 @@ public:
 		return 0;
 	}
 
-	//ÏÂÒ»¸ö·ÖÅäµÄpage-id
+	//ä¸‹ä¸€ä¸ªåˆ†é…çš„page-id
 	int allocate_page_id;
 	vector<int> free_page_id_list;
 };
@@ -232,7 +233,7 @@ public:
 	static Subsystem1_Manager mgr;
 	string UserName;
 	string DBName;
-	//²éÕÒÊı¾İ±í£¬·µ»ØÖµÎªÊÇ·ñ³É¹¦£¬½«½á¹û´æ·ÅÖ®×îºóµÄ²ÎÊırelÖĞ£¬ºóÃæµÄº¯ÊıÍ¬Àí
+	//æŸ¥æ‰¾æ•°æ®è¡¨ï¼Œè¿”å›å€¼ä¸ºæ˜¯å¦æˆåŠŸï¼Œå°†ç»“æœå­˜æ”¾ä¹‹æœ€åçš„å‚æ•°relä¸­ï¼Œåé¢çš„å‡½æ•°åŒç†
 	bool lookup_Rel(string RelName, Rel_Info& rel) {
 		int operate_page = 6;
 
@@ -272,7 +273,7 @@ public:
 		return false;
 	}
 
-	//²éÕÒÊôĞÔ
+	//æŸ¥æ‰¾å±æ€§
 	bool lookup_Attr(string Rel_Name, string AttrName, Attr_Info& attr) {
 		vector<Attr_Info> vec;
 		int operate_page = 1;
@@ -312,8 +313,8 @@ public:
 						attr_info.type = AttrType::STRING;
 					}
 					/*
-					¾¯¸æ
-					ÕÅºÆÔÚÊµÏÖÊ±½«distributionÒÔÁ½¸ödouble½øĞĞ´æ´¢
+					è­¦å‘Š
+					å¼ æµ©åœ¨å®ç°æ—¶å°†distributionä»¥ä¸¤ä¸ªdoubleè¿›è¡Œå­˜å‚¨
 					
 					if (*distribution_type == 0) {
 						attr_info.distribution.type = Distribution_Type::NORMAL;
@@ -345,7 +346,7 @@ public:
 
 	}
 
-	//²éÕÒËùÓĞÊôĞÔ
+	//æŸ¥æ‰¾æ‰€æœ‰å±æ€§
 	vector<Attr_Info> lookup_Attrs(string Rel_Name) {
 		vector<Attr_Info> vec;
 		int operate_page = 1;
@@ -385,8 +386,8 @@ public:
 						attr_info.type = AttrType::STRING;
 					}
 					/*
-					¾¯¸æ
-					Í¬ÉÏ
+					è­¦å‘Š
+					åŒä¸Š
 					if (*distribution_type == 0) {
 						attr_info.distribution.type = Distribution_Type::NORMAL;
 						attr_info.distribution.nor_eve.nor.mu = *param1;
@@ -435,7 +436,7 @@ public:
 		return vec;
 
 	}
-	//²éÑ¯È¨ÏŞ ret[SELECT]=true,ret[UPDATE]=false£¬Êı¾İ±í»òÓÃ»§²»´æÔÚ·µ»ØNULL
+	//æŸ¥è¯¢æƒé™ ret[SELECT]=true,ret[UPDATE]=falseï¼Œæ•°æ®è¡¨æˆ–ç”¨æˆ·ä¸å­˜åœ¨è¿”å›NULL
 	bool* lookup_Authority(string RelName, string UserName) {
 		int operate_page = 2;
 
@@ -471,7 +472,7 @@ public:
 		return NULL;
 	}
 
-	//²éÕÒË÷Òı
+	//æŸ¥æ‰¾ç´¢å¼•
 	bool lookup_Index(string RelName, string AttrName, Index_Info& Index) {
 		int operate_page = 4;
 
@@ -522,7 +523,7 @@ public:
 		return false;
 	}
 
-	//²éÕÒËùÓĞË÷Òı
+	//æŸ¥æ‰¾æ‰€æœ‰ç´¢å¼•
 	vector<Index_Info> lookup_Indexes(string RelName) {
 		vector<Index_Info> index_vec;
 		int operate_page = 4;
@@ -574,7 +575,7 @@ public:
 		return index_vec;
 	}
 
-	//»ñÈ¡±íÊı¾İ
+	//è·å–è¡¨æ•°æ®
 	vector<char*> Find_Record(string Rel_Name) {
 		vector<char*> vec;
 		vector<Attr_Info> attr_vec = lookup_Attrs(Rel_Name);
@@ -596,9 +597,9 @@ public:
 		while (operate_page != -1) {
 			int scan_begin = 8;
 			while (scan_begin != begin) {
-				//exist =1 ¸Ãrecord´æÔÚ£¬=0²»´æÔÚ
+				//exist =1 è¯¥recordå­˜åœ¨ï¼Œ=0ä¸å­˜åœ¨
 				int* exist = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin);  scan_begin += 4;
-				//¼ÇÂ¼¼ÓÈëµ½vectorÖĞ£¬×÷Îª×îÖÕ·µ»ØÖµ
+				//è®°å½•åŠ å…¥åˆ°vectorä¸­ï¼Œä½œä¸ºæœ€ç»ˆè¿”å›å€¼
 				if (*exist == 1) {
 					int temp_scan_begin = scan_begin;
 					char* ch = new char[len];
@@ -608,7 +609,7 @@ public:
 					}
 					vec.push_back(ch);
 				}
-				//attr_vec[i]´ú±íÃ¿Ò»¸öÊôĞÔ
+				//attr_vec[i]ä»£è¡¨æ¯ä¸€ä¸ªå±æ€§
 				for (int i = 0; i < attr_vec.size(); i++) {
 					if (attr_vec[i].type == AttrType::INT) {
 						int* p = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin);  scan_begin += 4;
@@ -650,7 +651,7 @@ public:
 	}
 
 
-	//É¾³ı±íÊı¾İ
+	//åˆ é™¤è¡¨æ•°æ®
 	void Delete_Record(string Rel_Name) {
 		vector<Attr_Info> attr_vec = lookup_Attrs(Rel_Name);
 		for (int i = 0; i < attr_vec.size(); i++) {
@@ -715,7 +716,7 @@ public:
 		}
 	}
 
-	//¸üĞÂ±íÊı¾İ
+	//æ›´æ–°è¡¨æ•°æ®
 	void Update_Record(string Rel_Name, char* new_value) {
 		vector<Attr_Info> attr_vec = lookup_Attrs(Rel_Name);
 		for (int i = 0; i < attr_vec.size(); i++) {
@@ -787,7 +788,7 @@ public:
 		}
 	}
 
-	//ĞÂ½¨Êı¾İ±í
+	//æ–°å»ºæ•°æ®è¡¨
 	void Create_Rel(string RelName, vector<Attr_Info> attrs) {
 		Rel_Info rel_info;
 		memcpy(rel_info.Rel_Name, RelName.c_str(), RelName.length() + 1);
@@ -890,7 +891,7 @@ public:
 
 		//---------------------------------------------------------------------------------------------------------------
 
-		//Add_attribute(rel_info.attr_list); ×¢Òâ
+		//Add_attribute(rel_info.attr_list); æ³¨æ„
 
 
 	}
@@ -1005,8 +1006,8 @@ public:
 				begin++;
 			}
 			/*
-			¾¯¸æ
-			Í¬ÉÏ
+			è­¦å‘Š
+			åŒä¸Š
 			if (attr_list[j].distribution.type == Distribution_Type::NORMAL) {
 				p = &attr_list[j].distribution.nor_eve.nor.mu;
 				t_ch = (char*)p;
@@ -1063,7 +1064,7 @@ public:
 		//PF_BufferMgr::pf_buffermgr.Write_buffer_to_page(buffer_id);
 	}
 
-	//É¾³ıÊı¾İ±í
+	//åˆ é™¤æ•°æ®è¡¨
 	bool Delete_Rel(string RelName) {
 		int operate_page = 6;
 
@@ -1106,7 +1107,7 @@ public:
 		return false;
 	}
 
-	//»ñÈ¡±íµÄpage-id
+	//è·å–è¡¨çš„page-id
 	int Scan_rel_get_page_id(string Rel_Name) {
 		int operate_page = 6;
 
@@ -1142,7 +1143,7 @@ public:
 		}
 	}
 
-	//É¨ÃèËùÓĞ±í
+	//æ‰«ææ‰€æœ‰è¡¨
 	void Scan_rel() {
 		int operate_page = 6;
 
@@ -1175,7 +1176,7 @@ public:
 		}
 	}
 
-	//É¨ÃèËùÓĞÊôĞÔ
+	//æ‰«ææ‰€æœ‰å±æ€§
 	void Scan_attribute() {
 		int operate_page = 1;
 
@@ -1354,17 +1355,17 @@ public:
 
 	}
 
-	//É¨Ãè±í»ñµÃ¼ÇÂ¼RID
+	//æ‰«æè¡¨è·å¾—è®°å½•RID
 	vector<RID> Scan_Record(string Rel_Name) {
-		vector<RID> vec;  //´æ´¢ËùÓĞ·ûºÏÌõ¼şRID
+		vector<RID> vec;  //å­˜å‚¨æ‰€æœ‰ç¬¦åˆæ¡ä»¶RID
 
-		vector<Attr_Info> attr_vec = lookup_Attrs(Rel_Name); //±íÊôĞÔ¼¯ºÏ
+		vector<Attr_Info> attr_vec = lookup_Attrs(Rel_Name); //è¡¨å±æ€§é›†åˆ
 		for (int i = 0; i < attr_vec.size(); i++) {
 			cout << attr_vec[i].Attr_Name << " ";
 		}
 		cout << endl;
 
-		int len = 0;                         //ËùÓĞÊôĞÔ³¤¶ÈÖ®ºÍ
+		int len = 0;                         //æ‰€æœ‰å±æ€§é•¿åº¦ä¹‹å’Œ
 		for (int i = 0; i < attr_vec.size(); i++) {
 			len += attr_vec[i].Length;
 		}
@@ -1380,18 +1381,18 @@ public:
 			while (scan_begin != begin) {
 
 
-				//exist = 1 ¸Ãrecord´æÔÚ£¬ = 0²»´æÔÚ
+				//exist = 1 è¯¥recordå­˜åœ¨ï¼Œ = 0ä¸å­˜åœ¨
 				int* exist = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin);
 
 				if (*exist == 1) {
 					RID rid; rid.blockID = operate_page; rid.slotID = scan_begin;
-					vec.push_back(rid);               //´æ´¢RID
+					vec.push_back(rid);               //å­˜å‚¨RID
 				}
 				scan_begin += 4;
 
 
 
-				//attr_vec[i]´ú±íÃ¿Ò»¸öÊôĞÔ  attr_vec[i].Attr_Name attr_vec[i].type ¿ÉÒÔ»ñµÃÊôĞÔÃû¡¢ÊôĞÔÀàĞÍµÈ½øĞĞ¹ıÂË
+				//attr_vec[i]ä»£è¡¨æ¯ä¸€ä¸ªå±æ€§  attr_vec[i].Attr_Name attr_vec[i].type å¯ä»¥è·å¾—å±æ€§åã€å±æ€§ç±»å‹ç­‰è¿›è¡Œè¿‡æ»¤
 				for (int i = 0; i < attr_vec.size(); i++) {
 
 					if (attr_vec[i].type == AttrType::INT) {
