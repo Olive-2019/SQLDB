@@ -62,13 +62,13 @@ void Optimizer::init(int Rel_num, RelInfo* rels, int Attr_num, AggRelAttr* attrs
     }
 
     //获取逻辑树
-    //for (int i = 0; i < Rels.size(); ++i) printf("%p\n",Rels[i].Rel_Name);
-    //DP_Link_Order_Affirmant link_order_affirmant = DP_Link_Order_Affirmant(Rels, Conds);
+    Link_Order_Affirmant* link_order_affirmant(NULL);
+    if (Rels.size() < 9) link_order_affirmant = new DP_Link_Order_Affirmant(Rels, Conds, Attrs);
+    else link_order_affirmant = new GA_Link_Order_Affirmant(Rels, Conds, Attrs);
     
-    //DP_Link_Order_Affirmant link_order_affirmant = DP_Link_Order_Affirmant(Rels, Conds);
-    //this->Logical_Tree_Root = link_order_affirmant.get_tree();
+    this->Logical_Tree_Root = link_order_affirmant->get_tree();
     
-    this->Logical_Tree_Root = Logical_Tree_Builder(Rels, Attrs, Conds).get_tree_root();
+    //this->Logical_Tree_Root = Logical_Tree_Builder(Rels, Attrs, Conds).get_tree_root();
     {
         //优化逻辑树
 

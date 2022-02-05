@@ -43,8 +43,8 @@ vector<vector<string>> zFun(const std::vector<string>& a, int m)
 
 
 
-DP_Link_Order_Affirmant::DP_Link_Order_Affirmant(vector<Rel_Info>& Rels, vector<Condition>& Conds)
-	: Link_Order_Affirmant(Rels, Conds) {
+DP_Link_Order_Affirmant::DP_Link_Order_Affirmant(vector<Rel_Info>& Rels, vector<Condition>& Conds, vector<Attr_Info>& Attrs)
+	: Link_Order_Affirmant(Rels, Conds, Attrs) {
 	//joinrels第一个占位
 	joinrels.push_back(vector<vector<string>>());
 	//第二个就是所有的表

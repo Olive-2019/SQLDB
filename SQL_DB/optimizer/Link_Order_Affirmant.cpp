@@ -6,8 +6,8 @@
 
 
 
-Link_Order_Affirmant::Link_Order_Affirmant(vector<Rel_Info>& Rels, vector<Condition>& Conds)
-	: Rels(Rels), Conds(Conds) {init();}
+Link_Order_Affirmant::Link_Order_Affirmant(vector<Rel_Info>& Rels, vector<Condition>& Conds, vector<Attr_Info>& Attrs)
+	: Rels(Rels), Conds(Conds), Attrs(Attrs) { init();}
 
 void Link_Order_Affirmant::init() {
 	for (int i = 0; i < Rels.size(); i++) {
@@ -59,9 +59,13 @@ void Link_Order_Affirmant::init() {
 
 	for (int i = 0; i < Rels.size(); ++i) rels_name.push_back(Rels[i].Rel_Name);
 
+	tree_builder = new Logical_Tree_Builder(relation_to_binary_condition_node_map, relation_to_node_map, Attrs);
 	
 }
 
+Logical_TreeNode* Link_Order_Affirmant::add_proj(Logical_TreeNode* node) {
+	return tree_builder->get_proj(node);
+}
 
 
 //Link_Order_Affirmant::Link_Order_Affirmant(vector<Condition>& Conds)

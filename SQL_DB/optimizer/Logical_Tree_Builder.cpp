@@ -136,6 +136,17 @@ Logical_TreeNode* Logical_Tree_Builder::get_tree_root()
 	display();
 	return Root;
 }
+Logical_TreeNode* Logical_Tree_Builder::get_proj(Logical_TreeNode* node) {
+	Logical_TreeNode* Root = get_logical_tree_node(Logical_TreeNode_Kind::PLAN_PROJ);
+	Root->u.PROJECTION.rel = node;
+	Attr_Info* attrs = new Attr_Info[Attrs.size()];
+	for (int i = 0; i < Attrs.size(); i++) {
+		attrs[i] = Attrs[i];
+	}
+	Root->u.PROJECTION.Attr_Num = Attrs.size();
+	Root->u.PROJECTION.Attr_list = attrs;
+	return Root;
+}
 
 Logical_TreeNode* Logical_Tree_Builder::get_tree_root_with_order(vector<string> order)
 {
@@ -157,22 +168,24 @@ Logical_TreeNode* Logical_Tree_Builder::add_node_to_binary_condition_node(Logica
 	vector<string> rels = { rel1, rel2 };
 	sort(rels.begin(), rels.end());
 	if (!relation_to_binary_condition_node_map.count(rels)) return node;
-	Logical_TreeNode* p = relation_to_binary_condition_node_map[rels], * p0 = NULL;
-	Logical_TreeNode* new_binary_tree, * root(NULL), * rear(NULL);
+	Logical_TreeNode* p = relation_to_binary_condition_node_map[rels];
+	Logical_TreeNode* new_binary_tree, * root(NULL), * front(NULL);
 	while (p) {
 		new_binary_tree = get_logical_tree_node(Logical_TreeNode_Kind::PLAN_FILTER);
 		new_binary_tree->u.FILTER.rel = NULL;
 		memcpy(new_binary_tree, p, sizeof(*p));
 		if (p == relation_to_binary_condition_node_map[rels]) {
-			rear = root = new_binary_tree;
+			front = new_binary_tree;
+			root = new_binary_tree;
+			//printf("%p\n", root);
 		}
 		else {
-			rear->u.FILTER.rel = new_binary_tree;
-			rear = new_binary_tree;
+			front->u.FILTER.rel = new_binary_tree;
+			front = new_binary_tree;
 		}
-		p0 = p, p = p->u.FILTER.rel;
+		p = p->u.FILTER.rel;
 	}
-	rear->u.FILTER.rel = node;
+	front->u.FILTER.rel = node;
 	return root;
 }
 void Logical_Tree_Builder::display()
