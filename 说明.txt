@@ -1,0 +1,40 @@
+storage部分操作说明位于 storage/test.cpp中
+对磁盘进行的更改如需保存在磁盘上，则需添加如下代码
+	PF_BufferMgr::pf_buffermgr.Write_all_buffer();
+	cout << "buffer writed" << endl;
+	Page_Mgr::page_mgr.Write_page();
+	cout << "page writed" << endl;
+
+
+程序起始必须设定user与db
+	Subsystem1_Manager::mgr.UserName = "User1";
+	Subsystem1_Manager::mgr.DBName = "DB1";
+在该user与db下，已有数个数据表其具体说明如下
+	
+	Rel1 id(int) price(float) name(string20)
+	Rel2/Rel3 同Rel1
+	
+	Rel1:
+	id price name
+	110 32.14 XiMing
+	2 32.14 XiMing
+	1 32.14 XiMing
+
+	Rel2/3	
+	id price name
+	1 32.14 XiMing
+	1 32.14 XiMing
+该数据表信息被保留在origin data文件夹中，若磁盘文件混乱，替换data与sys文件夹即可
+
+可以通过如下两个函数查看当前所有数据表以及属性信息
+	Subsystem1_Manager::mgr.Scan_rel();
+	Subsystem1_Manager::mgr.Scan_attribute();
+
+
+为了方便调试，将sql语句固化在函数内部，详情请见parser.cpp 49行
+
+小黑框中可能会出现“系统找不到指定的文件。”此为windows报错，原因为在每次新建临时表前删除过去的该临时表，若过去不存在该表，则找不到文件
+
+由于&在Windows命令中有其他意义，不便于创建文件，因此将&替换为const string spacer="#" （Query_Executor.cpp 13行）
+
+注意，由于系统内部relname以及attrname以char*的形式存放，且指向同一位置，对其attrname的修正已引发bug（多次对一个attrname进行修正）

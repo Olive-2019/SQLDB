@@ -12,7 +12,7 @@ Link_Order_Affirmant::Link_Order_Affirmant(vector<Rel_Info>& Rels, vector<Condit
 void Link_Order_Affirmant::init() {
 	for (int i = 0; i < Rels.size(); i++) {
 		Logical_TreeNode* node = get_logical_tree_node(Logical_TreeNode_Kind::PLAN_FILESCAN);
-		node->u.FILESCAN.Rel = Rels[i].Rel_Name;
+		strcpy(node->u.FILESCAN.Rel , Rels[i].Rel_Name);
 		relation_to_node_map[Rels[i].Rel_Name] = node;
 	}
 

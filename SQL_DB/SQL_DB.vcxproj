@@ -162,7 +162,10 @@
     <ClInclude Include="parser\redbase.h" />
     <ClInclude Include="RECORD.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="storage\pf.h" />
+    <ClInclude Include="storage\Page_Mgr.h" />
+    <ClInclude Include="storage\PF_BufferMgr.h" />
+    <ClInclude Include="storage\PF_BufPageDesc.h" />
+    <ClInclude Include="storage\Subsystem1_Manager.h" />
     <ClInclude Include="Subsystem1.h" />
     <ClInclude Include="transaction\Exclusive_Lock.h" />
     <ClInclude Include="transaction\Lock.h" />
@@ -196,7 +199,11 @@
     <ClCompile Include="parser\parser_syntaxtree.cpp" />
     <ClCompile Include="parser\parser_token.cpp" />
     <ClCompile Include="RECORD.cpp" />
-    <ClCompile Include="storage\pf.cpp" />
+    <ClCompile Include="storage\Page_Mgr.cpp" />
+    <ClCompile Include="storage\PF_BufferMgr.cpp" />
+    <ClCompile Include="storage\PF_BufPageDesc.cpp" />
+    <ClCompile Include="storage\Subsystem1_Manager.cpp" />
+    <ClCompile Include="storage\Test.cpp" />
     <ClCompile Include="transaction\Exclusive_Lock.cpp" />
     <ClCompile Include="transaction\Lock.cpp" />
     <ClCompile Include="transaction\Log.cpp" />

@@ -492,6 +492,7 @@ int interp(NODE *n)
 		{
 			int nattrs;
 			string table_name(n->u.CREATETABLE.relname);
+			cout << "table Name==" << table_name << endl;
 			if (table_name.size() > MAXNAME) {
 				print_error("create", E_TOOLONG);
 				break;
@@ -628,7 +629,6 @@ int interp(NODE *n)
 			if (groupAttr.attrname != NULL)
 				group = true;
 
-			
 			Optimizer* optimizer = new Optimizer(nrelations, relations, nselattrs, relAttrs, nconditions, conditions);
 			
 			break;

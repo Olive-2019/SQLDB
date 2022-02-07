@@ -35,9 +35,8 @@ Logical_TreeNode* Logical_Tree_Builder::get_tree_root()
 	//双向快表，解决警告问题（这个之前我查过，属于数据库常用技术了【空间换时间】）
 	map<Logical_TreeNode*, vector<string>> node_to_rel_map;//根据结点找表名
 	for (int i = 0; i < Rels.size(); i++) {   //建立叶节点
-		cout << Rels[i].Rel_Name << endl;
 		Logical_TreeNode* node = get_logical_tree_node(Logical_TreeNode_Kind::PLAN_FILESCAN);
-		node->u.FILESCAN.Rel = Rels[i].Rel_Name;
+		strcpy(node->u.FILESCAN.Rel , Rels[i].Rel_Name);
 		mp_Rel_to_Node[Rels[i].Rel_Name] = node;
 		vector<string> rel_names = { Rels[i].Rel_Name };
 		node_to_rel_map[node] = rel_names;
@@ -133,7 +132,8 @@ Logical_TreeNode* Logical_Tree_Builder::get_tree_root()
 		Root->u.PROJECTION.Attr_Num = Attrs.size();
 		Root->u.PROJECTION.Attr_list = attrs;
 	}
-	display();
+	cout << endl;
+	display(Root);
 	return Root;
 }
 
@@ -175,8 +175,9 @@ Logical_TreeNode* Logical_Tree_Builder::add_node_to_binary_condition_node(Logica
 	rear->u.FILTER.rel = node;
 	return root;
 }
-void Logical_Tree_Builder::display()
+void Logical_Tree_Builder::display(Logical_TreeNode *Root)
 {
+	cout << "displaying logical tree" << endl;
 	Logical_TreeNode* node = Root;
 	queue<Logical_TreeNode*> que1;
 	queue<Logical_TreeNode*> que2;
@@ -193,12 +194,12 @@ void Logical_Tree_Builder::display()
 			case Logical_TreeNode_Kind::PLAN_FILTER: {
 				cout << "filter " << "  ";
 				Condition* cond = (Condition*)node->u.FILTER.expr_filter;
-				cout << cond->lhsAttr.attrname << " xxx ";
+				cout << cond->lhsAttr.attrname << " >/</= ";
 				if (cond->bRhsIsAttr) {
-					cout << cond->rhsAttr.relname << "." << cond->rhsAttr.attrname << endl;
+					cout << cond->rhsAttr.relname << "." << cond->rhsAttr.attrname;
 				}
 				else {
-					cout << *(int*)cond->rhsValue.data << endl;
+					cout << *(int*)cond->rhsValue.data;
 				}
 				que2.push(node->u.FILTER.rel);
 				break;
@@ -222,7 +223,7 @@ void Logical_Tree_Builder::display()
 		que1.swap(que2);
 		cout << endl;
 	}
-
+	cout << endl;
 }
 void Logical_Tree_Builder::delete_node(Logical_TreeNode* root) {
 	if (root->kind == PLAN_FILTER) delete_node(root->u.FILTER.rel);

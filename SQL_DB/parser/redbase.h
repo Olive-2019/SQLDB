@@ -6,7 +6,7 @@
 //
 // 一些全局需要用到的变量
 //
-#define MAXNAME			20				// maximum length of a relname
+#define MAXNAME			200				// maximum length of a relname
 										// or attribute name
 #define MAXSTRINGLEN	255				// maximum length of a string-type attribute
 #define MAXATTRS		40				// maximum number of attrubutes in a relname

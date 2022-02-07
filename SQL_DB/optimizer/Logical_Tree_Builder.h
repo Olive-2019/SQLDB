@@ -46,7 +46,7 @@ struct Logical_TreeNode {
             struct Logical_TreeNode* right;
         }JOIN;
         struct FILESCAN {
-            char* Rel;  //数据表  
+            char Rel[100];  //数据表  
         }FILESCAN;   //叶节点
     }u;
 };
@@ -88,7 +88,7 @@ public:
     //根据某种连接顺序确定逻辑树，order内部为RelName
     //GA用
     Logical_TreeNode* get_tree_root_with_order(vector<string> order);
-    void display();
+    static void display(Logical_TreeNode *Root);
 
     static void delete_node(Logical_TreeNode* root);
 };

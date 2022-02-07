@@ -51,7 +51,16 @@ void Optimizer::init(int Rel_num, RelInfo* rels, int Attr_num, AggRelAttr* attrs
             Rels.push_back(temp);
         }
         for (int i = 0; i < Attr_num; i++) {
-            if (strcmp(attrs[i].attrname, "*") == 0) continue;
+            if (strcmp(attrs[i].attrname, "*") == 0) {
+                vector<Attr_Info> temp;
+                for (int j = 0; j < Rel_num; j++) {
+                    temp=Subsystem1_Manager::mgr.lookup_Attrs(Rels[j].Rel_Name);
+                    for (int k = 0; k < temp.size(); k++) {
+                        Attrs.push_back(temp[k]);
+                    }
+                }
+                continue;
+            }
             Attr_Info temp;
             Subsystem1_Manager::mgr.lookup_Attr(attrs[i].relname, attrs[i].attrname, temp);
             Attrs.push_back(temp);
@@ -67,7 +76,7 @@ void Optimizer::init(int Rel_num, RelInfo* rels, int Attr_num, AggRelAttr* attrs
     
     //DP_Link_Order_Affirmant link_order_affirmant = DP_Link_Order_Affirmant(Rels, Conds);
     //this->Logical_Tree_Root = link_order_affirmant.get_tree();
-    
+    cout << "get tree" << endl;
     this->Logical_Tree_Root = Logical_Tree_Builder(Rels, Attrs, Conds).get_tree_root();
     {
         //ÓÅ»¯Âß¼­Ê÷

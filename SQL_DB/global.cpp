@@ -1,7 +1,7 @@
 #include "global.h"
 string Global_Paras:: Current_DB;
 string Global_Paras:: Current_User;
-int Global_Paras:: Block_Size = 10;
+int Global_Paras:: Block_Size = 4092;
 #include "parser/parser_token.h"
 
 double EVENLY::rate(int op, double value) {

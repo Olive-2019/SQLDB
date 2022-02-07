@@ -46,10 +46,13 @@ RC RBparse()
 	string buffer;
 	LexerPtr lexer = Lexer::instance();
 	SyntaxTree tree(lexer);
+	string sql = "select Rel1.id,Rel2.id from Rel1,Rel2 where Rel1.id>Rel2.id;";
 	while (!stop) {
 		cout << PROMPT;
 		cout.flush();
-		getline(cin, buffer);
+		cout << sql << endl;
+		buffer = sql;
+		//getline(cin, buffer);
  	    tree.resetParser(buffer);
 		try { 
 			parse_tree = tree.buildSyntaxTree();
@@ -63,7 +66,7 @@ RC RBparse()
 			//PrintError(errval);
 			if (errval < 0) stop = true;
 		}
-
+		return 0;
 	}
 	return 0;
 }

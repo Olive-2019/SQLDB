@@ -10,7 +10,7 @@
 但此处为最后处理execute，后续不会再调用该内存
 因此可能没问题
 */
-
+const string spacer = "#";
 
 Query_Executor::Query_Executor(Logical_TreeNode* Root)
 {
@@ -24,6 +24,7 @@ string Query_Executor::get_final_RelName()
 
 vector<RID> Query_Executor::query()
 {
+
 	return execute_tree_node(Root);
 }
 
@@ -34,26 +35,33 @@ vector<RID> Query_Executor::execute_tree_node(Logical_TreeNode* node)
 	在进行join后，由于新表中属性名变化导致filter节点中cond属性名需要调整
 	已修改 execute tree node join中
 	*/
+	
+
 	vector<RID> ret;
 	if (node->kind == Logical_TreeNode_Kind::PLAN_FILESCAN) {  //无条件的叶节点
+		cout << "node->type==filescan" << endl;
 		return execute_tree_node_scan(node);
 	}
 
 	else if (node->kind == Logical_TreeNode_Kind::PLAN_FILTER) {
-		execute_tree_node_filter(node);
+		cout << "node->type==filter" << endl;
+		return execute_tree_node_filter(node);
 	}
 
 	else if (node->kind == Logical_TreeNode_Kind::PLAN_JOIN) {
+		cout << "node->type==join" << endl;
 		return execute_tree_node_join(node);
 	}
 
 	else if (node->kind == Logical_TreeNode_Kind::PLAN_PROJ) {
+		cout << "node->type==proj" << endl;
 		return execute_tree_node_proj(node);
 	}
 
 }
 vector<RID> Query_Executor::execute_tree_node_scan(Logical_TreeNode* node, vector<Condition*> cond)
 {
+	cout << "execute scan rel " << node->u.FILESCAN.Rel << endl;
 	node->RelName = node->u.FILESCAN.Rel;
 	vector<RID> ret;
 	vector<Attr_Info> attrs = Subsystem1_Manager::mgr.lookup_Attrs(node->u.FILESCAN.Rel);
@@ -69,6 +77,11 @@ vector<RID> Query_Executor::execute_tree_node_scan(Logical_TreeNode* node, vecto
 		//不等于不能用索引
 		if (key_cond[i].op == TOKENKIND::T_NE) continue;
 		hasIndex = Subsystem1_Manager::mgr.lookup_Index(node->u.FILESCAN.Rel, key, index);
+		/*
+		警告
+		Index功能尚未实现，因此将hasIndex设为false
+		*/
+		hasIndex = false;
 		if (hasIndex) {
 			cond.erase(it);
 			break;
@@ -107,14 +120,22 @@ vector<RID> Query_Executor::execute_tree_node_scan(Logical_TreeNode* node, vecto
 		}
 		return ret;
 	}
+	cout << "new scan reader 该函数将输出所有记录" << endl;
 	Reader* reader = new Scan_Reader(node->u.FILESCAN.Rel);
 	RID temp;
 	char* record = NULL;
 	attrs = Subsystem1_Manager::mgr.lookup_Attrs(node->u.FILESCAN.Rel);
 	while ((record = reader->get_Next_Record_with_RID(temp)) != NULL) {
+		bool fit_condition = true;
 		for (int i = 0; i < cond.size(); ++i)
-			if (!record_cmp(cond[i], record, node->RelName)) continue;
-		ret.push_back(temp);
+			if (!record_cmp(cond[i], record, node->RelName)) {
+				fit_condition = false;
+				break;
+			}
+		if (fit_condition) {
+			ret.push_back(temp);
+		}
+
 	}
 	cond.clear();
 	return ret;
@@ -129,12 +150,14 @@ vector<RID> Query_Executor::execute_tree_node_filter(Logical_TreeNode* node)
 		Conds.push_back(node->u.FILTER.expr_filter);
 	}
 	ret = execute_tree_node_under_filter(node->u.FILTER.rel, Conds);
+	cout << "filter record num==" << ret.size() << endl;
+	
 	node->RelName = node->u.FILTER.rel->RelName;
 	return ret;
 }
 vector<RID> Query_Executor::execute_tree_node_under_filter(Logical_TreeNode* node, vector<Condition*>& cond)
 {
-	
+	cout << "execute under filter" << endl;
 	if (node->kind == Logical_TreeNode_Kind::PLAN_FILESCAN) {
 		return execute_tree_node_scan(node, cond);
 	}
@@ -153,11 +176,11 @@ vector<RID> Query_Executor::execute_tree_node_join(Logical_TreeNode* node, vecto
 
 	vector<RID> LRID = execute_tree_node(node->u.JOIN.left);
 	vector<RID> RRID = execute_tree_node(node->u.JOIN.right);
-	node->RelName = node->u.JOIN.left->RelName + "&" + node->u.JOIN.right->RelName;
+	node->RelName = node->u.JOIN.left->RelName + spacer + node->u.JOIN.right->RelName;
 	/*
-	新建数据表，字段为a.x,b.y，表名为a&b
+	新建数据表，字段为a.x,b.y，表名为a/spacer/b
 	*/
-	attrs = Subsystem1_Manager::mgr.lookup_Attrs(node->RelName);
+	//attrs = Subsystem1_Manager::mgr.lookup_Attrs(node->RelName);
 
 	vector<Attr_Info> Lattr = Subsystem1_Manager::mgr.lookup_Attrs(node->u.JOIN.left->RelName);
 	vector<Attr_Info> Rattr = Subsystem1_Manager::mgr.lookup_Attrs(node->u.JOIN.right->RelName);
@@ -166,7 +189,7 @@ vector<RID> Query_Executor::execute_tree_node_join(Logical_TreeNode* node, vecto
 	//新表的属性
 	vector<Attr_Info> new_attr = Lattr;
 	//对新表属性名的修正：加入表名作为前缀
-	if (node->u.JOIN.left->RelName.find('&') == string::npos) {
+	if (node->u.JOIN.left->RelName.find(spacer) == string::npos) {
 		for (int i = 0; i < Lattr.size(); ++i) {
 			char buff[100] = {0};
 			strcpy(buff, node->u.JOIN.left->RelName.c_str());
@@ -177,7 +200,7 @@ vector<RID> Query_Executor::execute_tree_node_join(Logical_TreeNode* node, vecto
 	}
 	new_attr.insert(new_attr.end(), Rattr.begin(), Rattr.end());
 	//for (int i = 0; i < Rattr.size(); ++i) new_attr.push_back(Rattr[i]);
-	if (node->u.JOIN.right->RelName.find('&') == string::npos) {
+	if (node->u.JOIN.right->RelName.find(spacer) == string::npos) {
 		for (int i = 0; i < Rattr.size(); ++i) {
 			char buff[100] = { 0 };
 			strcpy(buff, node->u.JOIN.right->RelName.c_str());
@@ -193,6 +216,7 @@ vector<RID> Query_Executor::execute_tree_node_join(Logical_TreeNode* node, vecto
 	for (int new_attr_index = 0; new_attr_index < new_attr.size(); ++new_attr_index)
 		strcpy(new_attr[new_attr_index].Rel_Name, node->RelName.c_str());
 	//创建新表
+	Subsystem1_Manager::mgr.Delete_Rel(node->RelName);
 	Subsystem1_Manager::mgr.Create_Rel(node->RelName, new_attr);
 	Rel_Info LRel,RRel;
 	Subsystem1_Manager::mgr.lookup_Rel(node->u.JOIN.left->RelName,LRel);
@@ -200,22 +224,32 @@ vector<RID> Query_Executor::execute_tree_node_join(Logical_TreeNode* node, vecto
 	
 	/*
 	修改cond中的属性名
-	*/
 
+	*/
+	Logical_Tree_Builder::display(this->Root);
+	cout << "rhs rel==" << cond[0]->rhsAttr.relname << endl;
 	{
 		for (int i = 0; i < cond.size(); i++) {
 			string attrName = string(cond[i]->lhsAttr.relname) + "." + cond[i]->lhsAttr.attrname;
-			strcpy(cond[i]->lhsAttr.relname, node->RelName.c_str());
-			strcpy(cond[i]->lhsAttr.attrname, attrName.c_str());
+			cout << "rhs rel==" << cond[0]->rhsAttr.relname << endl;
+			strncpy(cond[i]->lhsAttr.relname, node->RelName.c_str(), node->RelName.length()+1);
+			cout << "rhs rel==" << cond[0]->rhsAttr.relname << endl;
+			attrName = "Rel1.id2";
+			cout << "attrName==" << attrName << endl;
+			strncpy(cond[i]->lhsAttr.attrname, attrName.c_str(), attrName.length() + 1);
+			cout << "rhs rel==" << cond[0]->rhsAttr.relname << endl;
+			cout << "left attr==" << cond[i]->lhsAttr.attrname << endl;
 			if (cond[i]->bRhsIsAttr) {
+				cout << "rhs rel==" << cond[i]->rhsAttr.relname << endl;
 				string attrName = string(cond[i]->rhsAttr.relname) + "." + cond[i]->rhsAttr.attrname;
-				strcpy(cond[i]->rhsAttr.relname, node->RelName.c_str());
-				strcpy(cond[i]->rhsAttr.attrname, attrName.c_str());
+				cout << "attrname==" << attrName << endl;
+				strncpy(cond[i]->rhsAttr.relname, node->RelName.c_str(), node->RelName.length() + 1);
+				strncpy(cond[i]->rhsAttr.attrname, attrName.c_str(), attrName.length() + 1);
 			}
 		}
 	}
 
-
+	cout << "left attr==" << cond[0]->lhsAttr.attrname << endl;
 
 
 	/*
@@ -227,7 +261,7 @@ vector<RID> Query_Executor::execute_tree_node_join(Logical_TreeNode* node, vecto
 		for (int j = 0; j < RRID.size(); j++) {
 			char* record = new char[1000];
 			char* left = Subsystem1_Manager::mgr.Find_Record_by_RID(LRel.Rel_Name,LRID[i]);
-			char* right = Subsystem1_Manager::mgr.Find_Record_by_RID(RRel.Rel_Name,RRID[i]);
+			char* right = Subsystem1_Manager::mgr.Find_Record_by_RID(RRel.Rel_Name,RRID[j]);
 			memcpy(record, left, Llength);
 			memcpy(record + Llength, right, Rlength);
 			//不一定只有一个条件的，这里改动了一下
@@ -242,15 +276,17 @@ vector<RID> Query_Executor::execute_tree_node_join(Logical_TreeNode* node, vecto
 			ret.push_back(rid);
 		}
 	}
-	if (node->u.JOIN.left->RelName.find('&') != string::npos) Subsystem1_Manager::mgr.Delete_Rel(node->u.JOIN.left->RelName);
-	if (node->u.JOIN.right->RelName.find('&') != string::npos) Subsystem1_Manager::mgr.Delete_Rel(node->u.JOIN.right->RelName);
+	if (node->u.JOIN.left->RelName.find(spacer) != string::npos) Subsystem1_Manager::mgr.Delete_Rel(node->u.JOIN.left->RelName);
+	if (node->u.JOIN.right->RelName.find(spacer) != string::npos) Subsystem1_Manager::mgr.Delete_Rel(node->u.JOIN.right->RelName);
 	return ret;
 }
 vector<RID> Query_Executor::execute_tree_node_proj(Logical_TreeNode* node)
 {
 	vector<RID> ret;
 	vector<RID> Records = execute_tree_node(node->u.PROJECTION.rel);
+	cout << "proj record num==" << Records.size() << endl;
 	node->RelName = node->u.PROJECTION.rel->RelName + "proj";
+	cout << "node->RelName==" << node->RelName << endl;
 	/*
 	根据投影字段信息新建数据表并进行投影，将ret设为新表的RID
 	*/
@@ -258,15 +294,15 @@ vector<RID> Query_Executor::execute_tree_node_proj(Logical_TreeNode* node)
 	Attr_Info* Proj_Attrs = node->u.PROJECTION.Attr_list;
 	int Proj_Attrs_Num = node->u.PROJECTION.Attr_Num;
 	/*构建新数据表*/
-	vector<Attr_Info> attrs = Subsystem1_Manager::mgr.lookup_Attrs(node->RelName);
+	vector<Attr_Info> attrs = Subsystem1_Manager::mgr.lookup_Attrs(node->u.PROJECTION.rel->RelName);
 	//对未join过的表的特殊处理
-	if (node->RelName.find('&') == string::npos) {
+	if (node->RelName.find(spacer) == string::npos) {
 		for (int i = 0; i < attrs.size(); ++i) {
 			char buff[50];
 			strcpy(buff, attrs[i].Rel_Name);
 			strcat(buff, ".");
 			strcat(buff, attrs[i].Attr_Name);
-			strcat(attrs[i].Attr_Name, buff);
+			strcpy(attrs[i].Attr_Name, buff);
 		}
 	}
 	vector<Attr_Info> new_attrs;
@@ -284,16 +320,37 @@ vector<RID> Query_Executor::execute_tree_node_proj(Logical_TreeNode* node)
 		offset += tmp.Length;
 		strcpy(tmp.Rel_Name, node->RelName.c_str());
 		bool error = true;
-		for (int attr_index = 0; attr_index < attrs.size(); ++attr_index) 
-			if (!strcmp(tmp.Attr_Name, attrs[attr_index].Attr_Name)) {
+		for (int attr_index = 0; attr_index < attrs.size(); ++attr_index) {
+			string lookup_attrName = attrs[attr_index].Attr_Name;
+			if (!strcmp(tmp.Attr_Name, lookup_attrName.c_str())) {
 				proj_attr_to_attrs_index.push_back(attr_index);
 				error = false;
 				break;
 			}
+		}
 		if (error) cout << "投影属性出错" << endl;
 	}
+	{
+		int offset = 0;
+		for (int i = 0; i < proj_attr_to_attrs_index.size(); i++) {
+			Attr_Info attr = attrs[proj_attr_to_attrs_index[i]];
+			attr.Offset = offset;
+			strcpy(attr.Rel_Name, node->RelName.c_str());
+			offset += attr.Length;
+			new_attrs.push_back(attr);
+		}
+	}
+
+
+
+	Subsystem1_Manager::mgr.Delete_Rel(node->RelName);
+	Subsystem1_Manager::mgr.Create_Rel(node->RelName, new_attrs);
+	
+
+
 	for (int i = 0; i < Records.size(); i++) {
-		char* record = Subsystem1_Manager::mgr.Find_Record_by_RID(node->RelName,Records[i]);
+		char* record = Subsystem1_Manager::mgr.Find_Record_by_RID(node->u.PROJECTION.rel->RelName,Records[i]);
+		int id = *(int*)record;
 		char* new_record = new char[500];
 		for (int j = 0; j < Proj_Attrs_Num; j++) {
 			memcpy(new_record + new_attrs[j].Offset, 
@@ -320,7 +377,11 @@ bool Query_Executor::record_cmp_1(Condition* cond, char* record, string RelName)
 	Attr_Info Lattr;
 	Subsystem1_Manager::mgr.lookup_Attr(RelName, cond->lhsAttr.attrname, Lattr);
 	char* Lvalue = record + Lattr.Offset;
+	cout <<"Lvalue==" << *(int*)Lvalue << endl;
+	cout << "Rvalue==" << *(int*)cond->rhsValue.data << endl;
+	
 	int ret = cmp(Lvalue, cond->rhsValue, Lattr);
+	cout << "ret==" << ret << endl;
 	switch (cond->op) {
 	case TOKENKIND::T_EQ: {
 		return ret == 0;
@@ -355,10 +416,14 @@ bool Query_Executor::record_cmp_1(Condition* cond, char* record, string RelName)
 bool Query_Executor::record_cmp_2(Condition* cond, char* record, string RelName)
 {
 	Attr_Info Lattr, Rattr;
+	cout << "Lattrname==" << cond->lhsAttr.attrname << endl;
 	Subsystem1_Manager::mgr.lookup_Attr(RelName, cond->lhsAttr.attrname, Lattr);
 	Subsystem1_Manager::mgr.lookup_Attr(RelName, cond->rhsAttr.attrname, Rattr);
+	
 	char* Lvalue = record + Lattr.Offset;
 	char* Rvalue = record + Rattr.Offset;
+	cout << "Lvalue==" << *(int*)Lvalue << endl;
+	cout << "Rvalue==" << *(int*)Rvalue << endl;
 	int ret = cmp(Lvalue, Rvalue, Lattr, Rattr);
 	switch (cond->op) {
 	case TOKENKIND::T_EQ: {

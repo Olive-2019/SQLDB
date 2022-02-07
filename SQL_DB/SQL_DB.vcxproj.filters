@@ -129,7 +129,16 @@
     <ClInclude Include="executor\DDL_executor.h">
       <Filter>executor</Filter>
     </ClInclude>
-    <ClInclude Include="storage\pf.h">
+    <ClInclude Include="storage\Page_Mgr.h">
+      <Filter>storage</Filter>
+    </ClInclude>
+    <ClInclude Include="storage\PF_BufferMgr.h">
+      <Filter>storage</Filter>
+    </ClInclude>
+    <ClInclude Include="storage\PF_BufPageDesc.h">
+      <Filter>storage</Filter>
+    </ClInclude>
+    <ClInclude Include="storage\Subsystem1_Manager.h">
       <Filter>storage</Filter>
     </ClInclude>
   </ItemGroup>
@@ -224,7 +233,19 @@
     <ClCompile Include="executor\DDL_executor.cpp">
       <Filter>executor</Filter>
     </ClCompile>
-    <ClCompile Include="storage\pf.cpp">
+    <ClCompile Include="storage\Page_Mgr.cpp">
+      <Filter>storage</Filter>
+    </ClCompile>
+    <ClCompile Include="storage\PF_BufferMgr.cpp">
+      <Filter>storage</Filter>
+    </ClCompile>
+    <ClCompile Include="storage\PF_BufPageDesc.cpp">
+      <Filter>storage</Filter>
+    </ClCompile>
+    <ClCompile Include="storage\Subsystem1_Manager.cpp">
+      <Filter>storage</Filter>
+    </ClCompile>
+    <ClCompile Include="storage\Test.cpp">
       <Filter>storage</Filter>
     </ClCompile>
   </ItemGroup>

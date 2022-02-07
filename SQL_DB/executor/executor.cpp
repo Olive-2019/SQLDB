@@ -47,8 +47,10 @@ void Executor::Display(string RelName, vector<RID> records)
 	cout << "查询结果为：" << endl;
 	vector<Attr_Info> attrs = Subsystem1_Manager::mgr.lookup_Attrs(RelName);
 	int length = 15;
-	for (int i = 0; i < attrs.size(); ++i) 
-		cout << setw(length) << attrs[i].Attr_Name << endl;
+	for (int i = 0; i < attrs.size(); ++i) {
+		cout << setw(length) << attrs[i].Attr_Name;
+	}
+	cout << endl;
 	for (int i = 0; i < records.size(); ++i) {
 		char* buff = Subsystem1_Manager::mgr.Find_Record_by_RID(RelName, records[i]);
 		for (int j = 0; j < attrs.size(); ++j) {
