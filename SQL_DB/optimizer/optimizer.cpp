@@ -51,7 +51,7 @@ void Optimizer::init(int Rel_num, RelInfo* rels, int Attr_num, AggRelAttr* attrs
             Rels.push_back(temp);
         }
         for (int i = 0; i < Attr_num; i++) {
-            if (strcmp(attrs[i].attrname, "*") == 0) {
+            if (strcmp(attrs[i].attrname, "*" ) == 0 || !Attr_num) {
                 vector<Attr_Info> temp;
                 for (int j = 0; j < Rel_num; j++) {
                     temp=Subsystem1_Manager::mgr.lookup_Attrs(Rels[j].Rel_Name);
