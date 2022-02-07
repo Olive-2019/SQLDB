@@ -643,6 +643,7 @@ bool SyntaxTree::parseValue(NODE* &node)
 	switch (val->type) {
 	case T_QSTRING:
 		node = value_node(STRING, val->content);
+		cout << "content==" << val->content << endl;
 		break;
 	case T_INT:
 	{

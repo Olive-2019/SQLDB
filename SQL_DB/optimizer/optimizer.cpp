@@ -115,6 +115,7 @@ Optimizer::Optimizer(RelInfo rel, int Attr_num, NODE* attrs, char** values, int 
         Subsystem1_Manager::mgr.lookup_Attr(attrs[i].u.RELATTR.relname, attrs[i].u.RELATTR.attrname, attr);
         Attrs.push_back(attr);
     }
+    //executor->execute_select();
     executor->execute_update(Attrs, values);
 }
 //insertÓï¾ä¹¹Ôìº¯Êı

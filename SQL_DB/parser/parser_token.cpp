@@ -59,7 +59,7 @@ static char *mk_string(const char *s, int len)
 	char *copy;
 
 	/* allocate space for new string */
-	if ((copy = string_alloc(len + 1)) == NULL) {
+	if ((copy = string_alloc(max(len+1,100))) == NULL) {
 		printf("out of string space\n");
 		exit(1);
 	}

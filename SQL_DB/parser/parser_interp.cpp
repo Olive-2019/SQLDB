@@ -263,7 +263,7 @@ static int mk_values(NODE *list, string RelName, char* record)
 			memcpy(record + attrs[i].Offset, (char*)&n->u.VALUE.rval, sizeof(float));
 			break;
 		case STRING:
-			memcpy(record + attrs[i].Offset, (char*)&n->u.VALUE.sval, attrs[i].Length);
+			memcpy(record + attrs[i].Offset, (char*)n->u.VALUE.sval, attrs[i].Length);
 			break;
 		}
 	}
@@ -586,6 +586,7 @@ int interp(NODE *n)
 			Condition* conds_arr = new Condition[cond_num];
 			for (int i = 0; i < cond_num; ++i) conds_arr[i] = conds[i];
 			Optimizer* optimizer = new  Optimizer(rel, Attr_num, attrs, values, cond_num, conds_arr);
+			break;
 		}
 		case N_LOAD:
 

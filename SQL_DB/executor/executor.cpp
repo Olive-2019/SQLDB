@@ -21,6 +21,7 @@ void Executor::execute_update(vector<Attr_Info> attrs, char** new_values)
 	Query_Executor* query_executor = new Query_Executor(Root);
 	vector<RID> records = query_executor->query();
 	string RelName = query_executor->get_final_RelName();
+	Display(RelName, records);
 	Update(RelName, records, attrs, new_values);
 }
 
