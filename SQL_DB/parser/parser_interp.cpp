@@ -586,6 +586,7 @@ int interp(NODE *n)
 			Condition* conds_arr = new Condition[cond_num];
 			for (int i = 0; i < cond_num; ++i) conds_arr[i] = conds[i];
 			Optimizer* optimizer = new  Optimizer(rel, Attr_num, attrs, values, cond_num, conds_arr);
+			break;
 		}
 		case N_LOAD:
 
