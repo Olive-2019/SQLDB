@@ -151,7 +151,6 @@
     <ClInclude Include="optimizer\Link_Order_Affirmant.h" />
     <ClInclude Include="optimizer\Logical_Tree_Builder.h" />
     <ClInclude Include="optimizer\optimizer.h" />
-    <ClInclude Include="optimizer\PSO_Link_Order_Affirmant.h" />
     <ClInclude Include="parser\parser.h" />
     <ClInclude Include="parser\parser_common.h" />
     <ClInclude Include="parser\parser_interp.h" />
@@ -190,12 +189,10 @@
     <ClCompile Include="optimizer\Link_Order_Affirmant.cpp" />
     <ClCompile Include="optimizer\Logical_Tree_Builder.cpp" />
     <ClCompile Include="optimizer\optimizer.cpp" />
-    <ClCompile Include="optimizer\PSO_Link_Order_Affirmant.cpp" />
     <ClCompile Include="parser\parser.cpp" />
     <ClCompile Include="parser\parser_interp.cpp" />
     <ClCompile Include="parser\parser_lexer.cpp" />
     <ClCompile Include="parser\parser_node.cpp" />
-    <ClCompile Include="parser\parser_scan.cpp" />
     <ClCompile Include="parser\parser_syntaxtree.cpp" />
     <ClCompile Include="parser\parser_token.cpp" />
     <ClCompile Include="RECORD.cpp" />

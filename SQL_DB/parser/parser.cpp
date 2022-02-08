@@ -46,7 +46,7 @@ RC RBparse()
 	string buffer;
 	LexerPtr lexer = Lexer::instance();
 	SyntaxTree tree(lexer);
-	string sql = "select id2,Rel2.id,Rel3.name from Rel1,Rel2,Rel3 where Rel1.id>Rel2.id;";
+	string sql = "select id,Rel2.id,Rel3.name from Rel1,Rel2,Rel3 where Rel1.id>Rel2.id;";
 	//string sql = "select * from Rel1 where Rel1.id=5;";
 	while (!stop) {
 		cout << PROMPT;

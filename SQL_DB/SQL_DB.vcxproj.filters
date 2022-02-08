@@ -78,9 +78,6 @@
     <ClInclude Include="optimizer\Link_Order_Affirmant.h">
       <Filter>optimizer</Filter>
     </ClInclude>
-    <ClInclude Include="optimizer\PSO_Link_Order_Affirmant.h">
-      <Filter>optimizer</Filter>
-    </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -158,9 +155,6 @@
     <ClCompile Include="parser\parser_node.cpp">
       <Filter>parser</Filter>
     </ClCompile>
-    <ClCompile Include="parser\parser_scan.cpp">
-      <Filter>parser</Filter>
-    </ClCompile>
     <ClCompile Include="parser\parser_syntaxtree.cpp">
       <Filter>parser</Filter>
     </ClCompile>
@@ -186,9 +180,6 @@
       <Filter>optimizer</Filter>
     </ClCompile>
     <ClCompile Include="optimizer\Link_Order_Affirmant.cpp">
-      <Filter>optimizer</Filter>
-    </ClCompile>
-    <ClCompile Include="optimizer\PSO_Link_Order_Affirmant.cpp">
       <Filter>optimizer</Filter>
     </ClCompile>
     <ClCompile Include="transaction\Exclusive_Lock.cpp">
