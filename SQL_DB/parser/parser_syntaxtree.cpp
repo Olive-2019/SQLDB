@@ -1,6 +1,6 @@
 #include "parser_syntaxtree.h"
 #include "parser_node.h"
-//#include "DBstruct.h"
+#include "../storage/Subsystem1_Manager.h"
 
 //
 // buildSyntaxTree - 构建一棵语法树
@@ -133,6 +133,37 @@ bool SyntaxTree::parseDML(NODE* &node)
 	if (!succ) succ = parseUpdate(node);
 	return succ;
 }
+//补充缺失的关系名
+void SyntaxTree::supply_relation(NODE* node, NODE* rel) {
+	NODE* p = rel;
+	vector<string> rels;
+	while (p) {
+		rels.push_back(p->u.LIST.curr->u.RELATION.relname);
+		p = p->u.LIST.next;
+	}
+	p = node;
+	while (p) {
+		NODE* cur = p->u.LIST.curr;
+		if (!cur->u.AGGRELATTR.relname) {
+			string attr_name = cur->u.AGGRELATTR.attrname;
+			bool get = false;
+			Attr_Info tmp;
+			string rel_name;
+			for (int i = 0; i < rels.size() && !get; ++i) {
+				rel_name = rels[i];
+				get = Subsystem1_Manager::mgr.lookup_Attr(rels[i], attr_name, tmp);
+			}
+			if (get) {
+				char* relname_chars = new char[rel_name.size() + 1];
+				strcpy(relname_chars, rel_name.c_str());
+				cur->u.AGGRELATTR.relname = relname_chars;
+			}
+			else throw GeneralError("属性不存在!");
+			
+		}
+		p = p->u.LIST.next;
+	}
+}
 
 //
 // parseQuery - 解析select语句
@@ -141,6 +172,8 @@ bool SyntaxTree::parseDML(NODE* &node)
 //		  -> RW_SELECT non_mt_select_clause RW_FROM non_mt_relation_list opt_where_clause
 //				opt_group_by_clause opt_order_by_clause
 //
+
+
 bool SyntaxTree::parseQuery(NODE* &node)
 {
 	TokenPtr ta = peek(1);
@@ -159,6 +192,7 @@ bool SyntaxTree::parseQuery(NODE* &node)
 		if (orderby == nullptr && groupby != nullptr) {
 			parseOptOrderByClause(orderby);
 		}
+		supply_relation(clause, relattrlist);
 		node = query_node(clause, relattrlist, condlist, orderby, groupby);
 		return true;
 	}
