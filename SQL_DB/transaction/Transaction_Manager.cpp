@@ -9,11 +9,9 @@ Transaction* TransactionManager::Begin(Transaction* txn) {
     txn_map_mutex.lock();
     if (txn == nullptr) txn = new Transaction(next_txn_id_++);
 
-    if (LogManager::enable_logging) {
-        // TODO: write log and update transaction's prev_lsn here
-        auto logRecord = LogRecord(txn->getTransactionId(), txn->getPrevLSN(), LogRecordType::BEGIN);
-        log_manager_->appendLogRecord(&logRecord);
-    }
+    // TODO: write log and update transaction's prev_lsn here
+    //auto logRecord = LogRecord(txn->getTransactionId(), txn->getPrevLSN(), LogRecordType::BEGIN);
+    //log_manager_->appendLogRecord(&logRecord);
 
     txn_map[txn->getTransactionId()] = txn;
     txn_map_mutex.unlock();
@@ -23,30 +21,11 @@ Transaction* TransactionManager::Begin(Transaction* txn) {
 void TransactionManager::Commit(Transaction* txn) {
     txn_map_mutex.lock();
     txn->setState(TransactionState::COMMITTED);
-    // truly delete before commit
-    //auto write_set = txn->getWriteSet();
-    //while (!write_set->empty()) {
-    //    auto& item = write_set->back();
-    //    auto tableName = item.relname_;
-    //    if (item.wtype_ == WType::DELETE) {
-    //        // ApplyDelete(item.rid_, txn);
-    //    }
-    //    else if (item.wtype_ == WType::INSERT) {
-    //        // InsertTuple(item.tuple_, item.rid_, txn);
-    //    }
-    //    else if (item.wtype_ == WType::UPDATE) {
-    //        // UpdateTuple(item.tuple_, item.rid_, txn);
-    //    }
-    //    write_set->pop_back();
-    //}
-    //write_set->clear();
 
-    if (LogManager::enable_logging) {
-        // TODO: write log and update transaction's prev_lsn here
-        auto logRecord = LogRecord(txn->getTransactionId(), txn->getPrevLSN(), LogRecordType::COMMIT);
-        log_manager_->appendLogRecord(&logRecord);
-        log_manager_->forceFlush();
-    }
+    // TODO: write log and update transaction's prev_lsn here
+    //auto logRecord = LogRecord(txn->getTransactionId(), txn->getPrevLSN(), LogRecordType::COMMIT);
+    //log_manager_->appendLogRecord(&logRecord);
+    //log_manager_->forceFlush();
 
     // release all the lock
     std::set<Trid> lock_set;
@@ -79,31 +58,29 @@ void TransactionManager::Abort(Transaction* txn) {
             cout << ("rollback delete\n");
             // 回滚操作 RollbackDelete(item.rid_, txn);
             Tuple tuple(relname, item.values_, item.rid_);
-            table_writer_->insertTuple(tuple, txn);
+            //table_writer_->insertTuple(tuple, txn);
         }
         else if (item.wtype_ == WType::INSERT) {
             cout << ("rollback insert\n");
             // 回滚操作 ApplyDelete(item.rid_, txn);
             Tuple tuple(relname, item.values_, item.rid_);
-            table_writer_->deleteTuple(tuple, txn);
+            //table_writer_->deleteTuple(tuple, txn);
         }
         else if (item.wtype_ == WType::UPDATE) {
             cout << ("rollback update\n");
             // 回滚操作 UpdateTuple(item.tuple_, item.rid_, txn);
             Tuple old_tuple(relname, item.values_, item.rid_);
             Tuple new_tuple(relname, item.new_values_, item.rid_);
-            table_writer_->updateTuple(new_tuple, old_tuple, txn);
+            //table_writer_->updateTuple(new_tuple, old_tuple, txn);
         }
         write_set->pop_back();
     }
     write_set->clear();
 
-    if (LogManager::enable_logging) {
-        // TODO: write log and update transaction's prev_lsn here
-        auto logRecord = LogRecord(txn->getTransactionId(), txn->getPrevLSN(), LogRecordType::ABORT);
-        log_manager_->appendLogRecord(&logRecord);
-        log_manager_->forceFlush();
-    }
+    // TODO: write log and update transaction's prev_lsn here
+    //auto logRecord = LogRecord(txn->getTransactionId(), txn->getPrevLSN(), LogRecordType::ABORT);
+    //log_manager_->appendLogRecord(&logRecord);
+    //log_manager_->forceFlush();
 
     // release all the lock
     std::set<Trid> lock_set;

@@ -1,7 +1,8 @@
 #pragma once
 
 #include "../global.h"
-#include "log_record.h"
+#include "Log_Record.h"
+#include "Transaction.h"
 #include <condition_variable>
 #include <chrono>
 #include <fstream>
@@ -9,8 +10,15 @@
 static constexpr int LOG_BUFFER_SIZE = (BUFFER_NUM + 1) * 4096; // 4096 == BlockSize
 
 class LogManager {
+    friend class LogManagerTest;
 public:
-    static std::atomic<bool> enable_logging;
+    /**
+     *   ios::app：　　　 //以追加的方式打开文件
+     *   ios::binary：　  //以二进制方式打开文件，缺省的方式是文本方式。
+     *   ios::in：　　　  //文件以输入方式打开（文件数据输入到内存） 
+     *   ios::out：　　　 //文件以输出方式打开（内存数据输出到文件）
+     *   ios::trunc：　   //如果文件存在，把文件长度设为0
+     */
 
     explicit LogManager(const std::string& dbname)
         : offset_(0), stop_flush_thread_(false), next_lsn_(0), persistent_lsn_(INVALID_LSN) {
@@ -57,10 +65,12 @@ public:
     inline void setPersistentLSN(lsn_t lsn) { persistent_lsn_ = lsn; }
     inline char* getLogBuffer() { return log_buffer_; }
 
+    bool Redo();
+    bool Undo();
+    bool Do(const LogRecord& log_record);
+    bool DoByTxn(const LogRecord& log_record, Transaction* txn);
 
-    void Redo();
-    void Undo();
-
+    // 本应更底层来做
     void writeLog(char* log_data, int size);
     bool readLog(char* log_data, int size, int offset);
 

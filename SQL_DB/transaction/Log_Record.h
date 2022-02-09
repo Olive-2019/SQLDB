@@ -56,7 +56,7 @@ public:
             delete_tuple_ = tuple;
         }
 
-        size_ = HEADER_SIZE + sizeof(RID) + sizeof(int32_t) + tuple.getLength();
+        size_ = HEADER_SIZE + sizeof(RID) + sizeof(int32_t) + tuple.getLength() + tuple.getRel().length();
     }
 
     // constructor for UPDATE type
