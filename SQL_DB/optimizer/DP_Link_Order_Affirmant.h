@@ -33,11 +33,11 @@ private:
 	
 
 public:
-	DP_Link_Order_Affirmant(vector<Rel_Info>& Rels, vector<Condition>& Conds);
+	DP_Link_Order_Affirmant(vector<Rel_Info>& Rels, vector<Condition>& Conds, vector<Attr_Info>& Attrs);
 
 	//获取dp算法的结果逻辑树
 	Logical_TreeNode* get_tree(){
 		dp();
-		return dp_relations_to_node_map[joinrels[joinrels.size() - 1][0]];
+		return add_proj(dp_relations_to_node_map[joinrels[joinrels.size() - 1][0]]);
 	}
 };

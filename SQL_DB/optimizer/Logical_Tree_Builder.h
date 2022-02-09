@@ -50,11 +50,12 @@ struct Logical_TreeNode {
         }FILESCAN;   //叶节点
     }u;
 };
-static Logical_TreeNode All_Logical_Tree_Node[100];
+static Logical_TreeNode All_Logical_Tree_Node[5000];
 static int All_Logical_Tree_Node_Ptr = 0;
 static Logical_TreeNode* get_logical_tree_node(Logical_TreeNode_Kind kind) {
     Logical_TreeNode* ret = All_Logical_Tree_Node + All_Logical_Tree_Node_Ptr;
     All_Logical_Tree_Node_Ptr++;
+    //cout << "All_Logical_Tree_Node_Ptr: " << All_Logical_Tree_Node_Ptr << endl;
     ret->kind = kind;
     return ret;
 }
@@ -78,7 +79,8 @@ public:
 
     //GA用
     Logical_Tree_Builder(map<vector<string>, Logical_TreeNode*> relation_to_binary_condition_node_map,
-        map<string, Logical_TreeNode*> relation_to_node_map) : Root (NULL), relation_to_node_map(relation_to_node_map),
+        map<string, Logical_TreeNode*> relation_to_node_map, vector<Attr_Info>& Attrs)
+        : Root (NULL), relation_to_node_map(relation_to_node_map), Attrs(Attrs),
         relation_to_binary_condition_node_map(relation_to_binary_condition_node_map){}
     
     
@@ -88,7 +90,9 @@ public:
     //根据某种连接顺序确定逻辑树，order内部为RelName
     //GA用
     Logical_TreeNode* get_tree_root_with_order(vector<string> order);
-    static void display(Logical_TreeNode *Root);
+    //获取投影结点
+    Logical_TreeNode* get_proj(Logical_TreeNode* node);
+    void display();
 
     static void delete_node(Logical_TreeNode* root);
 };

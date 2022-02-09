@@ -9,20 +9,20 @@ protected:
 	//关系、条件、关系名字
 	vector<Rel_Info>& Rels;
 	vector<Condition>& Conds;
+	vector<Attr_Info>& Attrs;
 	vector<string> rels_name;
-
+	Logical_Tree_Builder* tree_builder;
 	//所有表的二元条件映射
 	map<vector<string>, Logical_TreeNode*> relation_to_binary_condition_node_map;
 	//叶子结点加上一元条件+只有一个表的二元属性
 	map<string, Logical_TreeNode*> relation_to_node_map;
 	
-	//属性
-	vector<Attr_Info> Attrs;
+	Logical_TreeNode* add_proj(Logical_TreeNode* node);
 public:
 
-	Link_Order_Affirmant(vector<Rel_Info>& Rels, vector<Condition>& Conds);
+	Link_Order_Affirmant(vector<Rel_Info>& Rels, vector<Condition>& Conds, vector<Attr_Info>& Attrs);
 
-	/*virtual vector<Condition> get_Link_Order();*/
+	
 	virtual Logical_TreeNode* get_tree() = 0;
 
 };
