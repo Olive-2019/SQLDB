@@ -16,11 +16,9 @@ public:
     static std::shared_mutex txn_map_mutex;
 
     TransactionManager(TableWriter* table_writer , LockManager* lock_manager, LogManager* log_manager = nullptr)
-        : next_txn_id_(0), table_writer_(table_writer), lock_manager_(lock_manager), log_manager_(log_manager) {}
-
-    ~TransactionManager() {
-        delete table_writer_;
-    }
+        : next_txn_id_(0), table_writer_(table_writer), lock_manager_(lock_manager), log_manager_(log_manager) {}    
+    //TransactionManager(LockManager* lock_manager, LogManager* log_manager = nullptr)
+    //    : next_txn_id_(0), lock_manager_(lock_manager), log_manager_(log_manager) {}
 
     static Transaction* getTransaction(txn_id_t txn_id) {
         TransactionManager::txn_map_mutex.lock_shared();

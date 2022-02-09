@@ -7,9 +7,7 @@ bool TableWriter::insertTuple(const Tuple& tuple, Transaction* txn) {
     bool locked = lockManager_->LockExclusive(txn, trid);
     if (!locked) return false;
 
-    char* record;
-    tuple.toRecord(record);
-    sysManager_->Insert_Reocrd(relname, record);
+    sysManager_->Insert_Reocrd(relname, tuple.getData());
 
     LogRecord log_record(txn->getTransactionId(), txn->getPrevLSN(), LogRecordType::INSERT, tuple.getRid(),
         tuple, relname);

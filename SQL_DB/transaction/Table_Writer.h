@@ -2,7 +2,6 @@
 #include "../storage/Subsystem1_Manager.h"
 #include "Lock_Manager.h"
 #include "Log_Manager.h"
-#include "Transaction_Manager.h"
 
 class TableWriter{
 public:
@@ -22,5 +21,4 @@ private:
 
     LogManager* logManager_;
 
-    TransactionManager* tsManager;
 };

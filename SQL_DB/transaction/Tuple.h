@@ -36,10 +36,6 @@ public:
     inline uint32_t getLength() const { return size_; }
     inline string getRel() const { return relname_; }
 
-    void toRecord(char* record) const {
-        memcpy(record, data_, size_);
-    }
-
     // 日志管理器专用
     void serializeTo(char* storage) const {
         memcpy(storage, &size_, sizeof(uint32_t));
