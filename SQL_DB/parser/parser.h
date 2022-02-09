@@ -2,7 +2,7 @@
 #define PARSER_H
 #include "redbase.h"
 
-#define PROMPT	"\nLAM >> "
+#define PROMPT	"\nSQL >> "
 
 RC RBparse();
 #endif 

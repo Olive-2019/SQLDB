@@ -144,7 +144,7 @@ void SyntaxTree::supply_relation(NODE* node, NODE* rel) {
 	p = node;
 	while (p) {
 		NODE* cur = p->u.LIST.curr;
-		if (!cur->u.AGGRELATTR.relname) {
+		if (!cur->u.AGGRELATTR.relname && strcmp(cur->u.AGGRELATTR.attrname,"*")) {
 			string attr_name = cur->u.AGGRELATTR.attrname;
 			bool get = false;
 			Attr_Info tmp;
@@ -676,6 +676,7 @@ bool SyntaxTree::parseValue(NODE* &node)
 	TokenPtr val = next();
 	switch (val->type) {
 	case T_QSTRING:
+	case RW_STRING:
 		node = value_node(STRING, val->content);
 		cout << "content==" << val->content << endl;
 		break;

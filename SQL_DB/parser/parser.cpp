@@ -6,39 +6,12 @@
 #include "parser_lexer.h"
 #include "parser_syntaxtree.h"
 #include "parser_interp.h"
-/*
-#include "rm_error.h"
-#include "pf_error.h"
-#include "ix_error.h"
-#include "ql_error.h"
-#include "sm_error.h"
-*/
+
 using namespace std;
 
 static NODE* parse_tree;
 bool stop = false;
-/*
-extern PFManager pfManager;
-extern SMManager smManager;
-extern QLManager qlManager;
 
-
-void PrintError(RC rc)
-{
-	if (abs(rc) <= END_PF_WARN)
-		PFPrintError(rc);
-	else if (abs(rc) <= END_RM_WARN)
-		RMPrintError(rc);
-	else if (abs(rc) <= END_IX_WARN)
-		IXPrintError(rc);
-	else if (abs(rc) <= END_SM_WARN)
-		SMPrintError(rc);
-	else if (abs(rc) <= END_QL_WARN)
-		QLPrintError(rc);
-	else
-		cerr << "Error code out of range: " << rc << "\n";
-}
-*/
 RC RBparse()
 {
 	RC errval;
@@ -46,14 +19,15 @@ RC RBparse()
 	string buffer;
 	LexerPtr lexer = Lexer::instance();
 	SyntaxTree tree(lexer);
-	string sql = "select id,Rel2.id,Rel3.name from Rel1,Rel2,Rel3 where Rel1.id>Rel2.id;";
+	//string sql = "insert into Rel1(2, 3.3, Lam);";
+	string sql = "select * from Rel1;";
+	//string sql = "select id,Rel.id from Rel1,Rel2 where Rel1.id>Rel2.id;";
 	//string sql = "select * from Rel1 where Rel1.id=5;";
 	while (!stop) {
 		cout << PROMPT;
 		cout.flush();
 		cout << sql << endl;
 		buffer = sql;
-		//getline(cin, buffer);
  	    tree.resetParser(buffer);
 		try { 
 			parse_tree = tree.buildSyntaxTree();
@@ -61,10 +35,9 @@ RC RBparse()
 		catch (const GeneralError& err)
 		{
 			cerr << err.what() << endl;
-			continue;
+			break;
 		}
 		if (errval = interp(parse_tree)) { // ½âÎöÓï·¨Ê÷
-			//PrintError(errval);
 			if (errval < 0) stop = true;
 		}
 		return 0;
