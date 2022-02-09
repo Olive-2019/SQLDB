@@ -23,17 +23,6 @@ using txn_id_t = int32_t;								// transaction id type
 static constexpr int32_t INVALID_LSN = -1;						// 无效日志记录序号
 using lsn_t = int32_t;									// log sequence number type
 
-struct Trid {
-	string relname;
-	RID rid;
-	// 可构成一条记录的唯一标识
-	Trid(string name = "", RID r = RID{}) : relname(name), rid(r) {}
-	bool operator < (const Trid& rhs) const {
-		return relname < rhs.relname ||
-			(relname == rhs.relname && rid < rhs.rid);
-	}
-};
-
 // -------------------
 
 const int MAX_NAME_LENGTH = 20;    //各种名字如数据表名、字段名等最大长度
@@ -107,6 +96,17 @@ struct RID {
 	}
 };
 
+// 事务系统要用的RID和表名字联合的标识 注意Trid中的relname前要加用户名数据库名的前缀, 和storage用的表名应该一致
+struct Trid {
+	string relname;
+	RID rid;
+	// 可构成一条记录的唯一标识
+	Trid(string name = "", RID r = RID{}) : relname(name), rid(r) {}
+	bool operator < (const Trid& rhs) const {
+		return relname < rhs.relname ||
+			(relname == rhs.relname && rid < rhs.rid);
+	}
+};
 
 enum AttrType {
 	INT,FLOAT,STRING
