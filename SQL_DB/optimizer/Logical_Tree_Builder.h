@@ -92,7 +92,7 @@ public:
     Logical_TreeNode* get_tree_root_with_order(vector<string> order);
     //获取投影结点
     Logical_TreeNode* get_proj(Logical_TreeNode* node);
-    void display();
+    static void display(Logical_TreeNode* Root);
 
     static void delete_node(Logical_TreeNode* root);
 };

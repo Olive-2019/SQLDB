@@ -133,16 +133,15 @@ Logical_TreeNode* Logical_Tree_Builder::get_tree_root()
 		Root->u.PROJECTION.Attr_list = attrs;
 	}
 	cout << endl;
-	display(Root);
+	
 	return Root;
 }
 Logical_TreeNode* Logical_Tree_Builder::get_proj(Logical_TreeNode* node) {
 	Logical_TreeNode* Root = get_logical_tree_node(Logical_TreeNode_Kind::PLAN_PROJ);
 	Root->u.PROJECTION.rel = node;
 	Attr_Info* attrs = new Attr_Info[Attrs.size()];
-	for (int i = 0; i < Attrs.size(); i++) {
+	for (int i = 0; i < Attrs.size(); i++) 
 		attrs[i] = Attrs[i];
-	}
 	Root->u.PROJECTION.Attr_Num = Attrs.size();
 	Root->u.PROJECTION.Attr_list = attrs;
 	return Root;

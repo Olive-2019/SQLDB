@@ -24,5 +24,6 @@ public:
 
 	
 	virtual Logical_TreeNode* get_tree() = 0;
+	virtual string get_name() = 0;
 
 };

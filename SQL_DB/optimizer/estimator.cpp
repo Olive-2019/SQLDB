@@ -110,14 +110,17 @@ Link_Lost Estimator::estimate_scan_lost(const Execution_Plan& Plan)
 
 
 int Estimator::estimate_record_num(const Condition& cond, int record_num) {
-
+    srand(time(NULL));
+    return rand() % 100;
     if (cond.bRhsIsAttr) {
         Attr_Info left_attr, right_attr;
         Subsystem1_Manager::mgr.lookup_Attr(cond.lhsAttr.relname, cond.lhsAttr.attrname, left_attr);
         Subsystem1_Manager::mgr.lookup_Attr(cond.rhsAttr.relname, cond.rhsAttr.attrname, right_attr);
         Distribution left_dis = left_attr.distribution;
         Distribution right_dis = right_attr.distribution;
+        
         return left_dis.dis->binary_rate(cond.op, right_dis) * record_num;
+        
     }
     else {
         Attr_Info attr;

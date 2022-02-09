@@ -40,4 +40,7 @@ public:
 		dp();
 		return add_proj(dp_relations_to_node_map[joinrels[joinrels.size() - 1][0]]);
 	}
+	string get_name() {
+		return "DP";
+	}
 };

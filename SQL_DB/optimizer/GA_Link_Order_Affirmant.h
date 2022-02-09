@@ -33,4 +33,7 @@ public:
 	GA_Link_Order_Affirmant(vector<Rel_Info>& Rels, vector<Condition>& Conds, vector<Attr_Info>& Attrs, int agent_num = 10, int max_iteration_num = 30);
 
 	Logical_TreeNode* get_tree();
+	string get_name() {
+		return "GA";
+	}
 };
