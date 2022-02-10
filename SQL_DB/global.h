@@ -15,7 +15,17 @@
 
 using namespace std;
 
-const int MAX_NAME_LENGTH = 20;    //¸÷ÖÖÃû×ÖÈçÊı¾İ±íÃû¡¢×Ö¶ÎÃûµÈ×î´ó³¤¶È
+// configäº‹åŠ¡ç³»ç»Ÿçš„å˜é‡é…ç½®
+
+static constexpr int32_t INVALID_TXN_ID = -1;                   // æ— æ•ˆäº‹åŠ¡id
+using txn_id_t = int32_t;					// transaction id type
+
+static constexpr int32_t INVALID_LSN = -1;			// æ— æ•ˆæ—¥å¿—è®°å½•åºå·
+using lsn_t = int32_t;						// log sequence number type
+
+// -------------------
+
+const int MAX_NAME_LENGTH = 20;    //å„ç§åå­—å¦‚æ•°æ®è¡¨åã€å­—æ®µåç­‰æœ€å¤§é•¿åº¦
 const int BUFFER_NUM = 200;
 
 enum SQL_type {
@@ -26,16 +36,16 @@ enum SQL_type {
 };
 
 enum Distribution_Type {
-	//ÕıÌ¬·Ö²¼
+	//æ­£æ€åˆ†å¸ƒ
 	NORMAL
-	//¾ùÔÈ·Ö²¼
+	//å‡åŒ€åˆ†å¸ƒ
 	,EVENLY
 };
 struct Distribution;
 struct DISTRIBUTION_TYPE {
-	//Ò»ÔªÌõ¼ş
+	//ä¸€å…ƒæ¡ä»¶
 	virtual double rate(int op, double value) = 0;
-	//¶şÔªÌõ¼ş
+	//äºŒå…ƒæ¡ä»¶
 	virtual double binary_rate(int op, const Distribution& dis) = 0;
 };
 struct NORMAL : public DISTRIBUTION_TYPE {
@@ -62,7 +72,7 @@ struct Distribution {
 };
 
 
-class Global_Paras {  //ÓÃÓÚ´æ·ÅÒ»Ğ©È«¾Ö±äÁ¿£¬Èçµ±Ç°Êı¾İ¿â¡¢ÓÃ»§µÈ£¬²»¿ÉÊµÀı»¯
+class Global_Paras {  //ç”¨äºå­˜æ”¾ä¸€äº›å…¨å±€å˜é‡ï¼Œå¦‚å½“å‰æ•°æ®åº“ã€ç”¨æˆ·ç­‰ï¼Œä¸å¯å®ä¾‹åŒ–
 private:
 	Global_Paras();
 
@@ -78,6 +88,18 @@ public:
 struct RID {
 	int blockID;
 	int slotID;
+};
+
+// äº‹åŠ¡ç³»ç»Ÿè¦ç”¨çš„RIDå’Œè¡¨åå­—è”åˆçš„æ ‡è¯†
+struct Trid {
+	string relname;
+	RID rid;
+	// å¯æ„æˆä¸€æ¡è®°å½•çš„å”¯ä¸€æ ‡è¯†
+	Trid(string name = "", RID r = RID{}) : relname(name), rid(r) {}
+	bool operator < (const Trid& rhs) const {
+		return relname < rhs.relname ||
+			(relname == rhs.relname && rid < rhs.rid);
+	}
 };
 
 
