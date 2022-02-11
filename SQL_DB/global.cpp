@@ -4,7 +4,7 @@ string Global_Paras:: Current_User;
 int Global_Paras:: Block_Size = 4092;
 #include "parser/parser_token.h"
 
-double EVENLY::rate(int op, double value) {
+double EVENLY_dis::rate(int op, double value) {
 	switch (op)
 	{
 	case TOKENKIND::T_EQ: 
