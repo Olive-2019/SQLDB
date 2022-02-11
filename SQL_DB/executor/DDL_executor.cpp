@@ -33,12 +33,13 @@ void DDL_executor::create_table(string tableName, vector<AttrType> types, vector
 			break;
 		}
 		case AttrType::STRING: {
-			offset += sizeof(20);
+			offset += 20;
 			attr.Length = 20;
 			break;
 		}
 		}
-		
+		strcpy(attr.DBName, Subsystem1_Manager::mgr.DBName.c_str());
+		strcpy(attr.Creator, Subsystem1_Manager::mgr.UserName.c_str());
 		attrs.push_back(attr);
 	}
 

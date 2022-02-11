@@ -51,6 +51,7 @@ private:
 	void parseOptOrderByClause(NODE* &);
 	void parseOptGroupByClause(NODE* &);
 	void supply_relation(NODE*, NODE* rel);
+	void supply_cond_relation(NODE* cond, NODE* rel);
 	void parseCondition(NODE* &);
 	void parseRelAttrOrValue(NODE* &);
 private:

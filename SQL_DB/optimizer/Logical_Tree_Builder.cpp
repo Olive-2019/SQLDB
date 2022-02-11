@@ -198,6 +198,7 @@ void Logical_Tree_Builder::display(Logical_TreeNode *Root)
 		while (!que1.empty()) {
 			node = que1.front();
 			que1.pop();
+			
 			switch (node->kind) {
 			case Logical_TreeNode_Kind::PLAN_FILESCAN: {
 				cout << "scan " << node->u.FILESCAN.Rel << "  ";

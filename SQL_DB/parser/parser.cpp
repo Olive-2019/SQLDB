@@ -16,16 +16,18 @@ RC RBparse()
 {
 	RC errval;
 	stop = false;
-	string buffer;
+	string buffer,sql;
 	LexerPtr lexer = Lexer::instance();
 	SyntaxTree tree(lexer);
 	//string sql = "insert into Rel1(2, 3.3, Lam);";
-	string sql = "select * from Rel1;";
+	sql = "select R1.id,R2.id,R3.name,R4.price from R1,R2,R3,R4 where R1.id>R2.id and R3.id>5 and R4.price=R1.price;";
+	//string sql = "select * from Rel1;";
 	//string sql = "select id,Rel.id from Rel1,Rel2 where Rel1.id>Rel2.id;";
 	//string sql = "select * from Rel1 where Rel1.id=5;";
 	while (!stop) {
 		cout << PROMPT;
 		cout.flush();
+		getline(cin, sql);
 		cout << sql << endl;
 		buffer = sql;
  	    tree.resetParser(buffer);
@@ -35,12 +37,11 @@ RC RBparse()
 		catch (const GeneralError& err)
 		{
 			cerr << err.what() << endl;
-			break;
+			continue;
 		}
 		if (errval = interp(parse_tree)) { // ½âÎöÓï·¨Ê÷
 			if (errval < 0) stop = true;
 		}
-		return 0;
 	}
 	return 0;
 }
