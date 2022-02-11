@@ -46,6 +46,6 @@ public:
 	bool Change_Num_of_Change_Records(string Rel_Name);
 	//查询权限 ret[SELECT]=true,ret[UPDATE]=false，数据表或用户不存在返回NULL
 	bool* lookup_Authority(string RelName, string UserName);
-	void set_distribution(Distribution distribution);
+	void set_distribution(Attr_Info attr, Distribution distribution);
 };
 

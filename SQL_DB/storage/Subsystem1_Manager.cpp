@@ -1298,7 +1298,7 @@ bool* Subsystem1_Manager::lookup_Authority(string RelName, string UserName) {
 	return NULL;
 }
 
-void Subsystem1_Manager::set_distribution(Distribution distribution)
+void Subsystem1_Manager::set_distribution(Attr_Info attr, Distribution distribution)
 {
 	char temp[1000];
 	memcpy(temp, &distribution, sizeof(Distribution));
