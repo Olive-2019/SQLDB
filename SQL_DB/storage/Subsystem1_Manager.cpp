@@ -1304,5 +1304,10 @@ void Subsystem1_Manager::set_distribution(Attr_Info attr, Distribution distribut
 	memcpy(temp, &distribution, sizeof(Distribution));
 }
 
+void Subsystem1_Manager::set_change_records(Attr_Info attr, int num)
+{
+	
+}
+
 
 Subsystem1_Manager Subsystem1_Manager::mgr;

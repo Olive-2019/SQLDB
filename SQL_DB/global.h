@@ -48,7 +48,7 @@ struct DISTRIBUTION_TYPE {
 	//二元条件
 	virtual double binary_rate(int op, const Distribution& dis) = 0;
 };
-struct NORMAL : public DISTRIBUTION_TYPE {
+struct NORMAL_dis : public DISTRIBUTION_TYPE {
 	double mu;
 	double sigma;
 	double rate(int op, double value) {
@@ -58,7 +58,7 @@ struct NORMAL : public DISTRIBUTION_TYPE {
 		return 0.5;
 	}
 };
-struct EVENLY : public DISTRIBUTION_TYPE {
+struct EVENLY_dis : public DISTRIBUTION_TYPE {
 	double MIN;
 	double MAX;
 	double rate(int op, double value);

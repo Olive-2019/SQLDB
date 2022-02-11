@@ -47,5 +47,7 @@ public:
 	//查询权限 ret[SELECT]=true,ret[UPDATE]=false，数据表或用户不存在返回NULL
 	bool* lookup_Authority(string RelName, string UserName);
 	void set_distribution(Attr_Info attr, Distribution distribution);
+	//设置attr.Num_of_Change_Records = 0;
+	void set_change_records(Attr_Info attr, int num);
 };
 
