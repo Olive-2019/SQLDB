@@ -5,4 +5,5 @@
 #define PROMPT	"\nSQL >> "
 
 RC RBparse();
+void parse(string sql);
 #endif 

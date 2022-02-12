@@ -119,14 +119,14 @@ int Estimator::estimate_record_num(const Condition& cond, int record_num) {
         Distribution left_dis = left_attr.distribution;
         Distribution right_dis = right_attr.distribution;
         
-        return left_dis.dis->binary_rate(cond.op, right_dis) * record_num;
+        return left_dis.dis()->binary_rate(cond.op, right_dis) * record_num;
         
     }
     else {
         Attr_Info attr;
         Subsystem1_Manager::mgr.lookup_Attr(cond.lhsAttr.relname, cond.lhsAttr.attrname, attr);
         Distribution distri = attr.distribution;
-        return distri.dis->rate(cond.op, *(double*)cond.rhsValue.data) * record_num;
+        return distri.dis()->rate(cond.op, *(double*)cond.rhsValue.data) * record_num;
     }
     
 }

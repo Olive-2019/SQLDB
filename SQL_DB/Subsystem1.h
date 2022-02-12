@@ -25,7 +25,7 @@ private:
 		return false;
 	}
 public:
-	Scan_Reader(string RelName, vector<Condition> Conds= vector<Condition>()) {
+	Scan_Reader(string RelName, vector<Condition> Conds = vector<Condition>()) {
 		this->RelName = RelName;
 		RIDS = Subsystem1_Manager::mgr.Scan_Record(RelName);
 		index = 0;
@@ -68,7 +68,7 @@ public:
 			else if (attr.type == FLOAT) {
 				sum += *(float*)value;
 			}
-			
+
 		}
 		double avg = sum / num;
 		this->index = before_index;
@@ -86,7 +86,7 @@ public:
 			char* value = record + attr.Offset;
 			if (attr.type == INT) {
 				double temp = avg - *(int*)value;
-				sum += temp*temp;
+				sum += temp * temp;
 			}
 			else if (attr.type == FLOAT) {
 				double temp = avg - *(float*)value;

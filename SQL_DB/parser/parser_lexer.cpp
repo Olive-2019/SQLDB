@@ -41,6 +41,10 @@ static vector<TokenDef> tokens = {
 	{ RW_BY, "(by)|(BY)\\b" },
 	{ RW_DESC, "(desc)|(DESC)\\b" },
 	{ RW_ASC, "(asc)|(ASC)\\b" },
+	
+	{RW_SHOW, "(show)|(SHOW)\\b"},
+	{RW_DISTRIBUTION, "(distribution)|(DISTRIBUTION)\\b"},
+	{RW_SCRIPT, "(SCRIPT)|(script)\\b"},
 
 	{ RW_STRING, "[a-zA-Z][a-zA-Z0-9_]*" },
 	{ RW_COMMENT, "%[^\n]*" },

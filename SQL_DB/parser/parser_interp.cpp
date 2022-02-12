@@ -488,6 +488,12 @@ int interp(NODE *n)
 		case N_EXIT:
 			stop = true;
 			break;
+		case N_SHOW_DISTRIBUTION:
+			Executor(NULL).show_distribution(n->u.SHOW_DISTRIBUTION.relname, n->u.SHOW_DISTRIBUTION.attrname);
+			break;
+		case N_SCRIPT:
+			Executor(NULL).execute_script(n->u.SCRIPT.path);
+			break;
 		case N_CREATETABLE:	/* Create Table */
 		{
 			int nattrs;

@@ -1,4 +1,4 @@
-#include "executor.h"
+ï»¿#include "executor.h"
 #include "Query_Executor.h"
 #include "../Subsystem1.h"
 #include <iostream>
@@ -45,7 +45,7 @@ void Executor::execute()
 
 void Executor::Display(string RelName, vector<RID> records)
 {
-	cout << "²éÑ¯½á¹ûÎª£º" << endl;
+	cout << "æŸ¥è¯¢ç»“æžœä¸º" << endl;
 	vector<Attr_Info> attrs = Subsystem1_Manager::mgr.lookup_Attrs(RelName);
 	int length = 15;
 	for (int i = 0; i < attrs.size(); ++i) {
@@ -77,7 +77,11 @@ void Executor::Display(string RelName, vector<RID> records)
 		cout << endl;
 	}
 }
-
+void Executor::show_distribution(char* relname, char*attrname) {
+	Attr_Info attr;
+	Subsystem1_Manager::mgr.lookup_Attr(relname, attrname, attr);
+	attr.distribution.dis()->display();
+}
 void Executor::Insert(string RelName, char* record)
 {
 	Subsystem1_Manager::mgr.Insert_Reocrd(RelName, record);
@@ -90,8 +94,8 @@ void Executor::Delete(string RelName, vector<RID> records)
 
 void Executor::Update(string RelName, vector<RID> records, vector<Attr_Info> attrs, char** new_values)
 {
-	for (int i = 0; i < records.size(); ++i) 
-		for (int j = 0; j < attrs.size(); ++j) 
+	for (int i = 0; i < records.size(); ++i)
+		for (int j = 0; j < attrs.size(); ++j)
 			Subsystem1_Manager::mgr.Update_Record(RelName, records[i], attrs[j], new_values[j]);
 }
 
@@ -109,11 +113,30 @@ void Executor::update_distribution(Attr_Info attr)
 {
 	Distribution distribution;
 	Scan_Reader* reader = new Scan_Reader(attr.Rel_Name);
-	distribution.dis = new NORMAL_dis();
-	NORMAL_dis* dis = (NORMAL_dis*)distribution.dis;
+	NORMAL_dis* dis = (NORMAL_dis*)&distribution.normal_dis;
 	dis->mu = reader->get_mu(attr);
 	dis->sigma = reader->get_sigma(attr);
 	distribution.type = NORMAL;
 	Subsystem1_Manager::mgr.set_distribution(attr, distribution);
 	Subsystem1_Manager::mgr.set_change_records(attr, 0);
+}
+#include "../parser/parser.h"
+#include <istream>
+void Executor::execute_script(char* path) {
+	FILE * file = fopen(path, "r");
+	if (file) {
+		vector<string> sqls;
+		char buff[100];
+		while (true) {
+			char* is_EOF = fgets(buff, 100, file);
+			
+			if (is_EOF == NULL) {
+				break;
+			}
+			sqls.push_back(buff);
+		}
+		for (int i = 0; i < sqls.size(); ++i) parse(sqls[i]);
+		fclose(file);
+	}
+	
 }

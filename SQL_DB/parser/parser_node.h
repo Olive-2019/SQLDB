@@ -29,7 +29,9 @@ enum NODEKIND {
 	N_STATISTICS,
 	N_LIST,
 	N_EXIT,
-	N_UPDATE_NEW_VAL
+	N_UPDATE_NEW_VAL, 
+	N_SHOW_DISTRIBUTION,
+	N_SCRIPT
 };
 
 typedef struct node {
@@ -180,6 +182,16 @@ typedef struct node {
 			struct node* attr;//RELATTR
 			char* new_val;
 		}UPDATE_NEW_VAL;
+
+		/* 展示分布 */
+		struct {
+			char* relname;
+			char* attrname;
+		}SHOW_DISTRIBUTION;
+		/* 脚本 */
+		struct {
+			char* path;
+		} SCRIPT;
 	} u;
 }NODE;
 
@@ -214,6 +226,8 @@ NODE *relation_node(char *relname);
 NODE *list_node(NODE *n);
 NODE *exit_node();
 NODE *prepend(NODE *n, NODE *list);
+NODE* show_distribution_node(char* relname, char* attrname);
+NODE* script_node(char* path);
 void reset_scanner(void);
 void reset_parser(void);
 
