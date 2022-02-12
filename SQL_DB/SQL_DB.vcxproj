@@ -166,15 +166,13 @@
     <ClInclude Include="storage\PF_BufPageDesc.h" />
     <ClInclude Include="storage\Subsystem1_Manager.h" />
     <ClInclude Include="Subsystem1.h" />
-    <ClInclude Include="transaction\Exclusive_Lock.h" />
-    <ClInclude Include="transaction\Lock.h" />
-    <ClInclude Include="transaction\Log.h" />
+    <ClInclude Include="transaction\Lock_Manager.h" />
     <ClInclude Include="transaction\Log_Manager.h" />
-    <ClInclude Include="transaction\Redo_Log.h" />
-    <ClInclude Include="transaction\Shared_Lock.h" />
+    <ClInclude Include="transaction\Log_Record.h" />
+    <ClInclude Include="transaction\Table_Writer.h" />
     <ClInclude Include="transaction\Transaction.h" />
     <ClInclude Include="transaction\Transaction_Manager.h" />
-    <ClInclude Include="transaction\Undo_Log.h" />
+    <ClInclude Include="transaction\Tuple.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="executor\DDL_executor.cpp" />
@@ -201,15 +199,13 @@
     <ClCompile Include="storage\PF_BufPageDesc.cpp" />
     <ClCompile Include="storage\Subsystem1_Manager.cpp" />
     <ClCompile Include="storage\Test.cpp" />
-    <ClCompile Include="transaction\Exclusive_Lock.cpp" />
-    <ClCompile Include="transaction\Lock.cpp" />
-    <ClCompile Include="transaction\Log.cpp" />
+    <ClCompile Include="transaction\Lock_Manager.cpp" />
+    <ClCompile Include="transaction\Lock_Manager_Test.cpp" />
     <ClCompile Include="transaction\Log_Manager.cpp" />
-    <ClCompile Include="transaction\Redo_Log.cpp" />
-    <ClCompile Include="transaction\Shared_Lock.cpp" />
-    <ClCompile Include="transaction\Transaction.cpp" />
+    <ClCompile Include="transaction\Log_Manager_Test.cpp" />
+    <ClCompile Include="transaction\Table_Writer.cpp" />
+    <ClCompile Include="transaction\Table_Writer_test.cpp" />
     <ClCompile Include="transaction\Transaction_Manager.cpp" />
-    <ClCompile Include="transaction\Undo_Log.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SQL_DB.rc" />

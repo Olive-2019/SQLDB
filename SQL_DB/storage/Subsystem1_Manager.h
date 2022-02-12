@@ -14,37 +14,37 @@ public:
 	string DBName;
 
 
-	//É¨ÃèËùÓĞ±í
+	//æ‰«ææ‰€æœ‰è¡¨
 	void Scan_rel();
 
-	//É¨ÃèËùÓĞÊôĞÔ
+	//æ‰«ææ‰€æœ‰å±æ€§
 	void Scan_attribute();
-	//²éÕÒËùÓĞÊôĞÔ
+	//æŸ¥æ‰¾æ‰€æœ‰å±æ€§
 	vector<Attr_Info> lookup_Attrs(string Rel_Name);
 
 
-	//ĞÂ½¨Êı¾İ±í
+	//æ–°å»ºæ•°æ®è¡¨
 	void Create_Rel(string RelName, vector<Attr_Info> attrs);
 
 	void Add_rel(Rel_Info rel_info);
 	void Add_attribute(vector<Attr_Info> attr_list);
 
-	//É¾³ıÊı¾İ±í
+	//åˆ é™¤æ•°æ®è¡¨
 	bool Delete_Rel(string RelName);
 
 
-	//²éÕÒÊı¾İ±í£¬·µ»ØÖµÎªÊÇ·ñ³É¹¦£¬½«½á¹û´æ·ÅÖ®×îºóµÄ²ÎÊırelÖĞ£¬ºóÃæµÄº¯ÊıÍ¬Àí
+	//æŸ¥æ‰¾æ•°æ®è¡¨ï¼Œè¿”å›å€¼ä¸ºæ˜¯å¦æˆåŠŸï¼Œå°†ç»“æœå­˜æ”¾ä¹‹æœ€åçš„å‚æ•°relä¸­ï¼Œåé¢çš„å‡½æ•°åŒç†
 	bool lookup_Rel(string RelName, Rel_Info& rel);
 
-	//²éÕÒÊôĞÔ
+	//æŸ¥æ‰¾å±æ€§
 	bool lookup_Attr(string Rel_Name, string AttrName, Attr_Info& attr);
 
 
 
-	//É¨Ãè±í»ñµÃ¼ÇÂ¼RID
+	//æ‰«æè¡¨è·å¾—è®°å½•RID
 	vector<RID> Scan_Record(string Rel_Name);
 
-	//»ñÈ¡±íµÄpage-id
+	//è·å–è¡¨çš„page-id
 	int Scan_rel_get_page_id(string Rel_Name);
 
 
@@ -59,30 +59,30 @@ public:
 
 
 
-	//---------------------------------------------------------------ĞéÏßÉÏ·½º¯ÊıÊ¹ÓÃ½Ï¶à
+	//---------------------------------------------------------------è™šçº¿ä¸Šæ–¹å‡½æ•°ä½¿ç”¨è¾ƒå¤š
 
 
 
 
-	//²éÕÒË÷Òı
+	//æŸ¥æ‰¾ç´¢å¼•
 	bool lookup_Index(string RelName, string AttrName, Index_Info& Index);
 
-	//²éÕÒËùÓĞË÷Òı
+	//æŸ¥æ‰¾æ‰€æœ‰ç´¢å¼•
 	vector<Index_Info> lookup_Indexes(string RelName);
 
-	//ĞŞ¸Ä¼ÇÂ¼ÊıÁ¿
+	//ä¿®æ”¹è®°å½•æ•°é‡
 	bool Change_Rel_Record_num(string RelName, int change_num);
 
-	//É¾³ıÊôĞÔ
+	//åˆ é™¤å±æ€§
 	void Delete_Attr(string Rel_Name);
 
-	//ĞŞ¸ÄNum_of_Change_Records
+	//ä¿®æ”¹Num_of_Change_Records
 	bool Change_Num_of_Change_Records(string Rel_Name, string AttrName);
 
-	//ĞŞ¸ÄNum_of_Change_Records
+	//ä¿®æ”¹Num_of_Change_Records
 	bool Change_Num_of_Change_Records(string Rel_Name);
 
-	//²éÑ¯È¨ÏŞ ret[SELECT]=true,ret[UPDATE]=false£¬Êı¾İ±í»òÓÃ»§²»´æÔÚ·µ»ØNULL
+	//æŸ¥è¯¢æƒé™ ret[SELECT]=true,ret[UPDATE]=falseï¼Œæ•°æ®è¡¨æˆ–ç”¨æˆ·ä¸å­˜åœ¨è¿”å›NULL
 	bool* lookup_Authority(string RelName, string UserName);
 
 
@@ -90,7 +90,7 @@ public:
 
 	void set_distribution(Attr_Info attr, Distribution distribution);
 
-	//ÉèÖÃattr.Num_of_Change_Records = 0;
+	//è®¾ç½®attr.Num_of_Change_Records = 0;
 	void set_change_records(Attr_Info attr, int num);
 
 

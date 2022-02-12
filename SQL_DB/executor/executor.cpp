@@ -98,7 +98,6 @@ void Executor::Update(string RelName, vector<RID> records, vector<Attr_Info> att
 		for (int j = 0; j < attrs.size(); ++j)
 			Subsystem1_Manager::mgr.Update_Record(RelName, records[i], attrs[j], new_values[j]);
 }
-
 void Executor::exam_distribution(string RelName)
 {
 	vector<Attr_Info> attrs = Subsystem1_Manager::mgr.lookup_Attrs(RelName);
@@ -123,13 +122,13 @@ void Executor::update_distribution(Attr_Info attr)
 #include "../parser/parser.h"
 #include <istream>
 void Executor::execute_script(char* path) {
-	FILE * file = fopen(path, "r");
+	FILE* file = fopen(path, "r");
 	if (file) {
 		vector<string> sqls;
 		char buff[100];
 		while (true) {
 			char* is_EOF = fgets(buff, 100, file);
-			
+
 			if (is_EOF == NULL) {
 				break;
 			}
@@ -138,5 +137,5 @@ void Executor::execute_script(char* path) {
 		for (int i = 0; i < sqls.size(); ++i) parse(sqls[i]);
 		fclose(file);
 	}
-	
+
 }
