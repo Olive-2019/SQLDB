@@ -7,7 +7,7 @@ private:
 
 public:
 	Subsystem1_Manager() {
-		
+
 	}
 	static Subsystem1_Manager mgr;
 	string UserName;
@@ -88,5 +88,12 @@ public:
 
 
 
-};
+	void set_distribution(Attr_Info attr, Distribution distribution);
 
+	//…Ë÷√attr.Num_of_Change_Records = 0;
+	void set_change_records(Attr_Info attr, int num);
+
+
+
+
+};

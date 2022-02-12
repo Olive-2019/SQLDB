@@ -376,3 +376,15 @@ NODE *prepend(NODE *n, NODE *list)
 	newlist->u.LIST.next = list;
 	return newlist;
 }
+
+NODE* show_distribution_node(char* relname, char* attrname) {
+	NODE* newdis = newnode(N_SHOW_DISTRIBUTION);
+	newdis->u.SHOW_DISTRIBUTION.relname = relname;
+	newdis->u.SHOW_DISTRIBUTION.attrname = attrname;
+	return newdis;
+}
+NODE* script_node(char* path) {
+	NODE* newNode = newnode(N_SCRIPT);
+	newNode->u.SCRIPT.path = path;
+	return newNode;
+}

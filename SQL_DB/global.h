@@ -37,8 +37,9 @@ struct DISTRIBUTION_TYPE {
 	virtual double rate(int op, double value) = 0;
 	//二元条件
 	virtual double binary_rate(int op, const Distribution& dis) = 0;
+	virtual void display() = 0;
 };
-struct NORMAL : public DISTRIBUTION_TYPE {
+struct NORMAL_dis : public DISTRIBUTION_TYPE {
 	double mu;
 	double sigma;
 	double rate(int op, double value) {
@@ -47,18 +48,32 @@ struct NORMAL : public DISTRIBUTION_TYPE {
 	double binary_rate(int op, const Distribution& dis) {
 		return 0.5;
 	}
+	void display() {
+		cout << "分布为：高斯分布" << endl;
+		cout << "参数：  mu:" << mu << "  sigma:" << sigma << endl;
+	}
 };
-struct EVENLY : public DISTRIBUTION_TYPE {
+struct EVENLY_dis : public DISTRIBUTION_TYPE {
 	double MIN;
 	double MAX;
 	double rate(int op, double value);
 	double binary_rate(int op, const Distribution& dis) {
 		return 0.5;
 	}
+	void display() {
+		cout << "分布为：均匀分布" << endl;
+		cout << "参数：  max:" << MAX << "  min:" << MIN << endl;
+	}
 };
 struct Distribution {
 	Distribution_Type type;
-	DISTRIBUTION_TYPE* dis;
+	NORMAL_dis normal_dis;
+	EVENLY_dis evenly_dis;
+	DISTRIBUTION_TYPE* dis() {
+		if (type == NORMAL) return &normal_dis;
+		return &evenly_dis;
+	}
+	
 };
 
 

@@ -34,6 +34,8 @@ private:
 	bool parseQuery(NODE* &);
 	bool parseDropTable(NODE* &);
 	bool parseDropIndex(NODE* &);
+	bool parserShowDistribution(NODE* &);
+	bool parserScript(NODE* &);
 
 	bool parseNonmtAttrtypeList(NODE* &);
 	void parseNonmtSelectClause(NODE* &);

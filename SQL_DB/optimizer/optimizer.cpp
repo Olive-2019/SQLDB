@@ -116,7 +116,7 @@ Optimizer::Optimizer(int Rel_num, RelInfo* rels, int Attr_num, AggRelAttr* attrs
 Optimizer::Optimizer(RelInfo rel, int Attr_num, NODE* attrs, char** values, int Cond_num, Condition* conds, SQL_type sql_type)
 {
     init(1, &rel, 0, nullptr, Cond_num, conds);
-    Executor* executor = new Executor(Logical_Tree_Root);
+    Executor* executor = new Executor(Logical_Tree_Root->u.PROJECTION.rel);
     vector<Attr_Info> Attrs;
     for (int i = 0; i < Attr_num; i++) {
         Attr_Info attr;
@@ -137,7 +137,7 @@ Optimizer::Optimizer(RelInfo rel, char* record, SQL_type sql_type)
 Optimizer::Optimizer(RelInfo rel, int Cond_num, Condition* conds, SQL_type sql_type)
 {
     init(1, &rel, 0, nullptr, Cond_num, conds);
-    Executor* executor = new Executor(Logical_Tree_Root);
+    Executor* executor = new Executor(Logical_Tree_Root->u.PROJECTION.rel);
     executor->execute_delete();
 }
 

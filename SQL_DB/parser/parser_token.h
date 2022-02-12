@@ -38,7 +38,10 @@ enum TOKENKIND {
 	RW_BUFFER,
 	RW_ON,
 	RW_OFF,
-	RW_STRING,		// ÆÕÍ¨µÄ×Ö·û´®
+	RW_STRING,		
+	RW_SCRIPT,
+	RW_SHOW,
+	RW_DISTRIBUTION,// ÆÕÍ¨µÄ×Ö·û´®
 
 	T_STRING,
 	T_INT,

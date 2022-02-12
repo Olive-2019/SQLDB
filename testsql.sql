@@ -1,0 +1,13 @@
+create table R2(id int, price float, name string );
+create table R3(id int, price float, name string );
+create table R1(id int, price float, name string );
+create table R4(id int, price float, name string );
+insert into R1(1, 0.2, "Lam");
+insert into R1(2, 0.3, "Lamm");
+insert into R1(3, 0.4, "Lammm");
+insert into R1(1, 1.2, "Lam");
+insert into R1(2, 1.3, "Lam");
+insert into R1(3, 1.4, "Lamm");
+insert into R2(3, 1.4, "Lamm");
+insert into R3(3, 1.4, "Lamm");
+insert into R4(3, 1.4, "Lamm");

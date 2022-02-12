@@ -129,6 +129,9 @@ vector<RID> Query_Executor::execute_tree_node_scan(Logical_TreeNode* node, vecto
 				break;
 			}
 		if (fit_condition) {
+			char* record = Subsystem1_Manager::mgr.Find_Record_by_RID("R1", temp);
+			cout << temp.blockID << "  " << temp.slotID << endl;
+			cout << "id==" << *(int*)record << endl;
 			ret.push_back(temp);
 		}
 
@@ -324,17 +327,27 @@ vector<RID> Query_Executor::execute_tree_node_proj(Logical_TreeNode* node)
 			new_attrs.push_back(attr);
 		}
 	}
-
-
+	cout << endl << endl;
+	char* record = Subsystem1_Manager::mgr.Find_Record_by_RID(node->u.PROJECTION.rel->RelName, Records[0]);
+	int id = *(int*)record;
+	cout << Records[0].blockID << "  " << Records[0].slotID << endl;
+	cout << "id==" << id << endl;
 
 	Subsystem1_Manager::mgr.Delete_Rel(node->RelName);
 	Subsystem1_Manager::mgr.Create_Rel(node->RelName, new_attrs);
-	
 
+	record = Subsystem1_Manager::mgr.Find_Record_by_RID(node->u.PROJECTION.rel->RelName, Records[0]);
+	id = *(int*)record;
+	cout << Records[0].blockID << "  " << Records[0].slotID << endl;
+	cout << "id==" << id << endl;
+
+	cout << endl << endl;
 
 	for (int i = 0; i < Records.size(); i++) {
 		char* record = Subsystem1_Manager::mgr.Find_Record_by_RID(node->u.PROJECTION.rel->RelName,Records[i]);
 		int id = *(int*)record;
+		cout << Records[i].blockID << "  " << Records[i].slotID << endl;
+		cout << "id==" << id << endl;
 		char* new_record = new char[500];
 		for (int j = 0; j < Proj_Attrs_Num; j++) {
 			memcpy(new_record + new_attrs[j].Offset, 

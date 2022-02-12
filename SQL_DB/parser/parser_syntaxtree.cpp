@@ -131,8 +131,40 @@ bool SyntaxTree::parseDML(NODE* &node)
 	if (!succ) succ = parseInsert(node);
 	if (!succ) succ = parseDelete(node);
 	if (!succ) succ = parseUpdate(node);
+	if (!succ) succ = parserShowDistribution(node);
+	if (!succ) succ = parserScript(node);
 	return succ;
 }
+//script path
+bool SyntaxTree::parserScript(NODE*& node) {
+	TokenPtr ta = peek(1), tb = peek(2);
+	if (!ta || !tb || ta->type != RW_SCRIPT || tb->type != T_QSTRING) return false;
+	discard(2);
+	char* buff = new char[strlen(tb->content) + 1];
+	strcpy(buff, tb->content);
+	node = script_node(buff);
+	return true;
+}
+
+//show distribution relname attrname;
+bool SyntaxTree::parserShowDistribution(NODE*& node) {
+	TokenPtr ta = peek(1), tb = peek(2);
+	if (!ta || ta->type != RW_SHOW || !tb || tb->type != RW_DISTRIBUTION) return false;
+	discard(2);
+	ta = next();
+	tb = next();
+	char* rel_buff(NULL), *attr_buff;
+	if (!ta || ta->type != TOKENKIND::RW_STRING || !tb || tb->type != RW_STRING) goto tg;
+	rel_buff = new char[strlen(ta->content) + 1];
+	attr_buff = new char[strlen(tb->content) + 1];
+	strcpy(rel_buff, ta->content);
+	strcpy(attr_buff, tb->content);
+	node = show_distribution_node(rel_buff, attr_buff);
+	return true;
+tg:
+	throw GeneralError("Something wrong with the select. Please check your input.");
+}
+
 
 void SyntaxTree::supply_cond_relation(NODE* cond, NODE* rel) {
 	NODE* p = rel;
