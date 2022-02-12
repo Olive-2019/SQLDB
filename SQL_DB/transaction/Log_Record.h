@@ -56,7 +56,7 @@ public:
             delete_tuple_ = tuple;
         }
 
-        size_ = HEADER_SIZE + sizeof(RID) + sizeof(int32_t) + tuple.getLength() + tuple.getRel().length();
+        size_ = HEADER_SIZE + sizeof(RID) + sizeof(int32_t) + tuple.getLength() + relname.length();
     }
 
     // constructor for UPDATE type
@@ -70,7 +70,7 @@ public:
         new_tuple_(new_tuple), 
         relname_(relname){
         // calculate log record size
-        size_ = HEADER_SIZE + sizeof(RID) + old_tuple.getLength() + new_tuple.getLength() + sizeof(txn_id_t) + sizeof(lsn_t);
+        size_ = HEADER_SIZE + sizeof(RID) + old_tuple.getLength() + new_tuple.getLength() + relname.length() + sizeof(txn_id_t) + sizeof(lsn_t);
     }
 
     ~LogRecord() = default;

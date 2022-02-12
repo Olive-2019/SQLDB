@@ -12,10 +12,12 @@
 #include <string>
 #include <map>
 #include <random>
+#include <chrono>
 
 using namespace std;
 
 // config事务系统的变量配置
+extern chrono::duration<int64_t> log_timeout;
 
 static constexpr int32_t INVALID_TXN_ID = -1;                   // 无效事务id
 using txn_id_t = int32_t;					// transaction id type
@@ -88,9 +90,16 @@ public:
 struct RID {
 	int blockID;
 	int slotID;
+	bool operator<(const RID& rhs) const
+	{
+		if (blockID < rhs.blockID) return true;
+		else if (blockID == rhs.blockID && slotID < rhs.slotID) return true;
+		return false;
+	}
 };
 
 // 事务系统要用的RID和表名字联合的标识
+
 struct Trid {
 	string relname;
 	RID rid;
@@ -101,6 +110,8 @@ struct Trid {
 			(relname == rhs.relname && rid < rhs.rid);
 	}
 };
+
+
 
 
 enum AttrType {

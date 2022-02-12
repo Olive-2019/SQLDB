@@ -5,7 +5,7 @@
 std::map<txn_id_t, Transaction*> TransactionManager::txn_map = {};
 std::shared_mutex TransactionManager::txn_map_mutex = {};
 
-Transaction* TransactionManager::Begin(Transaction* txn) {
+Transaction* TransactionManager::begin(Transaction* txn) {
     txn_map_mutex.lock();
     if (txn == nullptr) txn = new Transaction(next_txn_id_++);
 
@@ -18,7 +18,7 @@ Transaction* TransactionManager::Begin(Transaction* txn) {
     return txn;
 }
 
-void TransactionManager::Commit(Transaction* txn) {
+void TransactionManager::commit(Transaction* txn) {
     txn_map_mutex.lock();
     txn->setState(TransactionState::COMMITTED);
 
@@ -47,7 +47,7 @@ void TransactionManager::Commit(Transaction* txn) {
     txn_map_mutex.unlock();
 }
 
-void TransactionManager::Abort(Transaction* txn) {
+void TransactionManager::abort(Transaction* txn) {
     txn->setState(TransactionState::ABORTED);
     // rollback before releasing lock
     auto write_set = txn->getWriteSet();
@@ -58,20 +58,20 @@ void TransactionManager::Abort(Transaction* txn) {
             cout << ("rollback delete\n");
             // 回滚操作 RollbackDelete(item.rid_, txn);
             Tuple tuple(relname, item.values_, item.rid_);
-            table_writer_.insertTuple(tuple, txn, lock_manager_, log_manager_);
+            TableWriter::insertTuple(tuple, txn, lock_manager_, log_manager_);
         }
         else if (item.wtype_ == WType::INSERT) {
             cout << ("rollback insert\n");
             // 回滚操作 ApplyDelete(item.rid_, txn);
             Tuple tuple(relname, item.values_, item.rid_);
-            table_writer_.deleteTuple(tuple, txn, lock_manager_, log_manager_);
+            TableWriter::deleteTuple(tuple, txn, lock_manager_, log_manager_);
         }
         else if (item.wtype_ == WType::UPDATE) {
             cout << ("rollback update\n");
             // 回滚操作 UpdateTuple(item.tuple_, item.rid_, txn);
             Tuple old_tuple(relname, item.values_, item.rid_);
             Tuple new_tuple(relname, item.new_values_, item.rid_);
-            table_writer_.updateTuple(new_tuple, old_tuple, txn, lock_manager_, log_manager_);
+            TableWriter::updateTuple(new_tuple, old_tuple, txn, lock_manager_, log_manager_);
         }
         write_set->pop_back();
     }
@@ -98,7 +98,7 @@ void TransactionManager::Abort(Transaction* txn) {
     }
 }
 
-void TransactionManager::Write(TableWriteRecord write_record, Transaction* txn) {
+void TransactionManager::write(TableWriteRecord write_record, Transaction* txn) {
     txn->AppendTableWriteRecord(write_record);
 
     string relname = write_record.relname_;
@@ -108,17 +108,17 @@ void TransactionManager::Write(TableWriteRecord write_record, Transaction* txn) 
     if (wtype == WType::DELETE) {
         cout << ("delete\n");
         Tuple tuple(relname, write_record.values_, rid);
-        table_writer_.deleteTuple(tuple, txn, lock_manager_, log_manager_);
+        TableWriter::deleteTuple(tuple, txn, lock_manager_, log_manager_);
     }
     else if (wtype == WType::INSERT) {
         cout << ("insert\n");
         Tuple tuple(relname, write_record.values_, rid);
-        table_writer_.insertTuple(tuple, txn, lock_manager_, log_manager_);
+        TableWriter::insertTuple(tuple, txn, lock_manager_, log_manager_);
     }
     else if (wtype == WType::UPDATE) {
         cout << ("update\n");
         Tuple old_tuple(relname, write_record.values_, rid);
         Tuple new_tuple(relname, write_record.new_values_, rid);
-        table_writer_.updateTuple(old_tuple, new_tuple, txn, lock_manager_, log_manager_);
+        TableWriter::updateTuple(old_tuple, new_tuple, txn, lock_manager_, log_manager_);
     }
 }

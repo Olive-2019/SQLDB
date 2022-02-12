@@ -20,7 +20,7 @@ RC RBparse()
 	LexerPtr lexer = Lexer::instance();
 	SyntaxTree tree(lexer);
 	//string sql = "insert into Rel1(2, 3.3, Lam);";
-	sql = "select R1.id,R2.id,R3.name,R4.price from R1,R2,R3,R4 where R1.id>R2.id and R3.id>5 and R4.price=R1.price;";
+	sql = "select * from Rel1;";
 	//string sql = "select * from Rel1;";
 	//string sql = "select id,Rel.id from Rel1,Rel2 where Rel1.id>Rel2.id;";
 	//string sql = "select * from Rel1 where Rel1.id=5;";

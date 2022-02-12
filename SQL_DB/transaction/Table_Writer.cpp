@@ -1,7 +1,7 @@
 #include "Table_Writer.h"
 
 // 封锁表级别, 要达到封锁更细粒度可能需要直接在底层实现, 但是目前封装的东西很多不好做
-bool TableWriter::insertTuple(const Tuple& tuple, Transaction* txn, LockManager* lock_manager, LogManager* log_manager) {
+bool TableWriter::insertTuple(Tuple& tuple, Transaction* txn, LockManager* lock_manager, LogManager* log_manager) {
     string relname = tuple.getRel();
 
     if (lock_manager) {
@@ -10,9 +10,10 @@ bool TableWriter::insertTuple(const Tuple& tuple, Transaction* txn, LockManager*
         if (!locked) return false;
     }
 
-    Subsystem1_Manager::mgr.Insert_Reocrd(relname, tuple.getData());
+    RID rid = Subsystem1_Manager::mgr.Insert_Reocrd(relname, tuple.getData());
 
     if (lock_manager) {
+        tuple.setRid(rid);
         LogRecord log_record(txn->getTransactionId(), txn->getPrevLSN(), LogRecordType::INSERT, tuple.getRid(),
             tuple, relname);
         lsn_t lsn = log_manager->appendLogRecord(&log_record);

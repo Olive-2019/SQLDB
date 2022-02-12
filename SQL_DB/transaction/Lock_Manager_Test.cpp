@@ -28,7 +28,7 @@ void BasicTest1() {
     for (int i = 0; i < num_rids; i++) {
         //RID rid{ i, i };
         trids.push_back({"testRel" + to_string(i)});
-        txns.push_back(txn_mgr.Begin());
+        txns.push_back(txn_mgr.begin());
         assert(i == txns[i]->getTransactionId());
     }
     // test
@@ -46,7 +46,7 @@ void BasicTest1() {
             assert(res == true);
             CheckShrinking(txns[txn_id]);
         }
-        txn_mgr.Commit(txns[txn_id]);
+        txn_mgr.commit(txns[txn_id]);
         CheckCommitted(txns[txn_id]);
     };
     std::vector<std::thread> threads;
@@ -72,7 +72,7 @@ void BasicTest2() {
     TransactionManager txn_mgr(&lock_mgr, &log_mgr);
 
     std::vector<Trid> trids;
-    Transaction* txn = txn_mgr.Begin();
+    Transaction* txn = txn_mgr.begin();
     int num_rids = 10;
     for (int i = 0; i < num_rids; i++) {
         //RID rid{ i, i };
@@ -87,7 +87,7 @@ void BasicTest2() {
         assert(res == true);
         CheckGrowing(txn);
     }
-    txn_mgr.Commit(txn);
+    txn_mgr.commit(txn);
     CheckCommitted(txn);
 }
 
@@ -101,7 +101,7 @@ void TwoPLTest() {
     Trid trid0{ "rel0" };
     Trid trid1{ "rel1" };
 
-    auto txn = txn_mgr.Begin();
+    auto txn = txn_mgr.begin();
     assert(0 == txn->getTransactionId());
 
     bool res;
@@ -126,7 +126,7 @@ void TwoPLTest() {
     CheckTxnLockSize(txn, 0, 1);
 
     // Need to call txn_mgr's abort
-    txn_mgr.Abort(txn);
+    txn_mgr.abort(txn);
     CheckAborted(txn);
     CheckTxnLockSize(txn, 0, 0);
 
@@ -141,7 +141,7 @@ void UpgradeTest() {
     //RID rid{ 0, 0 };
     Trid trid{ "rel" };
     Transaction txn(0);
-    txn_mgr.Begin(&txn);
+    txn_mgr.begin(&txn);
 
     bool res = lock_mgr.LockShared(&txn, trid);
     assert(res == true);
@@ -158,7 +158,7 @@ void UpgradeTest() {
     CheckTxnLockSize(&txn, 0, 0);
     CheckShrinking(&txn);
 
-    txn_mgr.Commit(&txn);
+    txn_mgr.commit(&txn);
     CheckCommitted(&txn);
 }
 
@@ -181,7 +181,7 @@ void WoundWaitBasicTest() {
     auto wait_die_task = [&]() {
         // younger transaction acquires lock first
         Transaction txn_die(id_die);
-        txn_mgr.Begin(&txn_die);
+        txn_mgr.begin(&txn_die);
         bool res = lock_mgr.LockExclusive(&txn_die, trid);
         assert(res == true);
 
@@ -196,11 +196,11 @@ void WoundWaitBasicTest() {
         CheckAborted(&txn_die);
 
         // unlock
-        txn_mgr.Abort(&txn_die);
+        txn_mgr.abort(&txn_die);
     };
 
     Transaction txn_hold(id_hold);
-    txn_mgr.Begin(&txn_hold);
+    txn_mgr.begin(&txn_hold);
 
     // launch the waiter thread
     std::thread wait_thread{ wait_die_task };
@@ -214,7 +214,7 @@ void WoundWaitBasicTest() {
     wait_thread.join();
 
     CheckGrowing(&txn_hold);
-    txn_mgr.Commit(&txn_hold);
+    txn_mgr.commit(&txn_hold);
     CheckCommitted(&txn_hold);
 }
 
@@ -270,7 +270,7 @@ void DeadLockTest() {
         res = lock_mgr.LockShared(&txn, trid_b);
         assert(res == false);
         assert(txn.getState() == TransactionState::ABORTED);
-        txn_mgr.Abort(&txn);
+        txn_mgr.abort(&txn);
         });
 
     t0.join();

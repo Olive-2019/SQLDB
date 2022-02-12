@@ -13,30 +13,21 @@ public:
         : relname_(relname), rid_(rid) {
         size_ = 0;
         // 注意 到这里的values应该和数据字典中的顺序是一一对应的
-         
+
         auto attrs = Subsystem1_Manager::mgr.lookup_Attrs(relname);
+
         for (int i = 0; i < values.size(); i++) {
             assert(attrs[i].type == values[i].type);
             size_ += attrs[i].Length;
         }
+
         data_ = new char[size_];
         std::memset(data_, 0, size_);
         int32_t offset = 0;
         for (int i = 0; i < values.size(); i++) {
             std::memcpy(data_ + offset, (char*)values[i].data, attrs[i].Length);
             offset += attrs[i].Length;
-        }
-        
-        // only for test
-        //for (int i = 0; i < values.size(); i++) size_ += Type2Len(values[i].type);
-        //data_ = new char[size_];
-        //std::memset(data_, 0, size_);
-        //memcpy(data_, &size_, sizeof(int32_t));
-        //uint32_t offset = sizeof(int32_t);
-        //for (int i = 0; i < values.size(); i++) {
-        //    memcpy(data_ + offset, values[i].data, Type2Len(values[i].type));
-        //    offset += Type2Len(values[i].type);
-        //}
+        }      
     }
 
     int Type2Len(AttrType type) {
@@ -47,6 +38,7 @@ public:
         return res;
     }
 
+    void setRid(RID rid) { rid_ = rid; }
     void setRel(string rel) { relname_ = rel; }
 
     inline RID getRid() const { return rid_; }
@@ -69,7 +61,7 @@ public:
         this->size_ = size;
         this->data_ = new char[this->size_];
         memcpy(this->data_, storage + sizeof(int32_t), this->size_);
-        return this->size_;
+        return this->size_ + sizeof(int32_t);
     }
 
 private:

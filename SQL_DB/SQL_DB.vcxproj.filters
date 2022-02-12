@@ -22,11 +22,11 @@
     <Filter Include="parser">
       <UniqueIdentifier>{2ca34379-fda6-4b50-ba80-dcb0731ca617}</UniqueIdentifier>
     </Filter>
-    <Filter Include="transaction">
-      <UniqueIdentifier>{c63a8f83-dc32-42cc-b7f5-8d38ab62e918}</UniqueIdentifier>
-    </Filter>
     <Filter Include="storage">
       <UniqueIdentifier>{eb4eae47-108d-43f3-a88d-e549e452f236}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="transaction">
+      <UniqueIdentifier>{63ed5c62-81ec-4549-a05e-01b491dbcf6e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -84,33 +84,6 @@
     <ClInclude Include="Exclusive_Lock.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="transaction\Exclusive_Lock.h">
-      <Filter>transaction</Filter>
-    </ClInclude>
-    <ClInclude Include="transaction\Lock.h">
-      <Filter>transaction</Filter>
-    </ClInclude>
-    <ClInclude Include="transaction\Log.h">
-      <Filter>transaction</Filter>
-    </ClInclude>
-    <ClInclude Include="transaction\Log_Manager.h">
-      <Filter>transaction</Filter>
-    </ClInclude>
-    <ClInclude Include="transaction\Redo_Log.h">
-      <Filter>transaction</Filter>
-    </ClInclude>
-    <ClInclude Include="transaction\Shared_Lock.h">
-      <Filter>transaction</Filter>
-    </ClInclude>
-    <ClInclude Include="transaction\Transaction.h">
-      <Filter>transaction</Filter>
-    </ClInclude>
-    <ClInclude Include="transaction\Transaction_Manager.h">
-      <Filter>transaction</Filter>
-    </ClInclude>
-    <ClInclude Include="transaction\Undo_Log.h">
-      <Filter>transaction</Filter>
-    </ClInclude>
     <ClInclude Include="executor\Linker.h">
       <Filter>executor</Filter>
     </ClInclude>
@@ -137,6 +110,27 @@
     </ClInclude>
     <ClInclude Include="storage\Subsystem1_Manager.h">
       <Filter>storage</Filter>
+    </ClInclude>
+    <ClInclude Include="transaction\Lock_Manager.h">
+      <Filter>transaction</Filter>
+    </ClInclude>
+    <ClInclude Include="transaction\Log_Manager.h">
+      <Filter>transaction</Filter>
+    </ClInclude>
+    <ClInclude Include="transaction\Log_Record.h">
+      <Filter>transaction</Filter>
+    </ClInclude>
+    <ClInclude Include="transaction\Table_Writer.h">
+      <Filter>transaction</Filter>
+    </ClInclude>
+    <ClInclude Include="transaction\Transaction.h">
+      <Filter>transaction</Filter>
+    </ClInclude>
+    <ClInclude Include="transaction\Transaction_Manager.h">
+      <Filter>transaction</Filter>
+    </ClInclude>
+    <ClInclude Include="transaction\Tuple.h">
+      <Filter>transaction</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -182,33 +176,6 @@
     <ClCompile Include="optimizer\Link_Order_Affirmant.cpp">
       <Filter>optimizer</Filter>
     </ClCompile>
-    <ClCompile Include="transaction\Exclusive_Lock.cpp">
-      <Filter>transaction</Filter>
-    </ClCompile>
-    <ClCompile Include="transaction\Lock.cpp">
-      <Filter>transaction</Filter>
-    </ClCompile>
-    <ClCompile Include="transaction\Log.cpp">
-      <Filter>transaction</Filter>
-    </ClCompile>
-    <ClCompile Include="transaction\Log_Manager.cpp">
-      <Filter>transaction</Filter>
-    </ClCompile>
-    <ClCompile Include="transaction\Redo_Log.cpp">
-      <Filter>transaction</Filter>
-    </ClCompile>
-    <ClCompile Include="transaction\Shared_Lock.cpp">
-      <Filter>transaction</Filter>
-    </ClCompile>
-    <ClCompile Include="transaction\Transaction.cpp">
-      <Filter>transaction</Filter>
-    </ClCompile>
-    <ClCompile Include="transaction\Transaction_Manager.cpp">
-      <Filter>transaction</Filter>
-    </ClCompile>
-    <ClCompile Include="transaction\Undo_Log.cpp">
-      <Filter>transaction</Filter>
-    </ClCompile>
     <ClCompile Include="executor\Linker.cpp">
       <Filter>executor</Filter>
     </ClCompile>
@@ -238,6 +205,27 @@
     </ClCompile>
     <ClCompile Include="storage\Test.cpp">
       <Filter>storage</Filter>
+    </ClCompile>
+    <ClCompile Include="transaction\Lock_Manager.cpp">
+      <Filter>transaction</Filter>
+    </ClCompile>
+    <ClCompile Include="transaction\Lock_Manager_Test.cpp">
+      <Filter>transaction</Filter>
+    </ClCompile>
+    <ClCompile Include="transaction\Log_Manager.cpp">
+      <Filter>transaction</Filter>
+    </ClCompile>
+    <ClCompile Include="transaction\Log_Manager_Test.cpp">
+      <Filter>transaction</Filter>
+    </ClCompile>
+    <ClCompile Include="transaction\Table_Writer.cpp">
+      <Filter>transaction</Filter>
+    </ClCompile>
+    <ClCompile Include="transaction\Table_Writer_test.cpp">
+      <Filter>transaction</Filter>
+    </ClCompile>
+    <ClCompile Include="transaction\Transaction_Manager.cpp">
+      <Filter>transaction</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

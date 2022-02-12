@@ -66,8 +66,8 @@ public:
     inline void setPersistentLSN(lsn_t lsn) { persistent_lsn_ = lsn; }
     inline char* getLogBuffer() { return log_buffer_; }
 
-    bool Redo();
-    bool Undo();
+    void redo();
+    void undo();
 
     // 本应更底层来做
     void writeLog(char* log_data, int size);

@@ -6,8 +6,7 @@ void LogManager::runFlushThread() {
     this->flush_thread_ = new std::thread([this]() {
         while (true) {
             std::unique_lock<std::mutex> lock(this->latch_);
-            //原代码:this->cv_.wait_for(lock, log_timeout, [this] { return this->force_flush_flag_; });
-            this->cv_.wait(lock, [this] { return this->force_flush_flag_; });
+            this->cv_.wait_for(lock, log_timeout, [this] { return this->force_flush_flag_; });
             this->force_flush_flag_ = false;
             if (this->stop_flush_thread_) {
                 this->stop_flush_thread_ = false;
@@ -16,7 +15,7 @@ void LogManager::runFlushThread() {
             // if the LogBuffer is full || force flush || timeout -> flush
             std::swap(this->log_buffer_, this->flush_buffer_);
             //原代码:this->disk_manager_->WriteLog(flush_buffer_, strlen(flush_buffer_));
-            writeLog(flush_buffer_, strlen(flush_buffer_));
+            writeLog(flush_buffer_, this->offset_);
             this->offset_ = 0;
             this->setPersistentLSN(this->getNextLSN());
             lock.unlock();
@@ -100,22 +99,34 @@ int32_t LogManager::deserializeLogRecord(const char* data, LogRecord& log_record
         memcpy(&log_record.insert_rid_, data + offset, sizeof(RID));
         offset += sizeof(RID);
         offset += log_record.insert_tuple_.deserializeFrom(data + offset);
+        char* relname = new char[log_record.size_ - offset + 1];
+        memcpy(relname, data + offset, log_record.size_ - offset);
+        relname[log_record.size_ - offset] = '\0';
+        log_record.insert_tuple_.setRel(relname);
+        log_record.relname_ = string(relname);
+        delete[] relname;
     }
     else if (log_type == LogRecordType::DELETE) {
         memcpy(&log_record.delete_rid_, data + offset, sizeof(RID));
         offset += sizeof(RID);
         offset += log_record.delete_tuple_.deserializeFrom(data + offset);
+        char* relname = new char[log_record.size_ - offset + 1];
+        memcpy(relname, data + offset, log_record.size_ - offset);
+        relname[log_record.size_ - offset] = '\0';
+        log_record.delete_tuple_.setRel(relname);
+        log_record.relname_ = string(relname);
+        delete[] relname;
     }
     else if (log_type == LogRecordType::UPDATE) {
         memcpy(&log_record.update_rid_, data + offset, sizeof(RID));
         offset += sizeof(RID);
         offset += log_record.old_tuple_.deserializeFrom(data + offset);
         offset += log_record.new_tuple_.deserializeFrom(data + offset);
-    }
-
-    if (log_type == LogRecordType::INSERT || log_type == LogRecordType::DELETE || log_type == LogRecordType::UPDATE) {
-        char* relname = new char[log_record.size_ - offset];
+        char* relname = new char[log_record.size_ - offset + 1];
         memcpy(relname, data + offset, log_record.size_ - offset);
+        relname[log_record.size_ - offset] = '\0';
+        log_record.old_tuple_.setRel(relname);
+        log_record.new_tuple_.setRel(relname);
         log_record.relname_ = string(relname);
         delete[] relname;
     }
@@ -157,11 +168,9 @@ bool LogManager::readLog(char* log_data, int size, int offset) {
 }
 
 // 注意全体Redo和Undo是不会留下日志记录的
-bool LogManager::Redo() {
+void LogManager::redo() {
     goffset_ = 0;
     offset_ = 0;
-
-    TableWriter wtr;
 
     while (readLog(log_buffer_, LOG_BUFFER_SIZE, goffset_)) {
         while (true) {
@@ -170,18 +179,19 @@ bool LogManager::Redo() {
                 active_txn_[record.getTxnId()] = record.getLSN();
                 lsn_mapping_[record.getLSN()] = make_pair(goffset_ + offset_, record.size_);
                 if (record.log_record_type_ == LogRecordType::INSERT) {
-                    wtr.insertTuple(record.insert_tuple_, nullptr, nullptr, nullptr);
+                    TableWriter::insertTuple(record.insert_tuple_, nullptr, nullptr, nullptr);
                 }
                 else if (record.log_record_type_ == LogRecordType::DELETE) {
-                    wtr.deleteTuple(record.delete_tuple_, nullptr, nullptr, nullptr);
+                    TableWriter::deleteTuple(record.delete_tuple_, nullptr, nullptr, nullptr);
                 }
                 else if (record.log_record_type_ == LogRecordType::UPDATE) {
-                    wtr.updateTuple(record.old_tuple_, record.new_tuple_, nullptr, nullptr, nullptr);
+                    TableWriter::updateTuple(record.old_tuple_, record.new_tuple_, nullptr, nullptr, nullptr);
                 }
                 else if (record.log_record_type_ == LogRecordType::COMMIT ||
                          record.log_record_type_ == LogRecordType::ABORT) {
                     active_txn_.erase(record.getTxnId());
                 }
+                offset_ += record.getSize();
             }
             else {
                 if (offset_ == 0) {
@@ -189,19 +199,15 @@ bool LogManager::Redo() {
                 }
                 goffset_ += offset_;
                 offset_ = 0;
+                memset(log_buffer_, 0, sizeof(log_buffer_));
             }
         }
     }
-
-    return true;
 }
 
 // undo会把处于活跃状态的事务恢复
-bool LogManager::Undo() {
+void LogManager::undo() {
     int size = active_txn_.size();
-    char tmp_buffer[LOG_BUFFER_SIZE];
-
-    TableWriter wtr;
 
     for (auto it = active_txn_.begin(); it != active_txn_.end(); ++it) {
         lsn_t lsn = it->second;
@@ -217,17 +223,15 @@ bool LogManager::Undo() {
             }
 
             if (record.log_record_type_ == LogRecordType::INSERT) {
-                wtr.deleteTuple(record.insert_tuple_, nullptr, nullptr, nullptr);
+                TableWriter::deleteTuple(record.insert_tuple_, nullptr, nullptr, nullptr);
             }
             else if (record.log_record_type_ == LogRecordType::DELETE) {
-                wtr.insertTuple(record.delete_tuple_, nullptr, nullptr, nullptr);
+                TableWriter::insertTuple(record.delete_tuple_, nullptr, nullptr, nullptr);
             }
             else if (record.log_record_type_ == LogRecordType::UPDATE) {
-                wtr.updateTuple(record.new_tuple_, record.old_tuple_, nullptr, nullptr, nullptr);
+                TableWriter::updateTuple(record.new_tuple_, record.old_tuple_, nullptr, nullptr, nullptr);
             }
             lsn = record.getPrevLSN();
         }
     }
-
-    return true;
 }

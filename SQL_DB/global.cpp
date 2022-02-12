@@ -4,6 +4,8 @@ string Global_Paras:: Current_User;
 int Global_Paras:: Block_Size = 4092;
 #include "parser/parser_token.h"
 
+chrono::duration<int64_t> log_timeout = std::chrono::seconds(1);
+
 double EVENLY_dis::rate(int op, double value) {
 	switch (op)
 	{

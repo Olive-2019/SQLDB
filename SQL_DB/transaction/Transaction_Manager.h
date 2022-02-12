@@ -27,13 +27,13 @@ public:
         return res;
     }
 
-    Transaction* Begin(Transaction* txn = nullptr);
+    Transaction* begin(Transaction* txn = nullptr);
 
-    void Commit(Transaction* txn);
+    void commit(Transaction* txn);
 
-    void Abort(Transaction* txn);
+    void abort(Transaction* txn);
 
-    void Write(TableWriteRecord write_record, Transaction* txn);
+    void write(TableWriteRecord write_record, Transaction* txn);
 
 private:
 
@@ -42,6 +42,4 @@ private:
     LockManager* lock_manager_;
 
     LogManager* log_manager_;
-
-    TableWriter table_writer_;
 };
