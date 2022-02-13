@@ -72,7 +72,7 @@ void Optimizer::init(int Rel_num, RelInfo* rels, int Attr_num, AggRelAttr* attrs
 
     //»ñÈ¡Âß¼­Ê÷
     Link_Order_Affirmant* link_order_affirmant(NULL);
-    if (Rels.size() < 3) link_order_affirmant = new DP_Link_Order_Affirmant(Rels, Conds, Attrs);
+    if (Rels.size() < 4) link_order_affirmant = new DP_Link_Order_Affirmant(Rels, Conds, Attrs);
     else link_order_affirmant = new GA_Link_Order_Affirmant(Rels, Conds, Attrs);
     
     

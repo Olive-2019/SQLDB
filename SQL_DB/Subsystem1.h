@@ -58,7 +58,7 @@ public:
 		this->index = 0;
 		char* record;
 		int num = 0;
-		double sum;
+		double sum = 0;
 		while ((record = get_Next_Record()) != NULL) {
 			num++;
 			char* value = record + attr.Offset;
@@ -80,7 +80,7 @@ public:
 		this->index = 0;
 		char* record;
 		int num = 0;
-		double sum;
+		double sum = 0;
 		while ((record = get_Next_Record()) != NULL) {
 			num++;
 			char* value = record + attr.Offset;
@@ -99,6 +99,7 @@ public:
 		return var;
 	}
 };
+
 
 class Index_Reader :public Reader {
 public:

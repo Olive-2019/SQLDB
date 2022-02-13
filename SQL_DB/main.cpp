@@ -25,12 +25,15 @@ void load(string filePath = "data.txt") {
 		Subsystem1_Manager::mgr.Insert_Reocrd("R1", t);
 	}
 }
-/*
+
 int main() {
 	Subsystem1_Manager::mgr.UserName = "User1";
 	Subsystem1_Manager::mgr.DBName = "DB1";
 
-	auto vec = Subsystem1_Manager::mgr.Scan_Record("R1");
+	/*Subsystem1_Manager::mgr.Delete_Rel("R1");
+	Subsystem1_Manager::mgr.Delete_Rel("R2");
+	Subsystem1_Manager::mgr.Delete_Rel("R3");
+	Subsystem1_Manager::mgr.Delete_Rel("R4");*/
 
 	Subsystem1_Manager::mgr.Scan_rel();
 	Subsystem1_Manager::mgr.Scan_attribute();
@@ -44,4 +47,4 @@ int main() {
 
 	//while (true);
 	return 0;
-}*/
+}

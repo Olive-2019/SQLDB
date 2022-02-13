@@ -85,11 +85,13 @@ void Executor::show_distribution(char* relname, char*attrname) {
 void Executor::Insert(string RelName, char* record)
 {
 	Subsystem1_Manager::mgr.Insert_Reocrd(RelName, record);
+	exam_distribution(RelName);
 }
 
 void Executor::Delete(string RelName, vector<RID> records)
 {
 	Subsystem1_Manager::mgr.Delete_Record(RelName, records);
+	exam_distribution(RelName);
 }
 
 void Executor::Update(string RelName, vector<RID> records, vector<Attr_Info> attrs, char** new_values)
@@ -103,7 +105,8 @@ void Executor::exam_distribution(string RelName)
 {
 	vector<Attr_Info> attrs = Subsystem1_Manager::mgr.lookup_Attrs(RelName);
 	for (int i = 0; i < attrs.size(); i++) {
-		if (attrs[i].Num_of_Change_Records > 10) {
+		if (attrs[i].type == AttrType::STRING) continue;
+		if (attrs[i].Num_of_Change_Records > 3) {
 			update_distribution(attrs[i]);
 		}
 	}

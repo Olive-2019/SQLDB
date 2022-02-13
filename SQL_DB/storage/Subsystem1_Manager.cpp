@@ -1,6 +1,6 @@
 #include "Subsystem1_Manager.h"
 
-//ɨ�����б�
+//扫描所有表
 void Subsystem1_Manager::Scan_rel() {
 	int operate_page = 6;
 
@@ -33,7 +33,7 @@ void Subsystem1_Manager::Scan_rel() {
 	}
 }
 
-//ɨ����������
+//扫描所有属性
 void Subsystem1_Manager::Scan_attribute() {
 	int operate_page = 1;
 
@@ -52,7 +52,7 @@ void Subsystem1_Manager::Scan_attribute() {
 			int* attr_type = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin);  scan_begin += 4;
 			int* length = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin);  scan_begin += 4;
 			int* offset = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin);  scan_begin += 4;
-			/*���棺ͬ��
+			/*警告：同上
 
 
 			int* distribution_type = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin);  scan_begin += 4;
@@ -81,7 +81,7 @@ void Subsystem1_Manager::Scan_attribute() {
 					cout << "STRING";
 				}
 				cout << " " << *length << " " << *offset << " ";
-				/*���棺ͬ��
+				/*警告：同上
 				if (*distribution_type == 0) {
 					cout << "NORMAL::" << *param1 << " " << *param2;
 				}
@@ -110,7 +110,7 @@ void Subsystem1_Manager::Scan_attribute() {
 
 	}
 }
-//������������
+//查找所有属性
 vector<Attr_Info> Subsystem1_Manager::lookup_Attrs(string Rel_Name) {
 	vector<Attr_Info> vec;
 	int operate_page = 1;
@@ -132,8 +132,8 @@ vector<Attr_Info> Subsystem1_Manager::lookup_Attrs(string Rel_Name) {
 			int* offset = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin);  scan_begin += 4;
 
 
-			/**����
-			 ��ʼʱ����δ�洢��3��ֵ������ʹ�ýṹ�壨char����洢��
+			/**警告
+			 初始时，并未存储这3个值，后续使用结构体（char数组存储）
 			int* distribution_type = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin);  scan_begin += 4;
 			int* param1 = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin);  scan_begin += 4;
 			int* param2 = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin);  scan_begin += 4;*/
@@ -165,8 +165,8 @@ vector<Attr_Info> Subsystem1_Manager::lookup_Attrs(string Rel_Name) {
 
 				attr_info.distribution = *dis_p;
 				/*
-				����
-				ͬ��
+				警告
+				同上
 				if (*distribution_type == 0) {
 					attr_info.distribution.type = Distribution_Type::NORMAL;
 					attr_info.distribution.nor_eve.nor.mu = *param1;
@@ -217,7 +217,7 @@ vector<Attr_Info> Subsystem1_Manager::lookup_Attrs(string Rel_Name) {
 }
 
 
-//�½����ݱ�
+//新建数据表
 void Subsystem1_Manager::Create_Rel(string RelName, vector<Attr_Info> attrs) {
 	cout << "create RelName==" << RelName << endl;
 	Rel_Info rel_info;
@@ -325,7 +325,7 @@ void Subsystem1_Manager::Add_rel(Rel_Info rel_info) {
 
 	//---------------------------------------------------------------------------------------------------------------
 
-	//Add_attribute(rel_info.attr_list); ע��
+	//Add_attribute(rel_info.attr_list); 注意
 
 
 }
@@ -433,7 +433,7 @@ void Subsystem1_Manager::Add_attribute(vector<Attr_Info> attr_list) {
 
 
 
-		/*���棺��ʼδ�洢
+		/*警告：初始未存储
 
 		Distribution_Type* dis_type_p = &attr_list[j].distribution.type;
 		t_ch = (char*)dis_type_p;
@@ -442,8 +442,8 @@ void Subsystem1_Manager::Add_attribute(vector<Attr_Info> attr_list) {
 			begin++;
 		}*/
 		/*
-		����
-		ͬ��
+		警告
+		同上
 		if (attr_list[j].distribution.type == Distribution_Type::NORMAL) {
 			p = &attr_list[j].distribution.nor_eve.nor.mu;
 			t_ch = (char*)p;
@@ -504,7 +504,7 @@ void Subsystem1_Manager::Add_attribute(vector<Attr_Info> attr_list) {
 	//PF_BufferMgr::pf_buffermgr.Write_buffer_to_page(buffer_id);
 }
 
-//ɾ�����ݱ�
+//删除数据表
 bool Subsystem1_Manager::Delete_Rel(string RelName) {
 
 	string com = "rd data\\" + UserName + "\\" + DBName + "\\" + RelName + " /s/q";
@@ -555,7 +555,7 @@ bool Subsystem1_Manager::Delete_Rel(string RelName) {
 }
 
 
-//�������ݱ������ֵΪ�Ƿ�ɹ�����������֮���Ĳ���rel�У�����ĺ���ͬ��
+//查找数据表，返回值为是否成功，将结果存放之最后的参数rel中，后面的函数同理
 bool Subsystem1_Manager::lookup_Rel(string RelName, Rel_Info& rel) {
 	int operate_page = 6;
 
@@ -595,7 +595,7 @@ bool Subsystem1_Manager::lookup_Rel(string RelName, Rel_Info& rel) {
 	return false;
 }
 
-//��������
+//查找属性
 bool Subsystem1_Manager::lookup_Attr(string Rel_Name, string AttrName, Attr_Info& attr) {
 	vector<Attr_Info> vec;
 	int operate_page = 1;
@@ -617,8 +617,8 @@ bool Subsystem1_Manager::lookup_Attr(string Rel_Name, string AttrName, Attr_Info
 			int* offset = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin);  scan_begin += 4;
 
 
-			/*����
-			 ��ʼʱ����δ�洢��3��ֵ������ʹ�ýṹ�壨char����洢��
+			/*警告
+			 初始时，并未存储这3个值，后续使用结构体（char数组存储）
 
 			int* distribution_type = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin);  scan_begin += 4;
 			int* param1 = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin);  scan_begin += 4;
@@ -650,8 +650,8 @@ bool Subsystem1_Manager::lookup_Attr(string Rel_Name, string AttrName, Attr_Info
 
 				attr_info.distribution = *dis_p;
 				/*
-				����
-				�ź���ʵ��ʱ��distribution������double���д洢
+				警告
+				张浩在实现时将distribution以两个double进行存储
 
 				if (*distribution_type == 0) {
 					attr_info.distribution.type = Distribution_Type::NORMAL;
@@ -685,11 +685,11 @@ bool Subsystem1_Manager::lookup_Attr(string Rel_Name, string AttrName, Attr_Info
 
 
 
-//ɨ����ü�¼RID
+//扫描表获得记录RID
 vector<RID> Subsystem1_Manager::Scan_Record(string Rel_Name) {
-	vector<RID> vec;  //�洢���з�������RID
+	vector<RID> vec;  //存储所有符合条件RID
 
-	vector<Attr_Info> attr_vec = lookup_Attrs(Rel_Name); //�����Լ���
+	vector<Attr_Info> attr_vec = lookup_Attrs(Rel_Name); //表属性集合
 	if (attr_vec.size() == 0) {
 		return vec;
 	}
@@ -698,7 +698,7 @@ vector<RID> Subsystem1_Manager::Scan_Record(string Rel_Name) {
 	}
 	cout << endl;
 
-	int len = 0;                         //�������Գ���֮��
+	int len = 0;                         //所有属性长度之和
 	for (int i = 0; i < attr_vec.size(); i++) {
 		len += attr_vec[i].Length;
 	}
@@ -714,18 +714,18 @@ vector<RID> Subsystem1_Manager::Scan_Record(string Rel_Name) {
 		while (scan_begin != begin) {
 
 
-			//exist = 1 ��record���ڣ� = 0������
+			//exist = 1 该record存在， = 0不存在
 			int* exist = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin);
 
 			if (*exist == 1) {
 				RID rid; rid.blockID = operate_page; rid.slotID = scan_begin;
-				vec.push_back(rid);               //�洢RID
+				vec.push_back(rid);               //存储RID
 			}
 			scan_begin += 4;
 
 
 
-			//attr_vec[i]����ÿһ������  attr_vec[i].Attr_Name attr_vec[i].type ���Ի�����������������͵Ƚ��й���
+			//attr_vec[i]代表每一个属性  attr_vec[i].Attr_Name attr_vec[i].type 可以获得属性名、属性类型等进行过滤
 			for (int i = 0; i < attr_vec.size(); i++) {
 
 				if (attr_vec[i].type == AttrType::INT) {
@@ -770,7 +770,7 @@ vector<RID> Subsystem1_Manager::Scan_Record(string Rel_Name) {
 	return vec;
 }
 
-//��ȡ���page-id
+//获取表的page-id
 int Subsystem1_Manager::Scan_rel_get_page_id(string Rel_Name) {
 	int operate_page = 6;
 
@@ -933,12 +933,12 @@ void Subsystem1_Manager::Update_Record(string Rel_Name, RID rid, Attr_Info attr,
 
 
 
-//---------------------------------------------------------------�����Ϸ�����ʹ�ý϶�
+//---------------------------------------------------------------虚线上方函数使用较多
 
 
 
 
-//��������
+//查找索引
 bool Subsystem1_Manager::lookup_Index(string RelName, string AttrName, Index_Info& Index) {
 	int operate_page = 4;
 
@@ -989,7 +989,7 @@ bool Subsystem1_Manager::lookup_Index(string RelName, string AttrName, Index_Inf
 	return false;
 }
 
-//������������
+//查找所有索引
 vector<Index_Info> Subsystem1_Manager::lookup_Indexes(string RelName) {
 	vector<Index_Info> index_vec;
 	int operate_page = 4;
@@ -1041,7 +1041,7 @@ vector<Index_Info> Subsystem1_Manager::lookup_Indexes(string RelName) {
 	return index_vec;
 }
 
-//�޸ļ�¼����
+//修改记录数量
 bool Subsystem1_Manager::Change_Rel_Record_num(string RelName, int change_num) {
 	int operate_page = 6;
 
@@ -1087,7 +1087,7 @@ bool Subsystem1_Manager::Change_Rel_Record_num(string RelName, int change_num) {
 	return false;
 }
 
-//ɾ������
+//删除属性
 void Subsystem1_Manager::Delete_Attr(string Rel_Name) {
 	vector<Attr_Info> vec;
 	int operate_page = 1;
@@ -1110,8 +1110,8 @@ void Subsystem1_Manager::Delete_Attr(string Rel_Name) {
 			int* offset = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin);  scan_begin += 4;
 
 
-			/*����
-			 ��ʼʱ����δ�洢��3��ֵ������ʹ�ýṹ�壨char����洢��
+			/*警告
+			 初始时，并未存储这3个值，后续使用结构体（char数组存储）
 
 			int* distribution_type = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin);  scan_begin += 4;
 			int* param1 = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin);  scan_begin += 4;
@@ -1136,8 +1136,8 @@ void Subsystem1_Manager::Delete_Attr(string Rel_Name) {
 				}
 
 				/*
-				����
-				�ź���ʵ��ʱ��distribution������double���д洢
+				警告
+				张浩在实现时将distribution以两个double进行存储
 
 				if (*distribution_type == 0) {
 					attr_info.distribution.type = Distribution_Type::NORMAL;
@@ -1167,7 +1167,7 @@ void Subsystem1_Manager::Delete_Attr(string Rel_Name) {
 
 }
 
-//�޸�Num_of_Change_Records
+//修改Num_of_Change_Records
 bool Subsystem1_Manager::Change_Num_of_Change_Records(string Rel_Name, string AttrName) {
 	vector<Attr_Info> vec;
 	int operate_page = 1;
@@ -1189,8 +1189,8 @@ bool Subsystem1_Manager::Change_Num_of_Change_Records(string Rel_Name, string At
 			int* offset = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin);  scan_begin += 4;
 
 
-			/*����
-			 ��ʼʱ����δ�洢��3��ֵ������ʹ�ýṹ�壨char����洢��
+			/*警告
+			 初始时，并未存储这3个值，后续使用结构体（char数组存储）
 
 			int* distribution_type = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin);  scan_begin += 4;
 			int* param1 = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin);  scan_begin += 4;
@@ -1218,8 +1218,8 @@ bool Subsystem1_Manager::Change_Num_of_Change_Records(string Rel_Name, string At
 
 
 				/*
-				����
-				�ź���ʵ��ʱ��distribution������double���д洢
+				警告
+				张浩在实现时将distribution以两个double进行存储
 
 				if (*distribution_type == 0) {
 					attr_info.distribution.type = Distribution_Type::NORMAL;
@@ -1251,7 +1251,7 @@ bool Subsystem1_Manager::Change_Num_of_Change_Records(string Rel_Name, string At
 
 }
 
-//�޸�Num_of_Change_Records
+//修改Num_of_Change_Records
 bool Subsystem1_Manager::Change_Num_of_Change_Records(string Rel_Name) {
 	vector<Attr_Info> vec;
 	int operate_page = 1;
@@ -1273,8 +1273,8 @@ bool Subsystem1_Manager::Change_Num_of_Change_Records(string Rel_Name) {
 			int* offset = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin);  scan_begin += 4;
 
 
-			/*����
-			 ��ʼʱ����δ�洢��3��ֵ������ʹ�ýṹ�壨char����洢��
+			/*警告
+			 初始时，并未存储这3个值，后续使用结构体（char数组存储）
 
 			int* distribution_type = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin);  scan_begin += 4;
 			int* param1 = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin);  scan_begin += 4;
@@ -1302,8 +1302,8 @@ bool Subsystem1_Manager::Change_Num_of_Change_Records(string Rel_Name) {
 
 
 				/*
-				����
-				�ź���ʵ��ʱ��distribution������double���д洢
+				警告
+				张浩在实现时将distribution以两个double进行存储
 
 				if (*distribution_type == 0) {
 					attr_info.distribution.type = Distribution_Type::NORMAL;
@@ -1334,7 +1334,7 @@ bool Subsystem1_Manager::Change_Num_of_Change_Records(string Rel_Name) {
 
 }
 
-//��ѯȨ�� ret[SELECT]=true,ret[UPDATE]=false�����ݱ���û������ڷ���NULL
+//查询权限 ret[SELECT]=true,ret[UPDATE]=false，数据表或用户不存在返回NULL
 bool* Subsystem1_Manager::lookup_Authority(string RelName, string UserName) {
 	int operate_page = 2;
 
@@ -1393,6 +1393,7 @@ void Subsystem1_Manager::set_change_records(Attr_Info attr, int num) {
 
 			/*警告
 			 初始时，并未存储这3个值，后续使用结构体（char数组存储）
+
 			int* distribution_type = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin);  scan_begin += 4;
 			int* param1 = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin);  scan_begin += 4;
 			int* param2 = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin);  scan_begin += 4;*/
@@ -1422,6 +1423,7 @@ void Subsystem1_Manager::set_change_records(Attr_Info attr, int num) {
 				/*
 				警告
 				张浩在实现时将distribution以两个double进行存储
+
 				if (*distribution_type == 0) {
 					attr_info.distribution.type = Distribution_Type::NORMAL;
 					attr_info.distribution.nor_eve.nor.mu = *param1;
@@ -1484,6 +1486,7 @@ void Subsystem1_Manager::set_distribution(Attr_Info attr, Distribution distribut
 
 			/*警告
 			 初始时，并未存储这3个值，后续使用结构体（char数组存储）
+
 			int* distribution_type = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin);  scan_begin += 4;
 			int* param1 = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin);  scan_begin += 4;
 			int* param2 = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin);  scan_begin += 4;*/
@@ -1521,6 +1524,11 @@ void Subsystem1_Manager::set_distribution(Attr_Info attr, Distribution distribut
 	}
 	return;
 }
+
+
+
+
+
 
 
 Subsystem1_Manager Subsystem1_Manager::mgr;

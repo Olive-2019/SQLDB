@@ -1,7 +1,7 @@
 #include "global.h"
 string Global_Paras:: Current_DB;
 string Global_Paras:: Current_User;
-int Global_Paras:: Block_Size = 4092;
+int Global_Paras:: Block_Size = 409200;
 #include "parser/parser_token.h"
 
 chrono::duration<int64_t> log_timeout = std::chrono::seconds(1);

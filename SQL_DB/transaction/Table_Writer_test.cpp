@@ -192,7 +192,7 @@ void UpdateTest() {
         puts("");
     }
 }
-
+/*
 int main(void) {
     Subsystem1_Manager::mgr.UserName = "User1";
     Subsystem1_Manager::mgr.DBName = "DB1";
@@ -211,3 +211,4 @@ int main(void) {
 
     return 0;
 }
+*/

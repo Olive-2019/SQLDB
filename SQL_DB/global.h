@@ -16,7 +16,7 @@
 
 using namespace std;
 
-// config事务系统的变量配置
+// config事务系统的变量配�?
 extern chrono::duration<int64_t> log_timeout;
 
 static constexpr int32_t INVALID_TXN_ID = -1;                   // 无效事务id
@@ -27,7 +27,7 @@ using lsn_t = int32_t;						// log sequence number type
 
 // -------------------
 
-const int MAX_NAME_LENGTH = 20;    //各种名字如数据表名、字段名等最大长度
+const int MAX_NAME_LENGTH = 20;    //各种名字如数据表名、字段名等最大长�?
 const int BUFFER_NUM = 200;
 
 enum SQL_type {
@@ -38,14 +38,14 @@ enum SQL_type {
 };
 
 enum Distribution_Type {
-	//正态分布
+	//正态分�?
 	NORMAL
 	//均匀分布
 	,EVENLY
 };
 struct Distribution;
 struct DISTRIBUTION_TYPE {
-	//一元条件
+	//一元条�?
 	virtual double rate(int op, double value) = 0;
 	//二元条件
 	virtual double binary_rate(int op, const Distribution& dis) = 0;
@@ -113,7 +113,7 @@ struct RID {
 	}
 };
 
-// 事务系统要用的RID和表名字联合的标识
+// 事务系统要用的RID和表名字联合的标�?
 
 struct Trid {
 	string relname;
