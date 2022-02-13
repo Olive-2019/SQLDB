@@ -32,8 +32,7 @@ RC RBparse()
 	stop = false;
 	string sql;
 	LexerPtr lexer = Lexer::instance();
-	tree = new SyntaxTree(lexer);
-	sql = "select R1.id,R2.id,R3.name,R4.price from R1,R2,R3,R4 where R1.id>R2.id and R3.id>5 and R4.price=R1.price;";
+	SyntaxTree tree(lexer);
 	
 	while (!stop) {
 		cout << PROMPT;
