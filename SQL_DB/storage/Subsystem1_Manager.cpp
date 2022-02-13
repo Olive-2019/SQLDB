@@ -1530,5 +1530,164 @@ void Subsystem1_Manager::set_distribution(Attr_Info attr, Distribution distribut
 
 
 
+void Subsystem1_Manager::set_change_records(Attr_Info attr, int num) {
+	vector<Attr_Info> vec;
+	int operate_page = 1;
+
+	int buffer_id = PF_BufferMgr::pf_buffermgr.Read_page_to_buffer("sys/Attribute", operate_page);
+	int* pp = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + 4);
+	int begin = *pp;
+
+	while (operate_page != -1) {
+		int scan_begin = 8;
+		while (scan_begin != begin) {
+			int* exist = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin);  scan_begin += 4;
+			char* db_name = PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin; scan_begin += 20;
+			char* rel_name = PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin;  scan_begin += 20;
+			char* attr_name = PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin;  scan_begin += 20;
+			char* creator = PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin;  scan_begin += 20;
+			int* attr_type = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin);  scan_begin += 4;
+			int* length = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin);  scan_begin += 4;
+			int* offset = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin);  scan_begin += 4;
+
+
+			/*警告
+			 初始时，并未存储这3个值，后续使用结构体（char数组存储）
+			int* distribution_type = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin);  scan_begin += 4;
+			int* param1 = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin);  scan_begin += 4;
+			int* param2 = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin);  scan_begin += 4;*/
+
+			char temp[1000];
+			for (int i = 0; i < 100; i++) {
+				temp[i] = PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData[scan_begin];
+				scan_begin++;
+			}
+			Distribution* dis_p = (Distribution*)temp;
+
+
+			int num_of_change_records_scan = scan_begin;
+			int* num_of_change_records = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin);  scan_begin += 4;
+
+			if (string(db_name) == DBName && string(creator) == UserName && string(rel_name) == attr.Rel_Name && string(attr_name) == attr.Attr_Name && *exist == 1) {
+
+				int new_num_of_change_records = num;
+				int* new_num_of_change_records_p = &new_num_of_change_records;
+				char* new_num_of_change_records_ch = (char*)new_num_of_change_records_p;
+				for (int i = 0; i < 4; i++) {
+					PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData[num_of_change_records_scan] = new_num_of_change_records_ch[i];
+					num_of_change_records_scan++;
+				}
+
+
+				/*
+				警告
+				张浩在实现时将distribution以两个double进行存储
+
+				if (*distribution_type == 0) {
+					attr_info.distribution.type = Distribution_Type::NORMAL;
+					attr_info.distribution.nor_eve.nor.mu = *param1;
+					attr_info.distribution.nor_eve.nor.sigma = *param2;
+				}
+				else {
+					attr_info.distribution.type = Distribution_Type::EVENLY;
+					attr_info.distribution.nor_eve.eve.MIN = *param1;
+					attr_info.distribution.nor_eve.eve.MAX = *param2;
+				}
+				*/
+
+			}
+
+
+		}
+		int* pl = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData);
+		operate_page = *pl;
+		if (operate_page != -1) {
+			buffer_id = PF_BufferMgr::pf_buffermgr.Read_page_to_buffer("sys/Relation", operate_page);
+			pp = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + 4);
+			begin = *pp;
+		}
+
+	}
+	return;
+}
+
+
+
+void Subsystem1_Manager::set_distribution(Attr_Info attr, Distribution distribution) {
+	char temp_[1000];
+	Distribution* dis_p = &distribution;
+	char* temp__ = (char*)dis_p;
+	for (int i = 0; i < 100; i++) {
+		temp_[i] = temp__[i];
+	}
+
+	memcpy(temp_, &distribution, sizeof(Distribution));
+
+	vector<Attr_Info> vec;
+	int operate_page = 1;
+
+	int buffer_id = PF_BufferMgr::pf_buffermgr.Read_page_to_buffer("sys/Attribute", operate_page);
+	int* pp = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + 4);
+	int begin = *pp;
+
+	while (operate_page != -1) {
+		int scan_begin = 8;
+		while (scan_begin != begin) {
+			int* exist = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin);  scan_begin += 4;
+			char* db_name = PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin; scan_begin += 20;
+			char* rel_name = PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin;  scan_begin += 20;
+			char* attr_name = PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin;  scan_begin += 20;
+			char* creator = PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin;  scan_begin += 20;
+			int* attr_type = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin);  scan_begin += 4;
+			int* length = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin);  scan_begin += 4;
+			int* offset = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin);  scan_begin += 4;
+
+
+			/*警告
+			 初始时，并未存储这3个值，后续使用结构体（char数组存储）
+
+			int* distribution_type = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin);  scan_begin += 4;
+			int* param1 = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin);  scan_begin += 4;
+			int* param2 = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin);  scan_begin += 4;*/
+
+			int dis_scan_begin = scan_begin;
+			char temp[100];
+			for (int i = 0; i < 100; i++) {
+				temp[i] = PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData[scan_begin];
+				scan_begin++;
+			}
+			Distribution* dis_p = (Distribution*)temp;
+
+			int* num_of_change_records = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + scan_begin);  scan_begin += 4;
+
+			if (string(db_name) == DBName && string(creator) == UserName && string(rel_name) == attr.Rel_Name && string(attr_name) == attr.Attr_Name && *exist == 1) {
+
+				for (int i = 0; i < 100; i++) {
+					PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData[dis_scan_begin] = temp_[i];
+					dis_scan_begin++;
+				}
+
+				return;
+			}
+
+
+		}
+		int* pl = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData);
+		operate_page = *pl;
+		if (operate_page != -1) {
+			buffer_id = PF_BufferMgr::pf_buffermgr.Read_page_to_buffer("sys/Relation", operate_page);
+			pp = (int*)(PF_BufferMgr::pf_buffermgr.buffer_list[buffer_id].pData + 4);
+			begin = *pp;
+		}
+
+	}
+	return;
+}
+
+
+
+
+
+
 
 Subsystem1_Manager Subsystem1_Manager::mgr;

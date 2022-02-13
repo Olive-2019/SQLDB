@@ -100,7 +100,6 @@ void Executor::Update(string RelName, vector<RID> records, vector<Attr_Info> att
 		for (int j = 0; j < attrs.size(); ++j)
 			Subsystem1_Manager::mgr.Update_Record(RelName, records[i], attrs[j], new_values[j]);
 }
-
 void Executor::exam_distribution(string RelName)
 {
 	vector<Attr_Info> attrs = Subsystem1_Manager::mgr.lookup_Attrs(RelName);
